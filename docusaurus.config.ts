@@ -1,7 +1,7 @@
 import type { Config } from '@docusaurus/types';
 
 const config: Config = {
-  title: 'PENAI Cookbook (RU)',
+  title: 'OpenAI Cookbook (RU)',
   url: 'https://openai-book.ru',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
@@ -31,11 +31,11 @@ const config: Config = {
     ],
   ],
 
-  themeConfig: {
+themeConfig: {
     navbar: {
-      title: 'PENAI Cookbook',
+      title: 'OpenAI Cookbook',
       items: [
-        { to: '/docs/cookbook/', label: 'Cookbook', position: 'left' },
+        { to: '/docs/cookbook/', label: 'База знаний', position: 'left' },
         { to: '/about-license', label: 'Об источнике', position: 'right' },
       ],
     },
