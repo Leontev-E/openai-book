@@ -52,13 +52,13 @@ function sha256(s) {
  */
 function rewriteImageLinks(md, relFrom) {
     function copyAndMap(srcPath) {
-        // убираем ./ или / в начале
+        // убрать ведущие ./ или /
         const cleaned = srcPath.replace(/^(?:\.\/|\/)/, '');
-        // если это static/images/... или docs/images/..., отделим хвост после images/
+        // хвост после images/
         const afterImages = cleaned.replace(/^(?:static|docs)\/images\//, '');
-        // кандидаты, откуда копировать
+
         const candidates = [
-            path.resolve(relFrom, srcPath),                        // относительный путь рядом с файлом
+            path.resolve(relFrom, srcPath),                        // рядом с файлом
             path.resolve('upstream/images', afterImages),          // upstream/images/...
             path.resolve('upstream/static/images', afterImages),   // upstream/static/images/...
         ];
@@ -74,25 +74,26 @@ function rewriteImageLinks(md, relFrom) {
 
     let out = md;
 
-    // 1) Markdown: относительные ./ и ../
+    // 1) Markdown: относительные ./../ + необязательный title
+    //    ![alt](./path.png "title")
     out = out.replace(
-        /!\[([^\]]*)\]\(((?:\.{1,2}\/)[^\)\s]+)\)/g,
-        (m, alt, rel) => {
-            const mapped = copyAndMap(rel);
-            return mapped ? `![${alt}](${mapped})` : m;
+        /!\[([^\]]*)\]\(((?<url>\.{1,2}\/[^)\s]+))(?:\s+(?<title>"[^"]*"|'[^']*'))?\)/g,
+        (m, alt, _u, _title, groups) => {
+            const mapped = copyAndMap(groups?.url || _u);
+            return mapped ? `![${alt}](${mapped}${groups?.title ? ' ' + groups.title : ''})` : m;
         }
     );
 
-    // 2) Markdown: static/images/... или docs/images/...
+    // 2) Markdown: static/images/... или docs/images/... + необязательный title
     out = out.replace(
-        /!\[([^\]]*)\]\(((?:\.{0,2}\/)?(?:static|docs)\/images\/[^\)\s]+)\)/gi,
-        (m, alt, rel) => {
-            const mapped = copyAndMap(rel);
-            return mapped ? `![${alt}](${mapped})` : m;
+        /!\[([^\]]*)\]\(((?<url>(?:\.{0,2}\/)?(?:static|docs)\/images\/[^)\s]+))(?:\s+(?<title>"[^"]*"|'[^']*'))?\)/gi,
+        (m, alt, _u, _title, groups) => {
+            const mapped = copyAndMap(groups?.url || _u);
+            return mapped ? `![${alt}](${mapped}${groups?.title ? ' ' + groups.title : ''})` : m;
         }
     );
 
-    // 3) HTML <img ... src="...">: относительные ./ и ../
+    // 3) HTML <img src="./...">
     out = out.replace(
         /<img\s+([^>]*?)src=["']((?:\.{1,2}\/)[^"']+)["']([^>]*)>/gi,
         (m, pre, rel, post) => {
@@ -101,7 +102,7 @@ function rewriteImageLinks(md, relFrom) {
         }
     );
 
-    // 4) HTML <img ... src="static/images/..."> и docs/images/...
+    // 4) HTML <img src="static/images/..."> или docs/images/...
     out = out.replace(
         /<img\s+([^>]*?)src=["']((?:\.{0,2}\/)?(?:static|docs)\/images\/[^"']+)["']([^>]*)>/gi,
         (m, pre, rel, post) => {
