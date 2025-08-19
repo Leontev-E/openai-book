@@ -1,7 +1,9 @@
 :root {
   --ifm-font-family-base: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  --ifm-heading-font-weight: 600;
+
+  /* OpenAI green */
   --ifm-color-primary: #10a37f;
-  /* openai green */
   --ifm-color-primary-dark: #0e9473;
   --ifm-color-primary-darker: #0d886a;
   --ifm-color-primary-darkest: #0a6d56;
@@ -10,8 +12,10 @@
   --ifm-color-primary-lightest: #5dd7ba;
 
   --ifm-code-font-size: 95%;
-  --ifm-heading-font-weight: 600;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.06);
+
+  /* немного компактнее контент */
+  --ifm-container-width-xl: 1200px;
 }
 
 html[data-theme='dark'] {
@@ -25,7 +29,47 @@ html[data-theme='dark'] {
   --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.08);
 }
 
-/* компактнее карточки/отступы */
+/* Navbar — чуть тоньше и с легкой тенью */
+.navbar {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.navbar__brand {
+  font-weight: 600;
+}
+
+/* Сайдбар — умеренная ширина, читабельность */
+@media (min-width: 997px) {
+  .docSidebarContainer {
+    border-right: 1px solid rgba(127, 127, 127, 0.15);
+  }
+}
+
+/* Ссылки — аккуратная подсветка при hover */
+a:not(.button):hover {
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+/* Коды/блоки кода */
+.theme-code-block {
+  border-radius: 10px;
+}
+
+/* Меню слева */
 .menu__list-item>a.menu__link {
   font-weight: 500;
+}
+
+/* Поиск (локальный плагин) — ширина поля на десктопе */
+.navbar__items .navbar__item.navbar__item--search {
+  min-width: 280px;
+}
+
+/* Мобильные правки */
+@media (max-width: 996px) {
+  .navbar__items .navbar__item.navbar__item--search {
+    min-width: 0;
+    flex: 1;
+  }
 }

@@ -2,10 +2,7 @@ import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
   cookbook: [
-    // ВАЖНО: делаем страницу /docs/cookbook/ частью сайдбара,
-    // иначе Docusaurus скрывает боковое меню на этой странице.
     'cookbook/index',
-
     {
       type: 'category',
       label: 'Статьи',
