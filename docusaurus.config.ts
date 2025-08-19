@@ -1,30 +1,20 @@
+// docusaurus.config.ts
 import type { Config } from '@docusaurus/types';
 
 const config: Config = {
   title: 'PENAI Cookbook (RU)',
-  url: 'https://penai-book.ru',
+  url: 'https://openai-book.ru',   // ← тут новый домен
   baseUrl: '/',
   favicon: 'img/favicon.ico',
+  i18n: { defaultLocale: 'ru', locales: ['ru'] },
 
-  i18n: {
-    defaultLocale: 'ru',
-    locales: ['ru'],
-  },
-
-  // Важный блок: preset "classic"
   presets: [
     [
       'classic',
       {
-        docs: {
-          // путь к вашему sidebars.ts
-          sidebarPath: require.resolve('./sidebars.ts'),
-          // корень docs уже настроен по умолчанию
-        },
-        blog: false, // блог не нужен
-        theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
+        docs: { sidebarPath: require.resolve('./sidebars.ts') },
+        blog: false,
+        theme: { customCss: require.resolve('./src/css/custom.css') },
       },
     ],
   ],
