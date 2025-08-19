@@ -3,54 +3,54 @@ lang: ru
 translationOf: openai-cookbook
 ---
 
-# Text comparison examples
+# Примеры сравнения текстов
 
-The [OpenAI API embeddings endpoint](https://beta.openai.com/docs/guides/embeddings) can be used to measure relatedness or similarity between pieces of text.
+[Эндпоинт эмбеддингов OpenAI API](https://beta.openai.com/docs/guides/embeddings) может использоваться для измерения связанности или схожести между фрагментами текста.
 
-By leveraging GPT-3's understanding of text, these embeddings [achieved state-of-the-art results](https://arxiv.org/abs/2201.10005) on benchmarks in unsupervised learning and transfer learning settings.
+Используя понимание текста GPT-3, эти эмбеддинги [достигли передовых результатов](https://arxiv.org/abs/2201.10005) на бенчмарках в задачах обучения без учителя и переноса обучения.
 
-Embeddings can be used for semantic search, recommendations, cluster analysis, near-duplicate detection, and more.
+Эмбеддинги можно использовать для семантического поиска, рекомендаций, кластерного анализа, обнаружения почти дубликатов и многого другого.
 
-For more information, read OpenAI's blog post announcements:
+Для дополнительной информации прочитайте анонсы в блоге OpenAI:
 
-- [Introducing Text and Code Embeddings (Jan 2022)](https://openai.com/blog/introducing-text-and-code-embeddings/)
-- [New and Improved Embedding Model (Dec 2022)](https://openai.com/blog/new-and-improved-embedding-model/)
+- [Введение текстовых и кодовых эмбеддингов (январь 2022)](https://openai.com/blog/introducing-text-and-code-embeddings/)
+- [Новая и улучшенная модель эмбеддингов (декабрь 2022)](https://openai.com/blog/new-and-improved-embedding-model/)
 
-For comparison with other embedding models, see [Massive Text Embedding Benchmark (MTEB) Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
+Для сравнения с другими моделями эмбеддингов смотрите [Таблицу лидеров Massive Text Embedding Benchmark (MTEB)](https://huggingface.co/spaces/mteb/leaderboard)
 
-## Semantic search
+## Семантический поиск
 
-Embeddings can be used for search either by themselves or as a feature in a larger system.
+Эмбеддинги можно использовать в поиске как самостоятельно, так и в качестве признака в более крупной системе.
 
-The simplest way to use embeddings for search is as follows:
+Самый простой способ использования эмбеддингов для поиска выглядит следующим образом:
 
-- Before the search (precompute):
-  - Split your text corpus into chunks smaller than the token limit (8,191 tokens for `text-embedding-3-small`)
-  - Embed each chunk of text
-  - Store those embeddings in your own database or in a vector search provider like [Pinecone](https://www.pinecone.io), [Weaviate](https://weaviate.io) or [Qdrant](https://qdrant.tech)
-- At the time of the search (live compute):
-  - Embed the search query
-  - Find the closest embeddings in your database
-  - Return the top results
+- Перед поиском (предварительный расчет):
+  - Разделите свой корпус текста на чанки, меньшие лимита токенов (8,191 токен для `text-embedding-3-small`)
+  - Получите эмбеддинги для каждого чанка текста
+  - Сохраните эти эмбеддинги в собственной базе данных или у провайдера векторного поиска, например [Pinecone](https://www.pinecone.io), [Weaviate](https://weaviate.io) или [Qdrant](https://qdrant.tech)
+- Во время поиска (вычисление в реальном времени):
+  - Получите эмбеддинг поискового запроса
+  - Найдите ближайшие эмбеддинги в вашей базе данных
+  - Верните лучшие результаты
 
-An example of how to use embeddings for search is shown in [Semantic_text_search_using_embeddings.ipynb](../examples/Semantic_text_search_using_embeddings.ipynb).
+Пример использования эмбеддингов для поиска показан в [Semantic_text_search_using_embeddings.ipynb](../examples/Semantic_text_search_using_embeddings.ipynb).
 
-In more advanced search systems, the cosine similarity of embeddings can be used as one feature among many in ranking search results.
+В более продвинутых системах поиска косинусная близость эмбеддингов может использоваться как один из признаков среди многих при ранжировании результатов.
 
-## Question answering
+## Ответы на вопросы
 
-The best way to get reliably honest answers from GPT-3 is to give it source documents in which it can locate correct answers. Using the semantic search procedure above, you can cheaply search through a corpus of documents for relevant information and then give that information to GPT-3 via the prompt to answer a question. We demonstrate this in [Question_answering_using_embeddings.ipynb](../examples/Question_answering_using_embeddings.ipynb).
+Лучший способ получить надежно честные ответы от GPT-3 — предоставить ему исходные документы, в которых он может найти правильные ответы. Используя описанную выше процедуру семантического поиска, можно дешево искать релевантную информацию в корпусе документов и затем передавать её GPT-3 через подсказку для ответа на вопрос. Мы демонстрируем это в [Question_answering_using_embeddings.ipynb](../examples/Question_answering_using_embeddings.ipynb).
 
-## Recommendations
+## Рекомендации
 
-Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set.
+Рекомендации очень похожи на поиск, за исключением того, что вместо свободного текстового запроса входными данными являются элементы множества.
 
-An example of how to use embeddings for recommendations is shown in [Recommendation_using_embeddings.ipynb](../examples/Recommendation_using_embeddings.ipynb).
+Пример того, как использовать эмбеддинги для рекомендаций, показан в [Recommendation_using_embeddings.ipynb](../examples/Recommendation_using_embeddings.ipynb).
 
-Similar to search, these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.
+Аналогично поиску, эти оценки косинусной близости можно использовать самостоятельно для ранжирования элементов или как признаки в более сложных алгоритмах ранжирования.
 
-## Customizing Embeddings
+## Настройка эмбеддингов
 
-Although OpenAI's embedding model weights cannot be fine-tuned, you can nevertheless use training data to customize embeddings to your application.
+Хотя веса модели эмбеддингов OpenAI нельзя дообучить, вы всё же можете использовать тренировочные данные для настройки эмбеддингов под ваше приложение.
 
-In [Customizing_embeddings.ipynb](../examples/Customizing_embeddings.ipynb), we provide an example method for customizing your embeddings using training data. The idea of the method is to train a custom matrix to multiply embedding vectors by in order to get new customized embeddings. With good training data, this custom matrix will help emphasize the features relevant to your training labels. You can equivalently consider the matrix multiplication as (a) a modification of the embeddings or (b) a modification of the distance function used to measure the distances between embeddings.
+В [Customizing_embeddings.ipynb](../examples/Customizing_embeddings.ipynb) мы приводим пример метода настройки эмбеддингов с помощью тренировочных данных. Идея метода заключается в обучении специальной матрицы, с помощью которой умножаются векторы эмбеддингов для получения новых настроенных эмбеддингов. При наличии качественных тренировочных данных эта матрица поможет выделить признаки, релевантные вашим меткам. Вы можете рассматривать матричное умножение либо как (а) модификацию эмбеддингов, либо как (б) модификацию функции расстояния, используемой для измерения расстояний между эмбеддингами.

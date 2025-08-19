@@ -3,453 +3,453 @@ lang: ru
 translationOf: openai-cookbook
 ---
 
-# Techniques to improve reliability
+# Техники для повышения надёжности
 
-When GPT-3 fails on a task, what should you do?
+Что делать, если GPT-3 не справляется с задачей?
 
-- Search for a better prompt that elicits more reliable answers?
-- Invest in thousands of examples to fine-tune a custom model?
-- Assume the model is incapable of the task, and move on?
+- Искать более удачный запрос, который вызывает более надёжные ответы?
+- Вкладывать средства в создание тысячи примеров для дообучения кастомной модели?
+- Считать, что модель неспособна выполнить задачу, и перейти к следующей?
 
-There is no simple answer - it depends. However, if your task involves logical reasoning or complexity, consider trying the techniques in this article to build more reliable, high-performing prompts.
+Простого ответа нет — всё зависит от ситуации. Однако если ваша задача связана с логическим рассуждением или сложностью, стоит попробовать техники из этой статьи, которые помогут создавать более надёжные, высокоэффективные запросы.
 
-## Why GPT-3 fails on complex tasks
+## Почему GPT-3 ошибается на сложных задачах
 
-If you were asked to multiply 13 by 17, would the answer pop immediately into your mind? For most of us, probably not. Yet, that doesn't mean humans are incapable of two-digit multiplication. With a few seconds, and some pen and paper, it's not too taxing to work out that 13 x 17 = 130 + 70 + 21 = 221.
+Если бы вас попросили умножить 13 на 17, ответ пришёл бы прямо в голову? Для большинства из нас — скорее нет. Но это не значит, что люди не умеют умножать двузначные числа. С несколькими секундам и листом бумаги вполне реально понять, что 13 × 17 = 130 + 70 + 21 = 221.
 
-Similarly, if you give GPT-3 a task that's too complex to do in the time it takes to calculate its next token, it may confabulate an incorrect guess. Yet, akin to humans, that doesn't necessarily mean the model is incapable of the task. With some time and space to reason things out, the model still may be able to answer reliably.
+Аналогично, если GPT-3 дать задание слишком сложное для того времени, которое требуется на предсказание следующего токена, оно может выдумать неправильный ответ. Но, как и у людей, это не значит, что модель неспособна решить задачу. Если у неё будет достаточно времени и пространства для рассуждений, она всё ещё может дать надёжный ответ.
 
-As an example, if you ask `gpt-3.5-turbo-instruct` the following math problem about juggling balls, it answers incorrectly:
+Например, если задать `gpt-3.5-turbo-instruct` задачу по жонглированию мячами, он ответит неверно:
 
 &lt;&lt;&lt;CODE_0&gt;>>
 
 &lt;&lt;&lt;CODE_1&gt;>>
 
-Does this mean that GPT-3 cannot do simple math problems? No; in fact, it turns out that by prompting the model with `Let's think step by step`, the model solves the problem reliably:
+Значит ли это, что GPT-3 не умеет решать простые математические задачи? Нет — на самом деле, если подать запрос с фразой `Let's think step by step`, модель решит задачу правильно:
 
 &lt;&lt;&lt;CODE_2&gt;>>
 
 &lt;&lt;&lt;CODE_3&gt;>>
 
-Of course, it's hard to tell from only a single example whether this `Let's think step by step` trick actually works in general or just got lucky on this particular problem. But it really does work. On a benchmark of word math problems, the `Let's think step by step` trick raised GPT-3's solve rate massively, from a worthless 18% to a decent 79%!
+Конечно, по одному примеру сложно понять, работает ли эта хитрость с `Let's think step by step` в целом или просто повезло в конкретном случае. Но она действительно эффективна. На наборе задач по словесной математике, трюк `Let's think step by step` значительно увеличил точность GPT-3 — с 18% до 79%!
 
-## Model capabilities depend on context
+## Возможности модели зависят от контекста
 
-When learning to work with GPT-3, one common conceptual mistake is to believe that its capabilities are fixed across all contexts. E.g., if GPT-3 gets a simple logic question wrong, then it must be incapable of simple logic.
+Одной из распространённых концептуальных ошибок при работе с GPT-3 является убеждение, что её возможности фиксированы во всех контекстах. Например, если GPT-3 ошибается на простом вопросе логики, значит оно неспособно решать простую логику.
 
-But as the `Let's think step by step` example illustrates, apparent failures of GPT-3 can sometimes be remedied with a better prompt that helps the model steer itself toward the correct output.
+Однако пример с `Let's think step by step` показывает, что с видимыми ошибками GPT-3 можно справиться, изменив запрос и помогая модели направлять себя к правильному ответу.
 
-## How to improve reliability on complex tasks
+## Как повысить надёжность на сложных задачах
 
-The rest of this article shares techniques for improving reliability of large language models on complex tasks. Although some of the techniques are specific to certain types of problems, many of them are built upon general principles that can be applied to a wide range of tasks, e.g.:
+Далее в статье описаны техники, которые улучшают надёжность больших языковых моделей в сложных задачах. Хотя некоторые техники специфичны для конкретных типов задач, многие основаны на общих принципах, применимых к широкому спектру задач, например:
 
-- Give clearer instructions
-- Split complex tasks into simpler subtasks
-- Structure the instruction to keep the model on task
-- Prompt the model to explain before answering
-- Ask for justifications of many possible answers, and then synthesize
-- Generate many outputs, and then use the model to pick the best one
-- Fine-tune custom models to maximize performance
+- Давайте более чёткие инструкции
+- Делите сложные задачи на более простые подзадачи
+- Структурируйте инструкцию, чтобы модель оставалась в теме
+- Просите модель сначала объяснить, а потом ответить
+- Запрашивайте обоснования для множества возможных ответов, затем синтезируйте их
+- Генерируйте много вариантов и затем выбирайте лучший
+- Дообучайте индивидуальные модели для максимума производительности
 
-## Split complex tasks into simpler tasks
+## Делите сложные задачи на простые
 
-One way to give a model more time and space to think is to break tasks into simpler pieces.
+Один из способов дать модели больше времени и пространства для рассуждений — разбивать задачи на простые части.
 
-As an example, consider a task where we ask the model a multiple-choice question about some text - in this case, a game of Clue. When asked directly, `gpt-3.5-turbo-instruct` isn't able to put clues 3 & 5 together, and answers incorrectly:
+Например, рассмотрим задачу, где модели задан вопрос с несколькими вариантами ответа на основе текста — в данном случае игра Clue. При прямом запросе `gpt-3.5-turbo-instruct` не может объединить подсказки 3 и 5 и даёт неправильный ответ:
 
 &lt;&lt;&lt;CODE_4&gt;>>
 
 &lt;&lt;&lt;CODE_5&gt;>>
 
-Although clues 3 and 5 establish that Colonel Mustard was the only person in the observatory and that the person in the observatory had the candlestick, the model fails to combine them into a correct answer of (a) Yes.
+Хотя подсказки 3 и 5 показывают, что полковник Горчичный был единственным в обсерватории, и у человека в обсерватории был подсвечник, модель не смогла объединить это в правильный ответ (a) Да.
 
-However, instead of asking for the answer directly, we can split the task into three pieces:
+Однако вместо прямого запроса ответа, мы можем разбить задачу на три части:
 
-- First, go through the clues one by one and consider whether the clue is potentially relevant
-- Second, combine the relevant clues to reason out the answer to the question
-- Third, write the final answer: either (a), (b), or (c)
+- Сначала последовательно пройтись по подсказкам и решить, какие из них релевантны
+- Затем объединить релевантные подсказки и рассуждать, какой ответ получить
+- Наконец, написать финальный ответ: (a), (b) или (c)
 
 &lt;&lt;&lt;CODE_6&gt;>>
 
 &lt;&lt;&lt;CODE_7&gt;>>
 
-By giving the model more time and space to think, and guiding it along a reasoning plan, it's able to figure out the correct answer of (a) Yes.
+Давая модели больше времени и направления для размышлений, она смогла найти правильный ответ (a) Да.
 
-Another benefit of splitting complex instructions into smaller subtasks is that it can help keep the model focused on each subtask.
+Ещё одно преимущество разбивки сложных инструкций на подзадачи — это помочь модели сфокусироваться на каждой из них.
 
-For example, if we ask `gpt-3.5-turbo-instruct` to summarize a text in its original language, the model can lapse back into English:
+Например, если попросить `gpt-3.5-turbo-instruct` обобщить текст на исходном языке, модель может неожиданно перейти на английский:
 
 &lt;&lt;&lt;CODE_8&gt;>>
 
 &lt;&lt;&lt;CODE_9&gt;>>
 
-However, if we first ask the model to identify the language of the text, and then summarize the text, it becomes more reliable:
+Но если сначала попросить модель определить язык текста, а потом его обобщить, результат становится надёжнее:
 
 &lt;&lt;&lt;CODE_10&gt;>>
 
 &lt;&lt;&lt;CODE_11&gt;>>
 
-## Prompt the model to explain before answering
+## Просите модель объяснять перед тем, как отвечать
 
-Another powerful technique for improving the reliability of answers is to prompt the model to gradually reason out the answer rather than jumping immediately to the final answer. By 'thinking aloud' the model can be far more likely to arrive at the correct answer.
+Другой эффективный способ повысить надёжность ответов — заставлять модель рассуждать постепенно, а не прыгать сразу к финальному ответу. «Проговаривая» рассуждения вслух, модель с гораздо большей вероятностью придёт к правильному решению.
 
 ### Zero-shot
 
-#### Method
+#### Метод
 
-Published by [Takeshi Kojima et al. in 2022](https://arxiv.org/abs/2205.11916), the easiest way to prompt a model to reason out the answer is to simply prepend answers with `Let's think step by step.` Figure 2 illustrates an example:
+Опубликованный [Такаши Кодзимой и соавторами в 2022 году](https://arxiv.org/abs/2205.11916) самый простой способ подтолкнуть модель к рассуждениям — начать ответы с `Let's think step by step.` На рисунке 2 показан пример:
 
-[![zero-shot reasoning example](/images/zero-shot_reasoners_fig2.png)
-<br />Source: _Large Language Models are Zero-Shot Reasoners_ by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
+[![пример zero-shot рассуждений](/images/zero-shot_reasoners_fig2.png)
+<br />Источник: _Large Language Models are Zero-Shot Reasoners_ — Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
-#### Results
+#### Результаты
 
-Applying this simple trick to the MultiArith math dataset, the authors found `Let's think step by step` quadrupled the accuracy, from 18% to 79%!
+Применив этот простой трюк к набору задач MultiArith, авторы нашли, что `Let's think step by step` увеличивает точность вчетверо — с 18% до 79%!
 
-[![zero-shot reasoning example](/images/zero-shot_reasoners_tab5.png)
-<br />Source: _Large Language Models are Zero-Shot Reasoners_ by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
+[![результаты zero-shot](/images/zero-shot_reasoners_tab5.png)
+<br />Источник: _Large Language Models are Zero-Shot Reasoners_ — Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
-#### Implications
+#### Выводы
 
-Although the `Let's think step by step` trick works well on math problems, it's not effective on all tasks. The authors found that it was most helpful for multi-step arithmetic problems, symbolic reasoning problems, strategy problems, and other reasoning problems. It didn't help with simple math problems or common sense questions, and presumably wouldn't help with many other non-reasoning tasks either.
+Хотя трюк `Let's think step by step` очень хорошо работает на математических задачах, он не универсален. Авторы отметили, что он особенно полезен для многошаговых арифметических задач, задач на символические рассуждения, стратегии и другие логические задачи. Он не помогал с простыми арифметическими задачами или вопросами здравого смысла, и, предположительно, не будет полезен во многих других нерешающих задачах.
 
 [![zero-shot reasoning example](/images/zero-shot_reasoners_tab1.png)
-<br />Source: _Large Language Models are Zero-Shot Reasoners_ by Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
+<br />Источник: _Large Language Models are Zero-Shot Reasoners_ — Takeshi Kojima et al. (2022).](https://arxiv.org/abs/2205.11916)
 
-To learn more, read the [full paper](https://arxiv.org/abs/2205.11916).
+Подробнее читайте в [полной статье](https://arxiv.org/abs/2205.11916).
 
-If you apply this technique to your own tasks, don't be afraid to experiment with customizing the instruction. `Let's think step by step` is rather generic, so you may find better performance with instructions that hew to a stricter format customized to your use case. For example, you can try more structured variants like `First, think step by step about why X might be true. Second, think step by step about why Y might be true. Third, think step by step about whether X or Y makes more sense.`. And you can even give the model an example format to help keep it on track, e.g.:
+Если вы примените эту технику самостоятельно, не бойтесь экспериментировать с формулировками инструкций. Фраза `Let's think step by step` довольно общая, и вы можете получить лучший результат, если использовать более строгий и адаптированный под задачу формат. Например, можно попробовать структурированные варианты вроде `Во-первых, подумай шаг за шагом, почему X может быть верным. Во-вторых, подумай шаг за шагом, почему Y может быть верным. В-третьих, подумай шаг за шагом, что из X или Y более вероятно.` Также можно привести пример формата, который помогает модели не сбиваться:
 
 &lt;&lt;&lt;CODE_12&gt;>>
 
 &lt;&lt;&lt;CODE_13&gt;>>
 
-### Few-shot examples
+### Few-shot примеры
 
-#### Method
+#### Метод
 
-Prompting the model to reason out its answers can be done in many ways. One way is to demonstrate with a few examples ('few-shot'), as studied by [Jason Wei and Denny Zhou et al. from Google](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html). Here's an example few-shot chain-of-thought prompt:
+Побуждение модели рассуждать можно делать разными способами. Один из них — показать несколько примеров («few-shot»), как изучали [Джейсон Вэй и Денни Чжоу с Google](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html). Вот пример запроса с цепочкой рассуждений:
 
-[![chain of thought example](/images/chain_of_thought_fig1.png)
-<br />Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
+[![пример цепочки рассуждений](/images/chain_of_thought_fig1.png)
+<br />Источник: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ — Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
-More demonstrations of reasoning chains written by human labelers:
+Дополнительные примеры рассуждений, написанные людьми:
 
-[![chain of thought example](/images/chain_of_thought_fig3.png)
-<br />Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
+[![пример цепочки рассуждений](/images/chain_of_thought_fig3.png)
+<br />Источник: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ — Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
-[(Note that it has been called into question whether pears actually float)](https://twitter.com/Meaningness/status/1561062170074370048?s=20&t=mpHt8f3RRboztXxdhLFnWQ)
+[(Обратите внимание, что вызывает сомнения, плавают ли действительно груши)](https://twitter.com/Meaningness/status/1561062170074370048?s=20&t=mpHt8f3RRboztXxdhLFnWQ)
 
-#### Results
+#### Результаты
 
-Testing on grade school math problems, the authors found that chain of thought prompting tripled the solve rate, from 18% to 57%.
+На задачах школьной математики авторы обнаружили, что запрос с цепочкой рассуждений увеличивает точность втрое — с 18% до 57%.
 
-[![chain of thought example](/images/chain_of_thought_fig5.png)
-<br />Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
+[![результаты цепочки рассуждений](/images/chain_of_thought_fig5.png)
+<br />Источник: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ — Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
-In addition to math problems, chain of thought prompting also lifted performance on questions related to sports understanding, coin flip tracking, and last letter concatenation. In most cases, not many examples were need to saturate the performance gains (less than 8 or so).
+Кроме математики, цепочка рассуждений повышала точность в вопросах о спорте, отслеживании подбрасывания монеты и конкатенации последних букв. В большинстве случаев достаточно было менее 8 примеров, чтобы достичь максимальной эффективности.
 
-[![chain of thought example](/images/chain_of_thought_fig11.png)
-<br />Source: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
+[![результаты цепочки рассуждений](/images/chain_of_thought_fig11.png)
+<br />Источник: _Chain of Thought Prompting Elicits Reasoning in Large Language Models_ — Jason Wei and Denny Zhou et al. (2022)](https://ai.googleblog.com/2022/05/language-models-perform-reasoning-via.html)
 
-To learn more, read the [full paper](https://arxiv.org/abs/2201.11903).
+Подробнее в [полной статье](https://arxiv.org/abs/2201.11903).
 
-#### Implications
+#### Выводы
 
-One advantage of the few-shot example-based approach relative to the `Let's think step by step` technique is that you can more easily specify the format, length, and style of reasoning that you want the model to perform before landing on its final answer. This can be particularly helpful in cases where the model isn't initially reasoning in the right way or depth.
+Одно из преимуществ подхода с несколькими примерами перед техникой `Let's think step by step` в том, что с ним легче задать формат, длину и стиль рассуждений, которые вы хотите получить от модели перед финальным ответом. Это особенно полезно, когда модель изначально не рассуждает правильно или недостаточно глубоко.
 
 ### Fine-tuned
 
-#### Method
+#### Метод
 
-In general, to eke out maximum performance on a task, you'll need to fine-tune a custom model. However, fine-tuning a model using explanations may take thousands of example explanations, which are costly to write.
+В общем случае, чтобы вытянуть максимум из задачи, нужно дообучить кастомную модель. Однако дообучение с объяснениями может потребовать тысячи примеров, что дорого создавать.
 
-In 2022, Eric Zelikman and Yuhuai Wu et al. published a clever procedure for using a few-shot prompt to generate a dataset of explanations that could be used to fine-tune a model. The idea is to use a few-shot prompt to generate candidate explanations, and only keep the explanations that produce the correct answer. Then, to get additional explanations for some of the incorrect answers, retry the few-shot prompt but with correct answers given as part of the question. The authors called their procedure STaR (Self-taught Reasoner):
+В 2022 году Эрик Зеликман и Юхуай Ву опубликовали умный метод, использующий few-shot запрос для генерации набора данных с объяснениями, для дообучения модели. Идея — использовать few-shot запрос для генерации кандидатских объяснений и оставлять только объяснения, приводящие к правильному ответу. Чтобы получить объяснения для неверных ответов, повторять запрос, но указывать правильные ответы как часть вопроса. Авторы назвали процедуру STaR (Self-taught Reasoner):
 
-[![STaR procedure](/images/star_fig1.png)
-<br />Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
+[![процедура STaR](/images/star_fig1.png)
+<br />Источник: _STaR: Bootstrapping Reasoning With Reasoning_ — Eric Zelikman и Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
 
-With this technique, you can combine the benefits of fine-tuning with the benefits of chain-of-thought prompting without needing to write thousands of example explanations.
+С этой техникой можно совместить преимущества дообучения и цепочки рассуждений без необходимости создавать тысячи объяснений.
 
-#### Results
+#### Результаты
 
-When the authors applied this technique to a Common Sense Q&A dataset, they found that STaR outperformed both chain-of-thought prompting alone (73% > 37%) and fine-tuning alone (73% > 60%):
+Применив технику к набору данных Common Sense Q&A, авторы увидели, что STaR превзошёл как рядовую цепочку рассуждений (73% > 37%), так и только fine-tuning (73% > 60%):
 
-[![STaR results](/images/star_tab1.png)
-<br />Source: _STaR: Bootstrapping Reasoning With Reasoning_ by Eric Zelikman and Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
+[![результаты STaR](/images/star_tab1.png)
+<br />Источник: _STaR: Bootstrapping Reasoning With Reasoning_ — Eric Zelikman и Yujuai Wu et al. (2022)](https://arxiv.org/abs/2203.14465)
 
-To learn more, read the [full paper](https://arxiv.org/abs/2203.14465).
+Подробнее — в [полной статье](https://arxiv.org/abs/2203.14465).
 
-#### Implications
+#### Выводы
 
-Using a few-shot prompt to extend or modify a fine-tuning dataset is an idea that can be generalized beyond explanation writing. For example, if you have large quantities of unstructured text that you want to train on, you may find opportunities to use a prompt to extract a structured dataset from your unstructured text, and then fine-tune a custom model on that structured dataset.
+Использование few-shot запроса для расширения или модификации датасета дообучения — идея, которую можно применять не только к написанию объяснений. Например, если у вас есть много неструктурированного текста для обучения, вы можете попытаться с помощью запроса извлечь из него структурированный набор данных, а затем дообучить модель на нём.
 
-## Extensions to chain-of-thought prompting
+## Расширения цепочки рассуждений
 
-A number of extensions of chain-of-thought prompting have been published as well.
+Опубликовано несколько расширений цепочки рассуждений.
 
 ### Selection-inference prompting
 
-#### Method
+#### Метод
 
-Published by Antonia Creswell et al., one extension of the chain-of-thought technique is to split the single prompt for generating explanations and answers into smaller parts. First, a prompt selects a relevant subset of facts from the text ('selection prompt'). Then, a second prompt infers a conclusion from the selected facts ('inference prompt'). These prompts are then alternated in a loop to generate multiple steps of reasoning and eventually land on a final answer. The authors illustrate the idea in the following figure:
+Предложенный Антонией Кресвелл и соавторами, один из вариантов техники — разделить запрос для генерации объяснений и ответов на более мелкие части. Сначала один запрос выбирает релевантные факты из текста («selection prompt»). Потом второй запрос генерирует вывод из выбранных фактов («inference prompt»). Эти запросы чередуются, формируя несколько шагов рассуждений и в итоге приводя к финальному ответу. Авторы показывают идею на рисунке:
 
 [![Selection-inference prompting](/images/selection-inference_fig1.png)
-<br />Source: _Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2205.09712)
+<br />Источник: _Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2205.09712)
 
-#### Results
+#### Результаты
 
-When applied to a 7B-parameter model, the authors found that selection-inference prompting substantially improved performance relative to chain-of-thought prompting on the bAbi and Proof Writer benchmark tasks (both of which require longer sequences of reasoning steps). The best performance they achieved combined both selection-inference prompting with fine-tuning.
+На модели с 7 млрд параметров авторы обнаружили, что selection-inference prompting значительно улучшает качество по сравнению с цепочкой рассуждений на задачах bAbi и Proof Writer (обе требуют длинных последовательностей рассуждений). Лучший результат достигается в комбинации selection-inference с тонкой настройкой.
 
 [![Selection-inference prompting](/images/selection-inference_fig4.png)
-<br />Source: _Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2205.09712)
+<br />Источник: _Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2205.09712)
 
-#### Implications
+#### Выводы
 
-Although the gains on these benchmarks were large, these benchmarks were specifically chosen because they required longer sequences of reasoning. On problems that don't require reasoning with many steps, the gains are likely smaller.
+Хотя улучшения на этих бенчмарках значительны, их выбирали именно за требование длинных цепочек рассуждений. Для задач с небольшим числом шагов выигрыш, вероятно, будет меньше.
 
-The results highlight a couple of general lessons for working with large language models. One, splitting up complex tasks into smaller tasks is a great way to improve reliability and performance; the more atomic the task, the less room there is for the model to err. Two, getting maximum performance often means combining fine-tuning with whatever approach you've chosen.
+Результаты подчеркивают два общих урока при работе с большими языковыми моделями. Во-первых, деление сложных задач на более мелкие — отличный способ повысить надёжность и эффективность; чем атомарнее задача, тем меньше у модели шансов ошибиться. Во-вторых, максимальная производительность часто достигается комбинацией тонкой настройки и выбранного подхода.
 
-To learn more, read the [full paper](https://arxiv.org/abs/2205.09712).
+Подробнее читайте в [полной статье](https://arxiv.org/abs/2205.09712).
 
 ### Faithful reasoning architecture
 
-A few months after publishing the selection-inference prompting technique, the authors extended the technique in a follow-up paper, with ideas for:
+Спустя несколько месяцев после публикации selection-inference prompting, авторы дополнили технику в следующей работе, предложив:
 
-- figuring out when the selection-inference cycle should stop or continue
-- adding a value function to help search over multiple reasoning paths
-- reducing hallucination of fake facts by fine-tuning a model to reason about sentence labels (e.g., sen1) rather than writing out the sentences themselves
+- определять, когда цикл selection-inference следует остановить или продолжить
+- добавлять функцию оценки (value function) для поиска среди множества путей рассуждений
+- снижать галлюцинации выдуманных фактов, дообучая модель рассуждать об обозначениях предложений (например, sen1), а не записывать целиком предложения
 
-#### Method
+#### Метод
 
-In the original selection-inference technique, specialized 'selection' and 'inference' prompts are alternated to select facts and make inferences from those facts, combining to generate a sequence of reasoning steps.
+В исходной технике selection-inference поочерёдно используются специализированные запросы для выбора фактов и вывода логических заключений, формируя цепочку рассуждений.
 
-The authors extend this technique with two additional components.
+Авторы добавили два компонента.
 
-First, the authors add a 'halter' model that, after each inference step, is asked whether the inferences thus far are sufficient to answer the question. If yes, then the model generates a final answer.
+Сначала 'halter' — модель, которая после каждого шага вывода спрашивается, достаточно ли сделанных выводов для ответа на вопрос. Если да — генерируется финальный ответ.
 
-The halter models brings a couple of advantages:
+Достоинства halter:
 
-- it can tell the selection-inference process to stop or keep going, as necessary.
-- if the process never halts, you'll get no answer, which is often preferable to a hallucinated guess
+- может приостанавливать или продолжать процесс selection-inference в зависимости от необходимости
+- если процесс так и не остановится, ответ не будет сгенерирован, что лучше, чем выдуманный ответ
 
 [![Faithful reasoning](/images/faithful-reasoning_fig3.png)
-<br />Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
+<br />Источник: _Faithful Reasoning Using Large Language Models_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
 [![Faithful reasoning](/images/faithful-reasoning_fig5.png)
-<br />Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
+<br />Источник: _Faithful Reasoning Using Large Language Models_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
-Second, the authors add a value function, which is used to assess the quality of reasoning steps and search over multiple reasoning trajectories. This echoes a common theme for increasing reliability; instead of generating a single answer from the model, generate a set of answers and then use some type of value function / discriminator / verifier model to pick the best one.
+Во-вторых, добавлена функция оценки, которая помогает оценивать качество рассуждений и искать по разным траекториям рассуждений. Это соответствует общему приёму повышения надёжности: вместо одного варианта генерировать множество ответов и затем выбирать лучший с помощью функции оценки / дискриминатора / верификатора.
 
 [![Faithful reasoning](/images/faithful-reasoning_fig7.png)
-<br />Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
+<br />Источник: _Faithful Reasoning Using Large Language Models_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
-In addition to these two extensions, the authors also use a trick to reduce hallucination of fake facts. Rather than asking the model to write out factual sentences, they fine-tune a model to work with sentence labels (e.g., sen1) instead. This helps prevent the model from hallucinating fake facts not mentioned in the prompt context.
+Кроме того, с помощью хитрости с обозначениями предложений (например, sen1) вместо полного текста удалось значительно снизить количество выдуманных фактов.
 
 [![Faithful reasoning](/images/faithful-reasoning_fig4.png)
-<br />Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
+<br />Источник: _Faithful Reasoning Using Large Language Models_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
-#### Results
+#### Результаты
 
-The authors evaluated their technique on two benchmarks: the ProofWriter task (not shown) and [EntailmentBankQA](https://allenai.org/data/entailmentbank) (shown). The technique increased accuracy substantially, especially on harder reasoning problems.
+Оценка техники проводилась на двух бенчмарках: ProofWriter (не показан) и [EntailmentBankQA](https://allenai.org/data/entailmentbank) (на рисунках). Техника значительно увеличила точность, особенно на сложных задачах рассуждений.
 
 ![Faithful reasoning](/images/faithful-reasoning_tab2.png)
-<br />Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
+<br />Источник: _Faithful Reasoning Using Large Language Models_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
-In addition, their sentence label manipulation trick essentially eliminated hallucination!
+Кроме того, трюк с обозначениями предложений практически полностью устранил галлюцинации!
 
 ![Faithful reasoning](/images/faithful-reasoning_tab5.png)
-<br />Source: _Faithful Reasoning Using Large Language Models_ by Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
+<br />Источник: _Faithful Reasoning Using Large Language Models_ — Antonia Creswell et al. (2022)](https://arxiv.org/abs/2208.14271)
 
-#### Implications
+#### Выводы
 
-This paper illustrates a number of helpful lessons for improving the reliability of large language models:
+Эта статья содержит ряд полезных уроков для повышения надёжности больших языковых моделей:
 
-- Split complex tasks into smaller, more reliable subtasks
-- Generate your answer in a step-by-step fashion, evaluating it along the way
-- Generate many possible answers and use another model or function to pick the ones that look best
-- Reduce hallucination by constraining what the model can say (e.g., by using sentence labels instead of sentences)
-- Maximize performance of models by fine-tuning them on specialized tasks
+- Делите сложные задачи на более мелкие, надёжные подзадачи
+- Формируйте ответ пошагово, оценивая результат по ходу
+- Генерируйте множество вариантов и используйте отдельную модель или функцию для выбора лучшего
+- Снижайте галлюцинации, ограничивая то, что модель может говорить (например, с помощью обозначений предложений)
+- Добивайтесь максимума производительности моделей через их дообучение на специализированных задачах
 
-To learn more, read the [full paper](https://arxiv.org/abs/2205.09712).
+Подробнее — в [полной статье](https://arxiv.org/abs/2205.09712).
 
 ### Least-to-most prompting
 
-In addition to doing poorly on long reasoning chains (where selection-inference shines), chain-of-thought prompting can especially struggle when the examples are short but the task is long.
+Кроме проблем с длинными цепочками рассуждений (где отлично проявляет себя selection-inference), цепочка рассуждений может испытывать сложности, если примеры короткие, а задача длинная.
 
-#### Method
+#### Метод
 
-Least-to-most prompting is another technique that splits up reasoning tasks into smaller, more reliable subtasks. The idea is to elicit a subtask from the model by prompting it with something like `To solve {question}, we need to first solve: "`. Then, with that subtask in hand, the model can generate a solution. The solution is appended to the original question and the process is repeated until a final answer is produced.
+Least-to-most prompting — ещё одна техника разбиения задач рассуждений на более мелкие и надёжные подзадачи. Идея — получить подзадачу, задав модель с чем-то вроде `To solve {question}, we need to first solve: "`. Затем, имея подзадачу, модель её решает. Решение добавляется к исходному вопросу, и процесс повторяется до финального ответа.
 
 [![Least-to-most prompting](/images/least-to-most_fig1.png)
-<br />Source: _Least-to-most Prompting Enables Complex Reasoning in Large Language Models_ by Denny Zhou et al. (2022)](https://arxiv.org/abs/2205.10625)
+<br />Источник: _Least-to-most Prompting Enables Complex Reasoning in Large Language Models_ — Denny Zhou et al. (2022)](https://arxiv.org/abs/2205.10625)
 
-#### Results
+#### Результаты
 
-When applied to benchmarks involving long reasoning chains using `code-davinci-002` (which is optimized for code but can still understand text), the authors measured gains as large as 16% -> 99.7%!
-
-[
-![Least-to-most prompting results on last-letter-concatenation task](/images/least-to-most_tab4.png)
-![Least-to-most prompting results on SCAN](/images/least-to-most_tab9.png)
-![Least-to-most prompting results on DROP numerical reasoning](/images/least-to-most_tab11.png)
-<br />Source: _Least-to-most Prompting Enables Complex Reasoning in Large Language Models_ by Denny Zhou et al. (2022)](https://arxiv.org/abs/2205.10625)
-
-#### Implications
-
-Although the above gains from least-to-most prompting are impressive, they are measured on a very narrow set of tasks that require long reasoning chains.
-
-Still, they illustrate a common theme: increase reliability by (a) breaking complex tasks into smaller subtasks and (b) giving the model more time and space to work out the answer.
-
-To learn more, read the [full paper](https://arxiv.org/abs/2205.10625).
-
-## Related ideas
-
-### Maieutic prompting
-
-#### Method
-
-In contrast to the previous techniques, which try to maximize the likelihood of correct answers, another approach is to use GPT-3 to generate a tree of possible explanations (both correct _and incorrect_), and then analyze their relationships to guess at which set is correct. This technique was coined maieutic prompting by [Jaehun Jung et al. in May 2022](https://arxiv.org/abs/2205.11822) (maieutic means relating to the Socratic method of asking questions to elicit ideas).
-
-The method is complicated, and works as follows:
-
-- First, build a maieutic tree, where each node is a statement that could be true or false:
-  - Start with a multiple-choice question or true/false statement (e.g. `War cannot have a tie`)
-  - For each possible answer to the question, use the model to generate a corresponding explanation (with a prompt like `War cannot have a tie? True, because`)
-  - Then, prompt the model with the question and the generated explanation, and ask it to produce the answer. If reversing the explanation (with a prefix like `It is wrong to say that {explanation}`) reverses the answer, then the explanation is considered 'logically integral.'
-  - If an explanation is not logically integral, then repeat the above process recursively, with each explanation turned into a True or False question, and generate more explanations for each new question.
-  - After all of the recursive explaining is done, you end up with a tree of explanations, where each leaf on the tree has the property that reversing the explanation reverses the model's answer.
-- Second, convert the tree into a graph of relations:
-  - For each node in the tree, calculate the model's relative belief in each node (inferred from the probability of getting an answer of `True` to given an explanation)
-  - For each pair of nodes in the tree, use the model to identify whether they are entailed (implied) or contradicted
-- Third, find the most consistent set of beliefs and take those to be true:
-  - Specifically, using the strength of belief in each node and the logical relationships between them, formulate the problem as a weighted maximum satisfiability problem (MAX-SAT)
-  - Use a solver to the find the most self-consistent set of beliefs, and take those as true
+На бенчмарках с длинными цепочками рассуждений с использованием `code-davinci-002` (оптимизированного на код, но понимающего текст) прирост достигал от 16% до 99.7%!
 
 [
-![Maieutic prompting](/images/maieutic_fig2.png)
-![Maieutic prompting](/images/maieutic_fig6.png)
-<br />Source: _Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations_ by Jaehun Jung et al. (2022)](https://arxiv.org/abs/2205.11822)
+![Результаты least-to-most на last-letter-concatenation](/images/least-to-most_tab4.png)
+![Результаты least-to-most на SCAN](/images/least-to-most_tab9.png)
+![Результаты least-to-most на DROP numerical reasoning](/images/least-to-most_tab11.png)
+<br />Источник: _Least-to-most Prompting Enables Complex Reasoning in Large Language Models_ — Denny Zhou et al. (2022)](https://arxiv.org/abs/2205.10625)
 
-#### Results
+#### Выводы
 
-[![Maieutic prompting results](/images/maieutic_tab1.png)
-<br />Source: _Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations_ by Jaehun Jung et al. (2022)](https://arxiv.org/abs/2205.11822)
+Хотя перечисленные приросты впечатляют, они сделаны по очень узкому набору задач с длинными цепочками рассуждений.
 
-#### Implications
+Тем не менее, они подчёркивают общую идею: повысьте надёжность, (а) разбив сложную задачу на более мелкие части и (б) дав модели больше времени и пространства для решения.
 
-Beyond the complexity, one limitation of this method is that it appears to only apply to questions that can be posed as multiple-choice.
+Подробнее — в [полной статье](https://arxiv.org/abs/2205.10625).
 
-To learn more, read the [full paper](https://arxiv.org/abs/2205.11822).
+## Похожие идеи
 
-## Extensions
+### Маевтическое (маиетическое) побуждение
+
+#### Метод
+
+В отличие от предыдущих методов, стремящихся максимизировать вероятность правильных ответов, другой подход — попросить GPT-3 построить дерево возможных объяснений (как правильных, так и ошибочных), а затем проанализировать их взаимосвязи, чтобы определить, какое множество объяснений правильное. Этот метод назван maieutic prompting (маиетическим побуждением) в статье [Джехуна Джунга и соавторов в мае 2022](https://arxiv.org/abs/2205.11822) (маиетика связана с сократическим методом задавания вопросов для вызова идей).
+
+Сложный метод работает так:
+
+- Сначала построить маиетическое дерево, где каждый узел — утверждение, которое может быть истинным или ложным:
+  - Начать с вопроса с несколькими вариантами ответов или с истинно/ложного утверждения (например, `War cannot have a tie`)
+  - Для каждого варианта ответа использовать модель, чтобы сгенерировать объяснение (например, с запросом `War cannot have a tie? True, because`)
+  - Затем запросить модель ответить на вопрос с этим объяснением. Если изменение объяснения на противоположное (с префиксом вроде `It is wrong to say that {explanation}`) меняет ответ модели, объяснение считается «логически целостным»
+  - Если объяснение не целостное, повторить процесс рекурсивно, превращая объяснение в отдельный вопрос True/False и генерируя для него объяснения
+  - В итоге получается дерево объяснений, где каждый лист имеет свойство изменения ответа модели при инверсии объяснения
+- Затем преобразовать дерево в граф взаимосвязей:
+  - Для каждого узла дерева вычисляется относительная уверенность модели (основываясь на вероятности ответа `True`, заданного объяснением)
+  - Для каждой пары узлов модель определяет, подразумевают ли они (entail) или противоречат друг другу
+- Затем найти максимально согласованный набор убеждений и принять их за истинные:
+  - Конкретно, используя силу веры в каждый узел и логические отношения между ними, сформулировать задачу как задачу максимальной выполнимости со взвешиванием (MAX-SAT)
+  - Решателем найти самый самосогласованный набор убеждений и принять его как истину
+
+[
+![Маевтическое побуждение](/images/maieutic_fig2.png)
+![Маевтическое побуждение](/images/maieutic_fig6.png)
+<br />Источник: _Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations_ — Jaehun Jung et al. (2022)](https://arxiv.org/abs/2205.11822)
+
+#### Результаты
+
+[![Результаты maieutic prompting](/images/maieutic_tab1.png)
+<br />Источник: _Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations_ — Jaehun Jung et al. (2022)](https://arxiv.org/abs/2205.11822)
+
+#### Выводы
+
+Помимо сложности реализации, метод, по-видимому, применим только к вопросам, формализуемым как выбор из вариантов.
+
+Подробнее — в [полной статье](https://arxiv.org/abs/2205.11822).
+
+## Расширения
 
 ### Self-consistency
 
-#### Method
+#### Метод
 
-For tasks with a discrete set of answers, one simple way to improve reliability is to sample multiple explanations & answers from the model (using a positive temperature) and then pick the final answer that appears most often.
+Для задач с дискретным множеством ответов простой способ повысить надёжность — сгенерировать множество объяснений и ответов из модели (с температурой > 0), затем выбрать наиболее часто встречающийся итоговый ответ.
 
-[![Self-consistency method](/images/self-consistency_fig1.png)
-<br />Source: _Self-Consistency Improves Chain of Thought Reasoning in Language Models_ by Xuezhi Wang et al. (2022)](https://arxiv.org/abs/2203.11171)
+[![Метод self-consistency](/images/self-consistency_fig1.png)
+<br />Источник: _Self-Consistency Improves Chain of Thought Reasoning in Language Models_ — Xuezhi Wang et al. (2022)](https://arxiv.org/abs/2203.11171)
 
-#### Results
+#### Результаты
 
-This technique lifted accuracies by anywhere from 1 to 24 percentage points on a suite of math and reasoning benchmarks. (Plotted below are results from Google's LaMDA model; using Google's larger PaLM model, the baselines were higher but the gains were a bit smaller.)
+Техника повысила точность от 1 до 24 процентных пунктов на различных математических и логических наборах данных. (Ниже результаты по модели LaMDA от Google; для более крупной модели PaLM базовые показатели были выше, а эффект чуть меньше.)
 
-[![Self-consistency results](/images/self-consistency_fig3.png)
-<br />Source: _Self-Consistency Improves Chain of Thought Reasoning in Language Models_ by Xuezhi Wang et al. (2022)](https://arxiv.org/abs/2203.11171)
+[![Результаты self-consistency](/images/self-consistency_fig3.png)
+<br />Источник: _Self-Consistency Improves Chain of Thought Reasoning in Language Models_ — Xuezhi Wang et al. (2022)](https://arxiv.org/abs/2203.11171)
 
-#### Implications
+#### Выводы
 
-Although this technique is simple to implement, it can be costly. Generating a set of 10 answers will increase your costs by 10x.
+Хотя техника простая, она может быть дорогой: генерация 10 ответов увеличивает расходы в 10 раз.
 
-Also, as with many of these techniques, it applies only to tasks with a limited set of answers. For open-ended tasks where each answer is unique (such as writing a poem), it's not obvious what it would mean to pick the most common answer.
+Также, как и многие подходы, она применима только к задачам с ограниченным набором ответов. Для открытых задач, где каждый ответ уникален (например, написание поэмы), выбор «самого частого» не имеет смысла.
 
-Lastly, this technique ought to be most beneficial when there are multiple paths or phrasings to reach an answer; if there's only one path, then the technique may not help at all. An extreme example: If the task was to generate a single token answer, then taking the most common token from 100 generations would be no different than taking the token with the highest logprobs (which you can get with a single generation at temperature=0).
+Наконец, техника наиболее полезна, если возможно несколько путей или формулировок решения; при одном единственном пути эффект может отсутствовать. Например, если задача сгенерировать один токен, выбор наиболее частого из 100 генераций равносилен выбору токена с максимальной вероятностью (то есть нулевая температура, одного прохода достаточно).
 
-### Verifiers
+### Верификаторы
 
-Another key technique for improving task performance is to train a verifier or discriminator model to evaluate the outputs of the main generative model. If the discriminator rejects the output, then you can resample the generative model until you get an acceptable output. In many cases, it's easier to judge an answer than it is to create an answer, which helps explain the power of this method.
+Ещё один важный приём для повышения качества — обучить модель-проверяющую (верификатор, дискриминатор), оценивающую ответы основной генеративной модели. Если верификатор отвергает ответ, генерация повторяется. Часто проще оценить, чем придумать ответ, что объясняет эффективность этого метода.
 
-#### Method
+#### Метод
 
-In 2021, OpenAI researchers applied this technique to grade school math problems, using the following procedure:
+В 2021 году исследователи OpenAI применили метод к задачам школьной математики:
 
-- First, they fine-tuned a model on questions and solutions
-- For each problem in the training set, they generated 100 solutions
-- Each of those 100 solutions was automatically labeled as either correct or incorrect, based on whether the final answer was correct
-- Using those solutions, with some labeled correct and some labeled incorrect, they fine-tuned a verifier model to classify whether a question and candidate solution was correct or incorrect
-- Finally, at test time, the generative model creates 100 solutions to each problem, and the one with the highest score according to the verifier model is picked as the final answer
+- Сначала дообучили модель на наборе вопросов и ответов
+- Для каждого вопроса из обучающего набора сгенерировали 100 ответов
+- Каждое из 100 решений автоматически помечено как правильное или неправильное по итоговому ответу
+- На этих примерах дообучили верификатор классифицировать верность решения
+- При тестировании генеративная модель создаёт 100 решений, и выбирается то, что набрало наибольшую оценку верификатора
 
-[![Verifier method](/images/verifiers_fig3.png)
-<br />Source: _Training Verifiers to Solve Math Word Problems_ by Karl Cobbe et al. (2021)](https://arxiv.org/abs/2110.14168)
+[![Метод верификаторов](/images/verifiers_fig3.png)
+<br />Источник: _Training Verifiers to Solve Math Word Problems_ — Karl Cobbe et al. (2021)](https://arxiv.org/abs/2110.14168)
 
-#### Results
+#### Результаты
 
-With a 175B GPT-3 model and 8,000 training examples, this technique substantially lifted grade school math accuracy from ~33% to ~55%.
+С моделью GPT-3 175B и 8,000 примерами этот метод существенно увеличил точность школьной математики с ~33% до ~55%.
 
-[![Verifier results](/images/verifiers_fig5.png)
-<br />Source: _Training Verifiers to Solve Math Word Problems_ by Karl Cobbe et al. (2021)](https://arxiv.org/abs/2110.14168)
+[![Результаты верификаторов](/images/verifiers_fig5.png)
+<br />Источник: _Training Verifiers to Solve Math Word Problems_ — Karl Cobbe et al. (2021)](https://arxiv.org/abs/2110.14168)
 
-#### Implications
+#### Выводы
 
-Similar to the self-consistency technique, this method can get expensive, as generating, say, 100 solutions per task will increase your costs by roughly ~100x.
+Как и self-consistency, метод может быть дорогим, так как генерация 100 ответов на задачу уходит в ~100 раз дороже.
 
-## Theories of reliability
+## Теории надёжности
 
-Although the techniques above vary in their approach, they all share the goal of improving reliability on complex tasks. Mainly they do this by:
+Хотя методы выше разнообразны, у них общая цель — повысить надёжность в сложных задачах. В основном они этого достигают через:
 
-- decomposing unreliable operations into smaller, more reliable operations (e.g., selection-inference prompting)
-- using multiple steps or multiple relationships to make the system's reliability greater than any individual component (e.g., maieutic prompting)
+- разбиение ненадёжных операций на более мелкие, надёжные (например, selection-inference prompting)
+- использование нескольких шагов и множественных связей для повышения надёжности сверх уровня отдельного компонента (например, maieutic prompting)
 
-### Probabilistic graphical models
+### Вероятностные графические модели
 
-This paradigm of trying to build a reliable system out of less reliable components is reminiscent of probabilistic programming, and many of the analysis techniques of that field can be applied to this one.
+Парадигма построения надёжной системы из менее надёжных компонентов напоминает вероятностное программирование, и многие методы анализа из той области применимы и здесь.
 
-In the paper _Language Model Cascades_, David Dohan et al. interpret the above techniques in the paradigm of probabilistic graphical models:
+В статье _Language Model Cascades_ Дэвид Доган и соавторы рассматривают описанные методы в рамках вероятностных графических моделей:
 
-#### Chain of thought prompting
+#### Цепочка рассуждений
 
-[![graphical model of chain of thought prompting](/images/lm_cascades_fig1.png)
-<br />Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
+[![Графическая модель цепочки рассуждений](/images/lm_cascades_fig1.png)
+<br />Источник: _Language Model Cascades_ — David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
 #### Fine-tuned chain of thought prompting / Self-taught reasoner
 
-[![graphical model of fine-tuned chain of thought prompting](/images/lm_cascades_fig3.png)
-<br />Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
+[![Графическая модель для fine-tuning цепочки рассуждений](/images/lm_cascades_fig3.png)
+<br />Источник: _Language Model Cascades_ — David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
 #### Selection-inference prompting
 
-[![graphical model of selection-inference prompting](/images/lm_cascades_fig4.png)
-<br />Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
+[![Графическая модель selection-inference prompting](/images/lm_cascades_fig4.png)
+<br />Источник: _Language Model Cascades_ — David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
-#### Verifiers
+#### Верификаторы
 
-[![graphical model of verifiers](/images/lm_cascades_fig5.png)
-<br />Source: _Language Model Cascades_ by David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
+[![Графическая модель верификаторов](/images/lm_cascades_fig5.png)
+<br />Источник: _Language Model Cascades_ — David Dohan et al. (2022)](https://arxiv.org/abs/2207.10342)
 
-#### Implications
+#### Выводы
 
-Although formulating these techniques as probabilistic graphical models may not be immediately useful for solving any particular problem, the framework may be helpful in selecting, combining, and discovering new techniques.
+Хотя формулировка методов как вероятностных графических моделей не всегда даёт прямое решение, она помогает при выборе, комбинировании и поиске новых методов.
 
-## Closing thoughts
+## Заключительные мысли
 
-Research into large language models is very active and evolving rapidly. Not only do researchers continue to improve the models, they also continue to improve our understanding of how to best employ the models. To underscore the pace of these developments, note that all of the papers shared above were published within the past 12 months (as I write in Sep 2022).
+Исследования больших языковых моделей очень активны и стремительно развиваются. Учёные не только улучшают модели, но и понимание того, как правильно их применять. Чтобы оценить темп, все упомянутые статьи опубликованы за последние 12 месяцев (на момент сентябрь 2022).
 
-In the future, expect better models and better techniques to be published. Even if the specific techniques here are eclipsed by future best practices, the general principles behind them will likely remain a key part of any expert user's toolkit.
+В будущем стоит ждать улучшенных моделей и техник. Даже если конкретные методы будут заменены, общие принципы, лежащие в их основе, останутся ключевой частью арсенала любого эксперта.
 
-## Bibliography
+## Список литературы
 
-| Lesson                                                                                                                         | Paper                                                                                                                                     | Date     |
-| ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| Break complex tasks into simpler subtasks (and consider exposing the intermediate outputs to users)                            | [AI Chains: Transparent and Controllable Human-AI Interaction by Chaining Large Language Model Prompts](https://arxiv.org/abs/2110.01691) | 2021 Oct |
-| You can improve output by generating many candidates, and then picking the one that looks best                                 | [Training Verifiers to Solve Math Word Problems](https://arxiv.org/abs/2110.14168)                                                        | 2021 Oct |
-| On reasoning tasks, models do better when they reason step-by-step before answering                                            | [Chain of Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)                                 | 2022 Jan |
-| You can improve step-by-step reasoning by generating many explanation-answer outputs, and picking the most popular answer      | [Self-Consistency Improves Chain of Thought Reasoning in Language Models](https://arxiv.org/abs/2203.11171)                               | 2022 Mar |
-| If you want to fine-tune a step-by-step reasoner, you can do it with multiple-choice question & answer data alone              | [STaR: Bootstrapping Reasoning With Reasoning](https://arxiv.org/abs/2203.14465)                                                          | 2022 Mar |
-| The step-by-step reasoning method works great even with zero examples                                                          | [Large Language Models are Zero-Shot Reasoners](https://arxiv.org/abs/2205.11916)                                                         | 2022 May |
-| You can do better than step-by-step reasoning by alternating a ‘selection’ prompt and an ‘inference’ prompt                    | [Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning](https://arxiv.org/abs/2205.09712)             | 2022 May |
-| On long reasoning problems, you can improve step-by-step reasoning by splitting the problem into pieces to solve incrementally | [Least-to-most Prompting Enables Complex Reasoning in Large Language Models](https://arxiv.org/abs/2205.10625)                            | 2022 May |
-| You can have the model analyze both good and bogus explanations to figure out which set of explanations are most consistent    | [Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations](https://arxiv.org/abs/2205.11822)                        | 2022 May |
-| You can think about these techniques in terms of probabilistic programming, where systems comprise unreliable components       | [Language Model Cascades](https://arxiv.org/abs/2207.10342)                                                                               | 2022 Jul |
-| You can eliminate hallucination with sentence label manipulation, and you can reduce wrong answers with a 'halter' prompt      | [Faithful Reasoning Using Large Language Models](https://arxiv.org/abs/2208.14271)                                                        | 2022 Aug |
+| Урок                                                                                                                          | Статья                                                                                                                                        | Дата     |
+| ----------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Делите сложные задачи на подзадачи (и, возможно, показывайте промежуточные результаты пользователям)                          | [AI Chains: Transparent and Controllable Human-AI Interaction by Chaining Large Language Model Prompts](https://arxiv.org/abs/2110.01691)      | Окт 2021 |
+| Улучшайте результат, генерируя множество кандидатов и выбирая лучший из них                                                  | [Training Verifiers to Solve Math Word Problems](https://arxiv.org/abs/2110.14168)                                                         | Окт 2021 |
+| На задачах рассуждений модели лучше работают, когда рассуждают шаг за шагом перед ответом                                     | [Chain of Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)                                    | Янв 2022 |
+| Повышайте эффективность рассуждений, генерируя множество объяснений-ответов и выбирая самый популярный                      | [Self-Consistency Improves Chain of Thought Reasoning in Language Models](https://arxiv.org/abs/2203.11171)                                  | Мар 2022 |
+| Если хотите дообучать модель рассуждений шаг за шагом, можете использовать данные с вопросами и ответами с выбором из вариантов | [STaR: Bootstrapping Reasoning With Reasoning](https://arxiv.org/abs/2203.14465)                                                             | Мар 2022 |
+| Метод пошаговых рассуждений успешен даже в zero-shot режиме                                                                   | [Large Language Models are Zero-Shot Reasoners](https://arxiv.org/abs/2205.11916)                                                            | Май 2022 |
+| Улучшайте пошаговые рассуждения, чередуя «selection» и «inference» запросы                                                     | [Selection-Inference: Exploiting Large Language Models for Interpretable Logical Reasoning](https://arxiv.org/abs/2205.09712)                  | Май 2022 |
+| На длинных рассуждениях улучшайте качество, разбивая проблему на части и решая по очереди                                    | [Least-to-most Prompting Enables Complex Reasoning in Large Language Models](https://arxiv.org/abs/2205.10625)                               | Май 2022 |
+| Можете проанализировать и правильные, и ошибочные объяснения, чтобы найти максимально согласованный набор объяснений         | [Maieutic Prompting: Logically Consistent Reasoning with Recursive Explanations](https://arxiv.org/abs/2205.11822)                           | Май 2022 |
+| Можно рассматривать эти методы в парадигме вероятностного программирования, где система строится из недостоверных компонентов | [Language Model Cascades](https://arxiv.org/abs/2207.10342)                                                                                    | Июль 2022 |
+| Устраняйте галлюцинации с помощью манипуляций с обозначениями предложений и уменьшайте ошибки с помощью «halter» запроса     | [Faithful Reasoning Using Large Language Models](https://arxiv.org/abs/2208.14271)                                                           | Авг 2022 |

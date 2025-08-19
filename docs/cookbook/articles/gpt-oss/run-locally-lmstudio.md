@@ -3,80 +3,80 @@ lang: ru
 translationOf: openai-cookbook
 ---
 
-# How to run gpt-oss locally with LM Studio
+# Как запустить gpt-oss локально с LM Studio
 
-[LM Studio](https://lmstudio.ai) is a performant and friendly desktop application for running large language models (LLMs) on local hardware. This guide will walk you through how to set up and run **gpt-oss-20b** or **gpt-oss-120b** models using LM Studio, including how to chat with them, use MCP servers, or interact with the models through LM Studio's local development API.
+[LM Studio](https://lmstudio.ai) — это производительное и удобное настольное приложение для запуска больших языковых моделей (LLM) на локальном оборудовании. В этом руководстве мы рассмотрим, как настроить и запустить модели **gpt-oss-20b** или **gpt-oss-120b** с помощью LM Studio, включая общение с ними, использование MCP-серверов и взаимодействие с моделями через локальное API для разработки LM Studio.
 
-Note that this guide is meant for consumer hardware, like running gpt-oss on a PC or Mac. For server applications with dedicated GPUs like NVIDIA's H100s, [check out our vLLM guide](https://cookbook.openai.com/articles/gpt-oss/run-vllm).
+Обратите внимание, что это руководство предназначено для потребительского оборудования, например для запуска gpt-oss на ПК или Mac. Для серверных приложений с выделенными GPU, такими как NVIDIA H100, [ознакомьтесь с нашим руководством по vLLM](https://cookbook.openai.com/articles/gpt-oss/run-vllm).
 
-## Pick your model
+## Выберите модель
 
-LM Studio supports both model sizes of gpt-oss:
+LM Studio поддерживает оба размера моделей gpt-oss:
 
 - [**`openai/gpt-oss-20b`**](https://lmstudio.ai/models/openai/gpt-oss-20b)
-  - The smaller model
-  - Only requires at least **16GB of VRAM**
-  - Perfect for higher-end consumer GPUs or Apple Silicon Macs
+  - Меньшая модель
+  - Требует минимум **16 ГБ VRAM**
+  - Идеально для мощных потребительских GPU или Mac на Apple Silicon
 - [**`openai/gpt-oss-120b`**](https://lmstudio.ai/models/openai/gpt-oss-120b)
-  - Our larger full-sized model
-  - Best with **≥60GB VRAM**
-  - Ideal for multi-GPU or beefy workstation setup
+  - Наша большая полноразмерная модель
+  - Рекомендуется **≥60 ГБ VRAM**
+  - Оптимально для мульти-GPU или мощных рабочих станций
 
-LM Studio ships both a [llama.cpp](https://github.com/ggml-org/llama.cpp) inferencing engine (running GGUF formatted models), as well as an [Apple MLX](https://github.com/ml-explore/mlx) engine for Apple Silicon Macs. 
+LM Studio комплектуется движком инференса [llama.cpp](https://github.com/ggml-org/llama.cpp) (запускающим модели в формате GGUF), а также движком [Apple MLX](https://github.com/ml-explore/mlx) для Mac на Apple Silicon.
 
-## Quick setup
+## Быстрая настройка
 
-1. **Install LM Studio**
-   LM Studio is available for Windows, macOS, and Linux. [Get it here](https://lmstudio.ai/download).
+1. **Установите LM Studio**  
+   LM Studio доступна для Windows, macOS и Linux. [Скачайте её здесь](https://lmstudio.ai/download).
 
-2. **Download the gpt-oss model** → 
+2. **Скачайте модель gpt-oss** → 
 
 &lt;&lt;&lt;CODE_0&gt;>> 
 
-3. **Load the model in LM Studio** 
-  → Open LM Studio and use the model loading interface to load the gpt-oss model you downloaded. Alternatively, you can use the command line:
+3. **Загрузите модель в LM Studio**  
+  → Откройте LM Studio и используйте интерфейс загрузки модели для загрузки скачанной модели gpt-oss. Либо используйте командную строку:
 
 &lt;&lt;&lt;CODE_1&gt;>>
 
-4. **Use the model** → Once loaded, you can interact with the model directly in LM Studio's chat interface or through the API.
+4. **Используйте модель** → После загрузки вы можете общаться с моделью напрямую в интерфейсе чата LM Studio или через API.
 
-## Chat with gpt-oss
+## Общение с gpt-oss
 
-Use LM Studio's chat interface to start a conversation with gpt-oss, or use the `chat` command in the terminal:
+Используйте чат-интерфейс LM Studio, чтобы начать разговор с gpt-oss, или воспользуйтесь командой `chat` в терминале:
 
 &lt;&lt;&lt;CODE_2&gt;>>
 
-Note about prompt formatting: LM Studio utilizes OpenAI's [Harmony](https://cookbook.openai.com/articles/openai-harmony) library to construct the input to gpt-oss models, both when running via llama.cpp and MLX.
+Примечание по форматированию промптов: LM Studio использует библиотеку OpenAI [Harmony](https://cookbook.openai.com/articles/openai-harmony) для формирования входных данных для моделей gpt-oss как при работе через llama.cpp, так и через MLX.
 
-## Use gpt-oss with a local /v1/chat/completions endpoint
+## Использование gpt-oss с локальным эндпоинтом /v1/chat/completions
 
-LM Studio exposes a **Chat Completions-compatible API** so you can use the OpenAI SDK without changing much. Here’s a Python example:
+LM Studio предоставляет **API, совместимый с Chat Completions**, чтобы вы могли использовать OpenAI SDK с минимальными изменениями. Вот пример на Python:
 
 &lt;&lt;&lt;CODE_3&gt;>>
 
-If you’ve used the OpenAI SDK before, this will feel instantly familiar and your existing code should work by changing the base URL.
+Если вы уже использовали OpenAI SDK, это покажется вам знакомым, и существующий код будет работать, если изменить базовый URL.
 
-## How to use MCPs in the chat UI
+## Как использовать MCP в интерфейсе чата
 
-LM Studio is an [MCP client](https://lmstudio.ai/docs/app/plugins/mcp), which means you can connect MCP servers to it. This allows you to provide external tools to gpt-oss models.
+LM Studio является [MCP-клиентом](https://lmstudio.ai/docs/app/plugins/mcp), что означает, что вы можете подключать к нему MCP-серверы. Это позволяет предоставлять внешние инструменты моделям gpt-oss.
 
-LM Studio's mcp.json file is located in:
+Файл mcp.json LM Studio находится по пути:
 
 &lt;&lt;&lt;CODE_4&gt;>>
 
-## Local tool use with gpt-oss in Python or TypeScript
+## Использование локальных инструментов с gpt-oss на Python или TypeScript
 
-LM Studio's SDK is available in both [Python](https://github.com/lmstudio-ai/lmstudio-python) and [TypeScript](https://github.com/lmstudio-ai/lmstudio-js). You can leverage the SDK to implement tool calling and local function execution with gpt-oss.
+SDK LM Studio доступен как на [Python](https://github.com/lmstudio-ai/lmstudio-python), так и на [TypeScript](https://github.com/lmstudio-ai/lmstudio-js). Вы можете использовать SDK для реализации вызова инструментов и выполнения локальных функций с gpt-oss.
 
-The way to achieve this is via the `.act()` call, which allows you to provide tools to the gpt-oss and have it go between calling tools and reasoning, until it completes your task.
+Для этого используется вызов `.act()`, который позволяет предоставлять инструменты gpt-oss и переключаться между вызовом инструментов и рассуждениями, пока задача не будет выполнена.
 
-The example below shows how to provide a single tool to the model that is able to create files on your local filesystem. You can use this example as a starting point, and extend it with more tools. See docs about tool definitions here for [Python](https://lmstudio.ai/docs/python/agent/tools) and [TypeScript](https://lmstudio.ai/docs/typescript/agent/tools).
+Ниже пример, который демонстрирует, как предоставить модели один инструмент, способный создавать файлы на локальной файловой системе. Этот пример можно взять за основу и расширить новыми инструментами. Смотрите документацию по определению инструментов здесь для [Python](https://lmstudio.ai/docs/python/agent/tools) и [TypeScript](https://lmstudio.ai/docs/typescript/agent/tools).
 
 &lt;&lt;&lt;CODE_5&gt;>>
 
 &lt;&lt;&lt;CODE_6&gt;>>
 
-For TypeScript developers who want to utilize gpt-oss locally, here's a similar example using `lmstudio-js`:
+Для разработчиков на TypeScript, желающих использовать gpt-oss локально, вот аналогичный пример с использованием `lmstudio-js`:
 
 &lt;&lt;&lt;CODE_7&gt;>>
 

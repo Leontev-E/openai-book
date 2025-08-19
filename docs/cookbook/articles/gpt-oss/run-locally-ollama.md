@@ -3,87 +3,87 @@ lang: ru
 translationOf: openai-cookbook
 ---
 
-# How to run gpt-oss locally with Ollama
+# Как запустить gpt-oss локально с Ollama
 
-Want to get [**OpenAI gpt-oss**](https://openai.com/open-models) running on your own hardware? This guide will walk you through how to use [Ollama](https://ollama.ai) to set up **gpt-oss-20b** or **gpt-oss-120b** locally, to chat with it offline, use it through an API, and even connect it to the Agents SDK.
+Хотите запустить [**OpenAI gpt-oss**](https://openai.com/open-models) на собственном оборудовании? В этом руководстве мы расскажем, как использовать [Ollama](https://ollama.ai), чтобы локально установить **gpt-oss-20b** или **gpt-oss-120b**, общаться с моделью офлайн, использовать через API и даже подключить её к Agents SDK.
 
-Note that this guide is meant for consumer hardware, like running a model on a PC or Mac. For server applications with dedicated GPUs like NVIDIA’s H100s, [check out our vLLM guide](https://cookbook.openai.com/articles/gpt-oss/run-vllm).
+Обратите внимание, что это руководство предназначено для потребительского оборудования, например, запуска модели на ПК или Mac. Для серверных приложений с выделенными GPU, такими как NVIDIA H100, [ознакомьтесь с нашим руководством по vLLM](https://cookbook.openai.com/articles/gpt-oss/run-vllm).
 
-## Pick your model
+## Выбор модели
 
-Ollama supports both model sizes of gpt-oss:
+Ollama поддерживает обе версии модели gpt-oss:
 
 - **`gpt-oss-20b`**
-  - The smaller model
-  - Best with **≥16GB VRAM** or **unified memory**
-  - Perfect for higher-end consumer GPUs or Apple Silicon Macs
+  - Модель меньшего размера
+  - Лучше всего с **≥16GB VRAM** или **объединённой памятью**
+  - Идеально подходит для высококлассных потребительских GPU или Apple Silicon Mac
 - **`gpt-oss-120b`**
-  - Our larger full-sized model
-  - Best with **≥60GB VRAM** or **unified memory**
-  - Ideal for multi-GPU or beefy workstation setup
+  - Наша большая полноформатная модель
+  - Лучше всего с **≥60GB VRAM** или **объединённой памятью**
+  - Идеально для настройки с несколькими GPU или мощной рабочей станцией
 
-**A couple of notes:**
+**Несколько замечаний:**
 
-- These models ship **MXFP4 quantized** out the box and there is currently no other quantization
-- You _can_ offload to CPU if you’re short on VRAM, but expect it to run slower.
+- Эти модели поставляются с **MXFP4-квантованием** «из коробки», в настоящее время других типов квантования нет
+- Вы _можете_ выгружать вычисления на CPU при нехватке VRAM, но ожидать более низкую скорость работы.
 
-## Quick setup
+## Быстрая настройка
 
-1. **Install Ollama** → [Get it here](https://ollama.com/download)
-2. **Pull the model you want:**
+1. **Установите Ollama** → [Скачать здесь](https://ollama.com/download)
+2. **Загрузите нужную модель:**
 
 &lt;&lt;&lt;CODE_0&gt;>>
 
-## Chat with gpt-oss
+## Общение с gpt-oss
 
-Ready to talk to the model? You can fire up a chat in the app or the terminal:
+Готовы поговорить с моделью? Можно запустить чат в приложении или в терминале:
 
 &lt;&lt;&lt;CODE_1&gt;>>
 
-Ollama applies a **chat template** out of the box that mimics the [OpenAI harmony format](https://cookbook.openai.com/articles/openai-harmony). Type your message and start the conversation.
+Ollama применяет **чатовый шаблон**, имитирующий [формат OpenAI harmony](https://cookbook.openai.com/articles/openai-harmony). Введите ваше сообщение и начните разговор.
 
-## Use the API
+## Использование API
 
-Ollama exposes a **Chat Completions-compatible API**, so you can use the OpenAI SDK without changing much. Here’s a Python example:
+Ollama предоставляет **API, совместимый с Chat Completions**, поэтому вы можете использовать OpenAI SDK без существенных изменений. Вот пример на Python:
 
 &lt;&lt;&lt;CODE_2&gt;>>
 
-If you’ve used the OpenAI SDK before, this will feel instantly familiar.
+Если вы уже использовали OpenAI SDK, это будет понятно сразу.
 
-Alternatively, you can use the Ollama SDKs in [Python](https://github.com/ollama/ollama-python) or [JavaScript](https://github.com/ollama/ollama-js) directly.
+В качестве альтернативы вы можете использовать SDK Ollama на [Python](https://github.com/ollama/ollama-python) или [JavaScript](https://github.com/ollama/ollama-js) напрямую.
 
-## Using tools (function calling)
+## Использование инструментов (вызов функций)
 
-Ollama can:
+Ollama может:
 
-- Call functions
-- Use a **built-in browser tool** (in the app)
+- Вызывать функции
+- Использовать **встроенный браузерный инструмент** (в приложении)
 
-Example of invoking a function via Chat Completions:
+Пример вызова функции через Chat Completions:
 
 &lt;&lt;&lt;CODE_3&gt;>>
 
-Since the models can perform tool calling as part of the chain-of-thought (CoT) it’s important for you to return the reasoning returned by the API back into a subsequent call to a tool call where you provide the answer until the model reaches a final answer.
+Поскольку модели могут выполнять вызов инструментов как часть цепочки рассуждений (chain-of-thought, CoT), важно возвращать логику, полученную от API, в последующий вызов функции, где вы предоставляете ответ, пока модель не достигнет окончательного результата.
 
-## Responses API workarounds
+## Обходы для Responses API
 
-Ollama doesn’t (yet) support the **Responses API** natively.
+Ollama пока **не поддерживает Responses API** нативно.
 
-If you do want to use the Responses API you can use [**Hugging Face’s `Responses.js` proxy**](https://github.com/huggingface/responses.js) to convert Chat Completions to Responses API.
+Если вы хотите использовать Responses API, можете применить [**прокси `Responses.js` от Hugging Face**](https://github.com/huggingface/responses.js) для преобразования Chat Completions в Responses API.
 
-For basic use cases you can also [**run our example Python server with Ollama as the backend.**](https://github.com/openai/gpt-oss?tab=readme-ov-file#responses-api) This server is a basic example server and does not have the
+Для базовых случаев также можно [**запустить пример нашего Python-сервера с Ollama в качестве бэкенда.**](https://github.com/openai/gpt-oss?tab=readme-ov-file#responses-api) Этот сервер является простым примером и не включает
 
 &lt;&lt;&lt;CODE_4&gt;>>
 
-## Agents SDK integration
+## Интеграция с Agents SDK
 
-Want to use gpt-oss with OpenAI’s **Agents SDK**?
+Хотите использовать gpt-oss с OpenAI **Agents SDK**?
 
-Both Agents SDK enable you to override the OpenAI base client to point to Ollama using Chat Completions or your Responses.js proxy for your local models. Alternatively, you can use the built-in functionality to point the Agents SDK against third party models.
+Agents SDK позволяет переопределить базовый OpenAI клиент, чтобы направлять запросы на Ollama через Chat Completions или ваш прокси Responses.js для локальных моделей. Также можно использовать встроенные возможности для подключения Agents SDK к сторонним моделям.
 
-- **Python:** Use [LiteLLM](https://openai.github.io/openai-agents-python/models/litellm/) to proxy to Ollama through LiteLLM
-- **TypeScript:** Use [AI SDK](https://openai.github.io/openai-agents-js/extensions/ai-sdk/) with the [ollama adapter](https://ai-sdk.dev/providers/community-providers/ollama)
+- **Python:** используйте [LiteLLM](https://openai.github.io/openai-agents-python/models/litellm/), который проксирует запросы к Ollama через LiteLLM
+- **TypeScript:** используйте [AI SDK](https://openai.github.io/openai-agents-js/extensions/ai-sdk/) с [адаптером ollama](https://ai-sdk.dev/providers/community-providers/ollama)
 
-Here’s a Python Agents SDK example using LiteLLM:
+Пример использования Agents SDK на Python с LiteLLM:
 
 &lt;&lt;&lt;CODE_5&gt;>>

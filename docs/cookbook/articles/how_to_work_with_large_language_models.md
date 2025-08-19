@@ -3,129 +3,129 @@ lang: ru
 translationOf: openai-cookbook
 ---
 
-# How to work with large language models
+# Как работать с крупными языковыми моделями
 
-## How large language models work
+## Как работают крупные языковые модели
 
-[Large language models][Large language models Blog Post] are functions that map text to text. Given an input string of text, a large language model predicts the text that should come next.
+[Крупные языковые модели][Large language models Blog Post] — это функции, которые отображают текст в текст. Получив на вход строку текста, крупная языковая модель предсказывает, какой текст должен идти далее.
 
-The magic of large language models is that by being trained to minimize this prediction error over vast quantities of text, the models end up learning concepts useful for these predictions. For example, they learn:
+Магия больших языковых моделей заключается в том, что, будучи обученными минимизировать ошибку предсказания на огромных объемах текста, модели в итоге изучают концепции, полезные для этих предсказаний. Например, они учатся:
 
-- how to spell
-- how grammar works
-- how to paraphrase
-- how to answer questions
-- how to hold a conversation
-- how to write in many languages
-- how to code
-- etc.
+- как правильно писать
+- как работает грамматика
+- как перефразировать
+- как отвечать на вопросы
+- как вести беседу
+- как писать на многих языках
+- как программировать
+- и так далее.
 
-They do this by “reading” a large amount of existing text and learning how words tend to appear in context with other words, and uses what it has learned to predict the next most likely word that might appear in response to a user request, and each subsequent word after that.
+Они делают это, «читая» большое количество существующего текста и изучая, как слова обычно появляются в контексте с другими словами, и используют то, что выучили, чтобы предсказать следующее наиболее вероятное слово, которое может появиться в ответ на запрос пользователя, и каждое последующее слово после него.
 
-GPT-3 and GPT-4 power [many software products][OpenAI Customer Stories], including productivity apps, education apps, games, and more.
+GPT-3 и GPT-4 лежат в основе [многих программных продуктов][OpenAI Customer Stories], включая приложения для продуктивности, образовательные приложения, игры и многое другое.
 
-## How to control a large language model
+## Как управлять крупной языковой моделью
 
-Of all the inputs to a large language model, by far the most influential is the text prompt.
+Из всех входных данных для крупной языковой модели наиболее влиятельным является текстовый запрос (prompt).
 
-Large language models can be prompted to produce output in a few ways:
+Крупные языковые модели можно направлять на генерацию результата несколькими способами:
 
-- **Instruction**: Tell the model what you want
-- **Completion**: Induce the model to complete the beginning of what you want
-- **Scenario**: Give the model a situation to play out
-- **Demonstration**: Show the model what you want, with either:
-  - A few examples in the prompt
-  - Many hundreds or thousands of examples in a fine-tuning training dataset
+- **Инструкция**: Скажите модели, что вы хотите
+- **Завершение**: Побудите модель дополнить начало того, что вы хотите
+- **Сценарий**: Дайте модели ситуацию, которую нужно отыграть
+- **Демонстрация**: Покажите модели, что вы хотите, используя:
+  - Несколько примеров в запросе
+  - Сотни или тысячи примеров в тренировочном наборе для тонкой настройки
 
-An example of each is shown below.
+Пример каждого из них приведён ниже.
 
-### Instruction prompts
+### Запросы-инструкции
 
-Write your instruction at the top of the prompt (or at the bottom, or both), and the model will do its best to follow the instruction and then stop. Instructions can be detailed, so don't be afraid to write a paragraph explicitly detailing the output you want, just stay aware of how many [tokens](https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them) the model can process.
+Напишите инструкцию в начале запроса (или в конце, или и там, и там), и модель постарается выполнить эту инструкцию, а затем прекратит вывод. Инструкции могут быть подробными, поэтому не бойтесь написать целый абзац, явно описывающий желаемый результат, но учитывайте, сколько [токенов](https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them) модель может обработать.
 
-Example instruction prompt:
+Пример запроса-инструкции:
 
 &lt;&lt;&lt;CODE_0&gt;>>
 
-Output:
+Вывод:
 
 &lt;&lt;&lt;CODE_1&gt;>>
 
-### Completion prompt example
+### Пример запроса в стиле завершения
 
-Completion-style prompts take advantage of how large language models try to write text they think is most likely to come next. To steer the model, try beginning a pattern or sentence that will be completed by the output you want to see. Relative to direct instructions, this mode of steering large language models can take more care and experimentation. In addition, the models won't necessarily know where to stop, so you will often need stop sequences or post-processing to cut off text generated beyond the desired output.
+Запросы в стиле завершения используют то, что крупные языковые модели пытаются написать текст, который, по их мнению, наиболее вероятно идет дальше. Чтобы управлять моделью, попробуйте начать шаблон или предложение, которое будет дополнено желаемым выводом. По сравнению с прямыми инструкциями, такой способ управления моделями требует больше аккуратности и экспериментов. Кроме того, модели не всегда знают, где остановиться, поэтому часто нужны специальные стоп-последовательности или постобработка, чтобы обрезать текст, сгенерированный сверх желаемого результата.
 
-Example completion prompt:
+Пример запроса в стиле завершения:
 
 &lt;&lt;&lt;CODE_2&gt;>>
 
-Output:
+Вывод:
 
 &lt;&lt;&lt;CODE_3&gt;>>
 
-### Scenario prompt example
+### Пример сценарного запроса
 
-Giving the model a scenario to follow or role to play out can be helpful for complex queries or when seeking imaginative responses. When using a hypothetical prompt, you set up a situation, problem, or story, and then ask the model to respond as if it were a character in that scenario or an expert on the topic.
+Задание модели сценария или роли для отыгрыша может быть полезным для сложных запросов или при поиске творческих ответов. Используя гипотетический запрос, вы создаёте ситуацию, проблему или историю, а затем просите модель ответить, как будто она персонаж в этом сценарии или эксперт по теме.
 
-Example scenario prompt:
+Пример сценарного запроса:
 
 &lt;&lt;&lt;CODE_4&gt;>>
 
-Output:
+Вывод:
 
 &lt;&lt;&lt;CODE_5&gt;>>
 
-### Demonstration prompt example (few-shot learning)
+### Пример демонстрационного запроса (few-shot обучение)
 
-Similar to completion-style prompts, demonstrations can show the model what you want it to do. This approach is sometimes called few-shot learning, as the model learns from a few examples provided in the prompt.
+Подобно запросам в стиле завершения, демонстрации показывают модели, что вы хотите, чтобы она сделала. Этот подход иногда называют few-shot обучением, так как модель учится на нескольких примерах, приведённых в запросе.
 
-Example demonstration prompt:
+Пример демонстрационного запроса:
 
 &lt;&lt;&lt;CODE_6&gt;>>
 
-Output:
+Вывод:
 
 &lt;&lt;&lt;CODE_7&gt;>>
 
-### Fine-tuned prompt example
+### Пример тонко настроенного запроса
 
-With enough training examples, you can [fine-tune][Fine Tuning Docs] a custom model. In this case, instructions become unnecessary, as the model can learn the task from the training data provided. However, it can be helpful to include separator sequences (e.g., `->` or `###` or any string that doesn't commonly appear in your inputs) to tell the model when the prompt has ended and the output should begin. Without separator sequences, there is a risk that the model continues elaborating on the input text rather than starting on the answer you want to see.
+Имея достаточное количество учебных примеров, вы можете [тонко настроить][Fine Tuning Docs] свою модель. В таком случае инструкции становятся ненужными, так как модель может научиться задаче на основе предоставленных данных для обучения. Тем не менее, полезно включать разделители (например, `->` или `###` или любую строку, которая обычно не встречается во входных данных), чтобы указать модели, где заканчивается запрос и начинается вывод. Без разделителей есть риск, что модель будет продолжать развивать текст запроса, а не начнёт желаемый ответ.
 
-Example fine-tuned prompt (for a model that has been custom trained on similar prompt-completion pairs):
+Пример тонко настроенного запроса (для модели, обученной на похожих парах запрос-завершение):
 
 &lt;&lt;&lt;CODE_8&gt;>>
 
-Output:
+Вывод:
 
 &lt;&lt;&lt;CODE_9&gt;>>
 
-## Code Capabilities
+## Возможности работы с кодом
 
-Large language models aren't only great at text - they can be great at code too. OpenAI's [GPT-4][GPT-4 and GPT-4 Turbo] model is a prime example.
+Крупные языковые модели хороши не только с текстом — они могут отлично работать и с кодом. Отличный пример — модель OpenAI [GPT-4][GPT-4 and GPT-4 Turbo].
 
-GPT-4 powers [numerous innovative products][OpenAI Customer Stories], including:
+GPT-4 лежит в основе [множества инновационных продуктов][OpenAI Customer Stories], включая:
 
-- [GitHub Copilot] (autocompletes code in Visual Studio and other IDEs)
-- [Replit](https://replit.com/) (can complete, explain, edit and generate code)
-- [Cursor](https://cursor.sh/) (build software faster in an editor designed for pair-programming with AI)
+- [GitHub Copilot] (автодополнение кода в Visual Studio и других IDE)
+- [Replit](https://replit.com/) (может дописывать, объяснять, редактировать и генерировать код)
+- [Cursor](https://cursor.sh/) (позволяет быстрее создавать ПО в редакторе, разработанном для парного программирования с ИИ)
 
-GPT-4 is more advanced than previous models like `gpt-3.5-turbo-instruct`. But, to get the best out of GPT-4 for coding tasks, it's still important to give clear and specific instructions. As a result, designing good prompts can take more care.
+GPT-4 более продвинут, чем предыдущие модели, например `gpt-3.5-turbo-instruct`. Но для максимально эффективной работы с GPT-4 в задачах программирования важно давать чёткие и конкретные инструкции. В результате разработка хороших запросов требует больше внимания.
 
-### More prompt advice
+### Дополнительные советы по запросам
 
-For more prompt examples, visit [OpenAI Examples][OpenAI Examples].
+Для большего количества примеров запросов посетите [OpenAI Examples][OpenAI Examples].
 
-In general, the input prompt is the best lever for improving model outputs. You can try tricks like:
+В целом, входной запрос — лучший инструмент для улучшения вывода модели. Можно попробовать такие приёмы:
 
-- **Be more specific** E.g., if you want the output to be a comma separated list, ask it to return a comma separated list. If you want it to say "I don't know" when it doesn't know the answer, tell it 'Say "I don't know" if you do not know the answer.' The more specific your instructions, the better the model can respond.
-- **Provide Context**: Help the model understand the bigger picture of your request. This could be background information, examples/demonstrations of what you want or explaining the purpose of your task.
-- **Ask the model to answer as if it was an expert.** Explicitly asking the model to produce high quality output or output as if it was written by an expert can induce the model to give higher quality answers that it thinks an expert would write. Phrases like "Explain in detail" or "Describe step-by-step" can be effective.
-- **Prompt the model to write down the series of steps explaining its reasoning.** If understanding the 'why' behind an answer is important, prompt the model to include its reasoning. This can be done by simply adding a line like "[Let's think step by step](https://arxiv.org/abs/2205.11916)" before each answer.
+- **Будьте конкретнее** Например, если вы хотите вывести список через запятую, попросите вернуть список, разделённый запятыми. Если хотите, чтобы модель написала «Я не знаю», когда не знает ответа, скажите ей «Скажи "Я не знаю", если не знаешь ответа». Чем конкретнее ваши инструкции, тем лучше модель сможет ответить.
+- **Дайте контекст**: Помогите модели понять общую картину вашего запроса. Это может быть фон, примеры или демонстрации того, что вы хотите, или объяснение цели вашей задачи.
+- **Попросите модель отвечать, как эксперт.** Явная просьба выдавать высококачественные ответы или отвечать так, как если бы ответ писал эксперт, может заставить модель генерировать более качественные ответы. Фразы «Объясните подробно» или «Опишите шаг за шагом» часто эффективны.
+- **Попросите модель выписать серию шагов с пояснением рассуждений.** Если важно понять «почему» за ответом, попросите модель включить свои рассуждения. Это можно сделать, просто добавив строку вроде «[Давайте подумаем шаг за шагом](https://arxiv.org/abs/2205.11916)» перед каждым ответом.
 
-[Fine Tuning Docs]: https://platform.openai.com/docs/guides/fine-tuning
-[OpenAI Customer Stories]: https://openai.com/customer-stories
-[Large language models Blog Post]: https://openai.com/research/better-language-models
-[GitHub Copilot]: https://github.com/features/copilot/
-[GPT-4 and GPT-4 Turbo]: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo
-[GPT3 Apps Blog Post]: https://openai.com/blog/gpt-3-apps/
+[Fine Tuning Docs]: https://platform.openai.com/docs/guides/fine-tuning  
+[OpenAI Customer Stories]: https://openai.com/customer-stories  
+[Large language models Blog Post]: https://openai.com/research/better-language-models  
+[GitHub Copilot]: https://github.com/features/copilot/  
+[GPT-4 and GPT-4 Turbo]: https://platform.openai.com/docs/models/gpt-4-and-gpt-4-turbo  
+[GPT3 Apps Blog Post]: https://openai.com/blog/gpt-3-apps/  
 [OpenAI Examples]: https://platform.openai.com/examples

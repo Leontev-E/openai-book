@@ -3,68 +3,68 @@ lang: ru
 translationOf: openai-cookbook
 ---
 
-# What makes documentation good
+# Что делает документацию хорошей
 
-Documentation puts useful information inside other people’s heads. Follow these tips to write better documentation.
+Документация помещает полезную информацию в головы других людей. Следуйте этим советам, чтобы писать лучшую документацию.
 
-### Make docs easy to skim
+### Делайте документацию удобной для быстрого просмотра
 
-Few readers read linearly from top to bottom. They’ll jump around, trying to assess which bit solves their problem, if any. To reduce their search time and increase their odds of success, make docs easy to skim.
+Мало кто читает документацию линейно сверху вниз. Люди будут прыгать по тексту, пытаясь понять, решает ли какая-то часть их проблему. Чтобы сократить время поиска и увеличить шансы на успех, делайте документацию удобной для быстрого просмотра.
 
-**Split content into sections with titles.** Section titles act as signposts, telling readers whether to focus in or move on.
+**Разделяйте контент на секции с заголовками.** Заголовки секций служат ориентирами, позволяя читателям понять, стоит ли углубляться или перейти к следующему разделу.
 
-**Prefer titles with informative sentences over abstract nouns.** For example, if you use a title like “Results”, a reader will need to hop into the following text to learn what the results actually are. In contrast, if you use the title “Streaming reduced time to first token by 50%”, it gives the reader the information immediately, without the burden of an extra hop.
+**Предпочитайте заголовки с информативными предложениями вместо абстрактных существительных.** Например, если использовать заголовок “Результаты”, читателю придется читать последующий текст, чтобы понять, какие именно результаты имеются в виду. В отличие от этого, заголовок “Потоковая передача сократила время до первого токена на 50%” сразу предоставляет читателю информацию, без необходимости дополнительных переходов.
 
-**Include a table of contents.** Tables of contents help readers find information faster, akin to how hash maps have faster lookups than linked lists. Tables of contents also have a second, oft overlooked benefit: they give readers clues about the doc, which helps them understand if it’s worth reading.
+**Включайте оглавление.** Оглавления помогают читателям быстрее находить информацию, подобно тому, как хэш-таблицы быстрее ищут, чем связные списки. У оглавлений есть и второе, часто упускаемое из виду преимущество: они дают читателям подсказки о содержании документа, помогая понять, стоит ли его читать.
 
-**Keep paragraphs short.** Shorter paragraphs are easier to skim. If you have an essential point, consider putting it in its own one-sentence paragraph to reduce the odds it’s missed. Long paragraphs can bury information.
+**Держите абзацы короткими.** Короткие абзацы легче просматривать. Если у вас есть ключевая мысль, подумайте о том, чтобы вынести её в отдельный однострочный абзац — так снижается риск, что её пропустят. Длинные абзацы могут «потерять» информацию.
 
-**Begin paragraphs and sections with short topic sentences that give a standalone preview.** When people skim, they look disproportionately at the first word, first line, and first sentence of a section. Write these sentences in a way that don’t depend on prior text. For example, consider the first sentence “Building on top of this, let’s now talk about a faster way.” This sentence will be meaningless to someone who hasn’t read the prior paragraph. Instead, write it in a way that can understood standalone: e.g., “Vector databases can speed up embeddings search.”
+**Начинайте абзацы и разделы с коротких тематических предложений, которые дают самостоятельный обзор.** При быстром просмотре люди непропорционально внимательно смотрят на первое слово, первую строку и первое предложение раздела. Пишите эти предложения так, чтобы они были понятны без контекста. Например, первое предложение “Опираясь на это, давайте теперь поговорим о более быстром способе” будет бессмысленным для тех, кто не прочитал предыдущий абзац. Лучше написать так, чтобы оно было понятно самостоятельно: например, “Векторные базы данных ускоряют поиск по эмбеддингам.”
 
-**Put topic words at the beginning of topic sentences.** Readers skim most efficiently when they only need to read a word or two to know what a paragraph is about. Therefore, when writing topic sentences, prefer putting the topic at the beginning of the sentence rather than the end. For example, imagine you’re writing a paragraph on vector databases in the middle of a long article on embeddings search. Instead of writing “Embeddings search can be sped up by vector databases” prefer “Vector databases speed up embeddings search.” The second sentence is better for skimming, because it puts the paragraph topic at the beginning of the paragraph.
+**Ставьте ключевые слова в начало тематических предложений.** Читателям удобнее быстро просматривать текст, когда достаточно прочесть одно-два слова в начале предложения, чтобы понять о чём абзац. Поэтому при написании тематических предложений лучше ставить основное слово в начало, а не в конец. Например, если вы пишете абзац про векторные базы в середине длинной статьи об эмбеддингах, вместо “Поиск по эмбеддингам может быть ускорен с помощью векторных баз” лучше “Векторные базы ускоряют поиск по эмбеддингам.” Второе предложение лучше подходит для быстрого просмотра, так как тема абзаца стоит в начале.
 
-**Put the takeaways up front.** Put the most important information at the tops of documents and sections. Don’t write a Socratic big build up. Don’t introduce your procedure before your results.
+**Выводы размещайте в начале.** Самая важная информация должна быть вверху документов и разделов. Не пишите длинное диалектическое развитие темы. Не вводите процедуру перед тем, как представить результаты.
 
-**Use bullets and tables.** Bulleted lists and tables make docs easier to skim. Use them frequently.
+**Используйте списки и таблицы.** Маркированные списки и таблицы делают документацию удобнее для быстрого просмотра. Используйте их чаще.
 
-**Bold important text.** Don’t be afraid to bold important text to help readers find it.
+**Выделяйте важный текст жирным шрифтом.** Не бойтесь выделять важное, чтобы помочь читателям быстрее его найти.
 
-### Write well
+### Пишите грамотно
 
-Badly written text is taxing to read. Minimize the tax on readers by writing well.
+Плохо написанный текст сложно читать. Снизьте нагрузку на читателей, написав текст хорошо.
 
-**Keep sentences simple.** Split long sentences into two. Cut adverbs. Cut unnecessary words and phrases. Use the imperative mood, if applicable. Do what writing books tell you.
+**Держите предложения простыми.** Разбивайте длинные предложения на два. Убирайте наречия. Удаляйте лишние слова и фразы. Используйте повелительное наклонение, если это уместно. Следуйте советам книг по написанию.
 
-**Write sentences that can be parsed unambiguously.** For example, consider the sentence “Title sections with sentences.” When a reader reads the word “Title”, their brain doesn’t yet know whether “Title” is going to be a noun or verb or adjective. It takes a bit of brainpower to keep track as they parse the rest of the sentence, and can cause a hitch if their brain mispredicted the meaning. Prefer sentences that can be parsed more easily (e.g., “Write section titles as sentences”) even if longer. Similarly, avoid noun phrases like “Bicycle clearance exercise notice” which can take extra effort to parse.
+**Пишите предложения, которые можно однозначно разобрать.** Например, предложение «Title sections with sentences.» При чтении слова «Title» мозг читателя ещё не знает, является ли оно существительным, глаголом или прилагательным. При разборе остальной части предложения это может вызвать затруднения и сбои, если смысл неправильно угадан. Предпочитайте предложения, которые легче разобрать (например, «Write section titles as sentences»), даже если они длиннее. Аналогично, избегайте существительных фраз вроде «Bicycle clearance exercise notice», которые требуют дополнительных усилий для понимания.
 
-**Avoid left-branching sentences.** Linguistic trees show how words relate to each other in sentences. Left-branching trees require readers to hold more things in memory than right-branching sentences, akin to breadth-first search vs depth-first search. An example of a left-branching sentence is “You need flour, eggs, milk, butter and a dash of salt to make pancakes.” In this sentence you don’t find out what ‘you need’ connects to until you reach the end of the sentence. An easier-to-read right-branching version is “To make pancakes, you need flour, eggs, milk, butter, and a dash of salt.” Watch out for sentences in which the reader must hold onto a word for a while, and see if you can rephrase them.
+**Избегайте предложений с левым ветвлением.** Лингвистические деревья показывают, как слова связаны в предложениях. Левоветвящиеся предложения требуют от читателей держать в памяти больше элементов, чем правоветвящиеся, подобно разнице между поиском в ширину и поиском в глубину. Пример левоветвящегося предложения: «You need flour, eggs, milk, butter and a dash of salt to make pancakes.» В конце предложения разбираешься, с чем связано «you need». Более лёгкое для чтения правоветвящееся предложение: «To make pancakes, you need flour, eggs, milk, butter, and a dash of salt.» Следите за предложениями, в которых читателю приходится долго держать слово в памяти, и старайтесь их переформулировать.
 
-**Avoid demonstrative pronouns (e.g., “this”), especially across sentences.** For example, instead of saying “Building on our discussion of the previous topic, now let’s discuss function calling” try “Building on message formatting, now let’s discuss function calling.” The second sentence is easier to understand because it doesn’t burden the reader with recalling the previous topic. Look for opportunities to cut demonstrative pronouns altogether: e.g., “Now let’s discuss function calling.”
+**Избегайте указательных местоимений (например, «this»), особенно между предложениями.** Например, вместо «Building on our discussion of the previous topic, now let’s discuss function calling» лучше «Building on message formatting, now let’s discuss function calling.» Второе предложение легче понимать, так как не заставляет читателя вспоминать предыдущую тему. Ищите возможности полностью убрать указательные местоимения: например, «Now let’s discuss function calling.»
 
-**Be consistent.** Human brains are amazing pattern matchers. Inconsistencies will annoy or distract readers. If we use Title Case everywhere, use Title Case. If we use terminal commas everywhere, use terminal commas. If all of the Cookbook notebooks are named with underscores and sentence case, use underscores and sentence case. Don’t do anything that will cause a reader to go ‘huh, that’s weird.’ Help them focus on the content, not its inconsistencies.
+**Будьте последовательными.** Человеческий мозг отлично распознаёт закономерности. Несогласованности раздражают или отвлекают читателей. Если везде используется Title Case, используйте Title Case. Если везде применяются конечные запятые, используйте конечные запятые. Если все «Кулинарные книжки» именуются с подчёркиваниями и в предложном регистре, придерживайтесь этого стиля. Не делайте ничего, что заставит читателя подумать «эээ, это странно». Помогайте им сконцентрироваться на содержании, а не на несогласованностях.
 
-**Don’t tell readers what they think or what to do.** Avoid sentences like “Now you probably want to understand how to call a function” or “Next, you’ll need to learn to call a function.” Both examples presume a reader’s state of mind, which may annoy them or burn our credibility. Use phrases that avoid presuming the reader’s state. E.g., “To call a function, …”
+**Не говорите читателям, что они думают или что им делать.** Избегайте фраз вроде «Теперь вы, вероятно, хотите понять, как вызвать функцию» или «Далее вам нужно научиться вызывать функцию.» Эти примеры предполагют состояние читателя, что может раздражать их или подрывать нашу надёжность. Используйте выражения, которые не предполагают состояние читателя. Например, «To call a function, …»
 
-### Be broadly helpful
+### Будьте максимально полезными
 
-People come to documentation with varying levels of knowledge, language proficiency, and patience. Even if we target experienced developers, we should try to write docs helpful to everyone.
+К документации обращаются люди с разным уровнем знаний, владения языком и терпения. Даже если мы ориентируемся на опытных разработчиков, стоит писать так, чтобы документация была полезна всем.
 
-**Write simply.** Explain things more simply than you think you need to. Many readers might not speak English as a first language. Many readers might be really confused about technical terminology and have little excess brainpower to spend on parsing English sentences. Write simply. (But don’t oversimplify.)
+**Пишите просто.** Объясняйте проще, чем вам кажется нужным. Многие читатели могут не иметь английский как родной язык. Многие могут быть сильно запутаны в технической терминологии и иметь мало лишних ресурсов для разбора английских предложений. Пишите просто. (Но не упрощайте чрезмерно.)
 
-**Avoid abbreviations.** Write things out. The cost to experts is low and the benefit to beginners is high. Instead of IF, write instruction following. Instead of RAG, write retrieval-augmented generation (or my preferred term: the search-ask procedure).
+**Избегайте аббревиатур.** Выписывайте всё полностью. Затраты для экспертов невелики, а польза для новичков высока. Вместо IF пишите instruction following. Вместо RAG — retrieval-augmented generation (или мой предпочтительный термин: search-ask procedure).
 
-**Offer solutions to potential problems.** Even if 95% of our readers know how to install a Python package or save environment variables, it can still be worth proactively explaining it. Including explanations is not costly to experts—they can skim right past them. But excluding explanations is costly to beginners—they might get stuck or even abandon us. Remember that even an expert JavaScript engineer or C++ engineer might be a beginner at Python. Err on explaining too much, rather than too little.
+**Предлагайте решения возможных проблем.** Даже если 95% наших читателей знают, как установить Python-библиотеку или сохранить переменные окружения, стоит заранее это объяснить. Включение объяснений не обременительно для экспертов — они могут быстро пролистать. Но отсутствие объяснений обременяет новичков — они могут застрять или даже уйти. Помните, что даже опытный JavaScript или C++ инженер может быть новичком в Python. Лучше объяснять больше, чем слишком мало.
 
-**Prefer terminology that is specific and accurate.** Jargon is bad. Optimize the docs for people new to the field, instead of ourselves. For example, instead of writing “prompt”, write “input.” Or instead of writing “context limit” write “max token limit.” The latter terms are more self-evident, and are probably better than the jargon developed in base model days.
+**Предпочитайте терминологию, которая точна и понятна.** Жаргон плохо работает. Оптимизируйте документацию для новичков в области, а не для себя. Например, вместо «prompt» пишите «input». Или вместо «context limit» — «максимальное количество токенов». Такие термины более очевидны и, вероятно, лучше, чем жаргон, выработанный в эпоху базовых моделей.
 
-**Keep code examples general and exportable.** In code demonstrations, try to minimize dependencies. Don’t make users install extra libraries. Don’t make them have to refer back and forth between different pages or sections. Try to make examples simple and self-contained.
+**Держите примеры кода общими и готовыми к использованию.** В демонстрациях кода минимизируйте зависимости. Не заставляйте пользователей устанавливать дополнительные библиотеки. Не заставляйте их постоянно переходить между разными страницами или разделами. Старайтесь, чтобы примеры были простыми и автономными.
 
-**Prioritize topics by value.** Documentation that covers common problems—e.g., how to count tokens—is magnitudes more valuable than documentation that covers rare problems—e.g., how to optimize an emoji database. Prioritize accordingly.
+**Приоритизируйте темы по их ценности.** Документация, покрывающая распространённые проблемы — например, как считать токены — значительно ценнее, чем описания редких случаев — например, как оптимизировать базу с эмодзи. Приоритизируйте соответственно.
 
-**Don’t teach bad habits.** If API keys should not be stored in code, never share an example that stores an API key in code.
+**Не обучайте плохим привычкам.** Если API-ключи нельзя хранить в коде, никогда не показывайте пример, где ключ хранится в коде.
 
-**Introduce topics with a broad opening.** For example, if explaining how to program a good recommender, consider opening by briefly mentioning that recommendations are widespread across the web, from YouTube videos to Amazon items to Wikipedia. Grounding a narrow topic with a broad opening can help people feel more secure before jumping into uncertain territory. And if the text is well-written, those who already know it may still enjoy it.
+**Вводите темы с широкого обзора.** Например, объясняя, как писать хороший рекомендательный движок, начните с краткого упоминания, что рекомендации распространены повсеместно — от видео на YouTube до товаров на Amazon и страниц Wikipedia. Связывание узкой темы с широким обзором помогает читателям чувствовать себя увереннее перед переходом на новую территорию. И если текст качественный, те, кто уже знаком с темой, всё равно получат удовольствие.
 
-### Break these rules when you have a good reason
+### Нарушайте эти правила, если на то есть веские причины
 
-Ultimately, do what you think is best. Documentation is an exercise in empathy. Put yourself in the reader’s position, and do what you think will help them the most.
+В конечном итоге делайте так, как считаете нужным. Документация — это проявление эмпатии. Поставьте себя на место читателя и сделайте так, чтобы помочь ему максимально.
