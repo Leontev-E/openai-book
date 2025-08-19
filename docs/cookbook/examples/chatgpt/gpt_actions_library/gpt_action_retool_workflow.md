@@ -43,7 +43,7 @@ Below is an example of a basic Retool Workflow. This workflow takes in 2 values 
 
 ***Note:*** Your workflow must be deployed before it will be accessible from your GPT.
 
-<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(57.26681127982647% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/MG7PcF8fh3RH722eonUb?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Retool Workflow Cookbook" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
+<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(57.26681127982647% + 41px); height: 0; width: 100%;">&lt;iframe src="https://demo.arcade.software/MG7PcF8fh3RH722eonUb?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Retool Workflow Cookbook" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" &gt;&lt;/iframe&gt;</div><!--ARCADE EMBED END-->
 
 ## ChatGPT Steps
 
@@ -55,47 +55,10 @@ Once you've created a Custom GPT, you should add Instructions to the GPT providi
 
 Once you've created a Custom GPT, copy the text below in the Actions panel. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
 
-***Note:*** You need to replace the __<WORKFLOW_ID>__ value in the OpenAPI spec below with the ID for your workflow.
+***Note:*** You need to replace the __&lt;WORKFLOW_ID&gt;__ value in the OpenAPI spec below with the ID for your workflow.
 
 
-```yaml
-openapi: 3.1.0
-info:
-  title: Retool Workflow API
-  description: API for interacting with Retool workflows.
-  version: 1.0.0
-servers:
-  - url: https://api.retool.com/v1
-    description: Main (production) server
-paths:
-  /workflows/<WORKFLOW_ID>/startTrigger:
-    post:
-      operationId: add_numbers
-      summary: Takes 2 numbers and adds them.
-      description: Initiates a workflow in Retool by triggering a specific workflow ID.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                first:
-                  type: integer
-                  description: First parameter for the workflow.
-                second:
-                  type: integer
-                  description: Second parameter for the workflow.
-      responses:
-        "200":
-          description: Workflow triggered successfully.
-        "400":
-          description: Bad Request - Invalid parameters or missing data.
-        "401":
-          description: Unauthorized - Invalid or missing API key.
-      security:
-        - apiKeyAuth: []
-```
+<<&lt;CODE_0&gt;>>
 
 ## Authentication Instructions
 
@@ -106,7 +69,7 @@ Below are instructions on setting up authentication with this 3rd party applicat
 Before you set up authentication in ChatGPT, please take the following steps in the application.
 - Get your API Key from the Webhook config panel
 
-![retool_api_key.png](/cookbook-images/retool_api_key.png)
+![retool_api_key.png](../../../images/retool_api_key.png)
 
 ### In ChatGPT
 

@@ -17,25 +17,15 @@ Store your internal file(s) in [OpenAI Vector Storage](https://platform.openai.c
 
 Python setup:
 
-```shell
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements.txt
-```
+<<&lt;CODE_0&gt;>>
 
 Run the server:
 
-```shell
-python main.py
-```
+<<&lt;CODE_1&gt;>>
 
 The server will start on `http://0.0.0.0:8000/sse/` using SSE transport. If you want to reach the server from the public internet, there are a variety of ways to do that including with ngrok:
 
-```shell
-brew install ngrok 
-ngrok config add-authtoken <your_token>
-ngrok http 8000
-```
+<<&lt;CODE_2&gt;>>
 
 You should now be able to reach your local server from your client. 
 
@@ -45,7 +35,7 @@ You should now be able to reach your local server from your client.
 
 ## Example Flow diagram for MCP Server
 
-![../../../images/mcp_dr.png](/cookbook-images/mcp_dr.png)
+![../../../images/mcp_dr.png](../../../images/mcp_dr.png)
 
 ## Example request
 

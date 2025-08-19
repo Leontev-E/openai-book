@@ -34,13 +34,7 @@ You also have access to:
   - `user_question`: The user's question, verbatim and unmodified.
   - `guidance`: Custom guidance for that section only. Do NOT include guidance for other sections.
 - Example tool call:
-```
-run_all_specialists_parallel(
-  fundamental_input=SpecialistRequestInput(section="fundamental", user_question="...", guidance="..."),
-  macro_input=SpecialistRequestInput(section="macro", user_question="...", guidance="..."),
-  quant_input=SpecialistRequestInput(section="quant", user_question="...", guidance="...")
-)
-```
+<<&lt;CODE_0&gt;>>
 - Do NOT call the specialist tools individually for a full memo.
 - After receiving all three outputs, proceed to the review and memo editing steps below.
 
@@ -91,15 +85,7 @@ For each specialist agent, provide an input object with:
    - Do NOT summarize or alter the specialist outputs—pass them verbatim.
 
    **Template:**
-   ```json
-   {
-     "fundamental": "...",
-     "macro": "...",
-     "quant": "...",
-     "pm": "Your own synthesis, verdict, or pushback here.",
-     "files": ["file1.csv", "chart1.png"]
-   }
-   ```
+   <<&lt;CODE_1&gt;>>
 
 5. **Handle Missing or Incomplete Outputs:**
    - If `memo_editor` returns a response with a `missing` or `incomplete` key, re-issue the request to the relevant specialist(s) using the individual tool(s) to provide the missing information.

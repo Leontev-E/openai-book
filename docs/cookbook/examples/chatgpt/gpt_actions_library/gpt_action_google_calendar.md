@@ -24,7 +24,7 @@ This GPT Action provides an overview of how to connect to your **Google Calendar
 - You want to search your calendar for events based on a specific criteria. 
 - You want to delete an event from your calendar. 
 
-***Note:*** This is a good example of an GPT that may be useful to call from other GPTs using the @<name of your GPT> function. You can find more information on this feature on our [help site](https://help.openai.com/en/articles/8908924-what-is-the-mentions-feature-for-gpts). 
+***Note:*** This is a good example of an GPT that may be useful to call from other GPTs using the @&lt;name of your GPT&gt; function. You can find more information on this feature on our [help site](https://help.openai.com/en/articles/8908924-what-is-the-mentions-feature-for-gpts). 
 
 
 ## Application Information
@@ -44,7 +44,7 @@ Before you get started, ensure you can meet the following pre-requistes.
 - In the project selector, choose the project you’d like to use for this GPT Action. If you don’t have a project yet, click the **Create Project** button.
 - When creating a new project, enter a name for it and select the billing account you’d like to associate. In this example, ‘No Organization’ is selected.
 
-<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(55.43981481481482% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/0QxHM3NKyUZcv3di9CkA?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Cookbook | Create Google Cloud Project" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
+<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(55.43981481481482% + 41px); height: 0; width: 100%;">&lt;iframe src="https://demo.arcade.software/0QxHM3NKyUZcv3di9CkA?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Cookbook | Create Google Cloud Project" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" &gt;&lt;/iframe&gt;</div><!--ARCADE EMBED END-->
 
 You now have a Google Cloud Project and are ready to configure the API access to your Google Calendar.
 
@@ -52,7 +52,7 @@ You now have a Google Cloud Project and are ready to configure the API access to
 - Search for **Google Calendar API** (not DKIM) and click on it.
 - Click on the **Enable** button.
 
-<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/uEOZVBdf8OZ8sP0DZAld?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Cookbook | Enable Google Calendar API" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
+<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;">&lt;iframe src="https://demo.arcade.software/uEOZVBdf8OZ8sP0DZAld?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Cookbook | Enable Google Calendar API" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" &gt;&lt;/iframe&gt;</div><!--ARCADE EMBED END-->
 
 ## Creating up OAuth Credentials
 
@@ -68,7 +68,7 @@ Depending on your current configuration you may need to configure your OAuth con
 - Agree to the terms and click **Create** 
 
 
-<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/Xs5oyXa1ssYY9zyPsL0s?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Cookbook | Create Consent Screen" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
+<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;">&lt;iframe src="https://demo.arcade.software/Xs5oyXa1ssYY9zyPsL0s?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Cookbook | Create Consent Screen" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" &gt;&lt;/iframe&gt;</div><!--ARCADE EMBED END-->
 
 We are now ready to create the OAuth credentials. 
 
@@ -81,7 +81,7 @@ We are now ready to create the OAuth credentials.
 - Open the credentials page and you'll see your OAuth client ID and client secret on the right of the screen.
 
 
-<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/OHyS6C3ETFPCc4eqrQ4a?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="OAuth overview – Google Auth Platform – cookbook-demo – Google Cloud console" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
+<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;">&lt;iframe src="https://demo.arcade.software/OHyS6C3ETFPCc4eqrQ4a?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="OAuth overview – Google Auth Platform – cookbook-demo – Google Cloud console" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" &gt;&lt;/iframe&gt;</div><!--ARCADE EMBED END-->
 
 ## Configuring OAuth Scopes
 
@@ -94,7 +94,7 @@ Next, configure the scopes (or services) that the OAuth client ID will have acce
 - Click **Update** and then **Save**
 
 
-<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;"><iframe src="https://demo.arcade.software/mbsRtOs10arPZtzjeum2?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Clients – Google Auth Platform – cookbook-demo – Google Cloud console" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" ></iframe></div><!--ARCADE EMBED END-->
+<!--ARCADE EMBED START--><div style="position: relative; padding-bottom: calc(53.793774319066145% + 41px); height: 0; width: 100%;">&lt;iframe src="https://demo.arcade.software/mbsRtOs10arPZtzjeum2?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true" title="Clients – Google Auth Platform – cookbook-demo – Google Cloud console" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="clipboard-write" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; color-scheme: light;" &gt;&lt;/iframe&gt;</div><!--ARCADE EMBED END-->
 
 # GPT Action Configuration Steps
 
@@ -115,215 +115,7 @@ We are now ready to configure the GPT Action. First we'll configure the OAuth se
 
 We can now enter the OpenAPI schema for the action. The config below allows reading and creating events. Enter this in the OpenAPI schema field.
 
-```yaml
-openapi: 3.1.0
-info:
-  title: Google Calendar API
-  description: This API allows you to read and create events in a user's Google Calendar.
-  version: 1.0.0
-servers:
-  - url: https://www.googleapis.com/calendar/v3
-    description: Google Calendar API server
-
-paths:
-  /calendars/primary/events:
-    get:
-      summary: List events from the primary calendar
-      description: Retrieve a list of events from the user's primary Google Calendar.
-      operationId: listEvents
-      tags:
-        - Calendar
-      parameters:
-        - name: timeMin
-          in: query
-          description: The lower bound (inclusive) of the events to retrieve, in RFC3339 format.
-          required: false
-          schema:
-            type: string
-            format: date-time
-            example: "2024-11-01T00:00:00Z"
-        - name: timeMax
-          in: query
-          description: The upper bound (exclusive) of the events to retrieve, in RFC3339 format.
-          required: false
-          schema:
-            type: string
-            format: date-time
-            example: "2024-12-01T00:00:00Z"
-        - name: maxResults
-          in: query
-          description: The maximum number of events to return.
-          required: false
-          schema:
-            type: integer
-            default: 10
-        - name: singleEvents
-          in: query
-          description: Whether to expand recurring events into instances. Defaults to `false`.
-          required: false
-          schema:
-            type: boolean
-            default: true
-        - name: orderBy
-          in: query
-          description: The order of events. Can be "startTime" or "updated".
-          required: false
-          schema:
-            type: string
-            enum:
-              - startTime
-              - updated
-            default: startTime
-      responses:
-        '200':
-          description: A list of events
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          description: The event ID
-                        summary:
-                          type: string
-                          description: The event summary (title)
-                        start:
-                          type: object
-                          properties:
-                            dateTime:
-                              type: string
-                              format: date-time
-                              description: The start time of the event
-                            date:
-                              type: string
-                              format: date
-                              description: The start date of the all-day event
-                        end:
-                          type: object
-                          properties:
-                            dateTime:
-                              type: string
-                              format: date-time
-                              description: The end time of the event
-                            date:
-                              type: string
-                              format: date
-                              description: The end date of the all-day event
-                        location:
-                          type: string
-                          description: The location of the event
-                        description:
-                          type: string
-                          description: A description of the event
-        '401':
-          description: Unauthorized access due to missing or invalid OAuth token
-        '400':
-          description: Bad request, invalid parameters
-
-    post:
-      summary: Create a new event on the primary calendar
-      description: Creates a new event on the user's primary Google Calendar.
-      operationId: createEvent
-      tags:
-        - Calendar
-      requestBody:
-        description: The event data to create.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                summary:
-                  type: string
-                  description: The title of the event
-                  example: "Team Meeting"
-                location:
-                  type: string
-                  description: The location of the event
-                  example: "Conference Room 1"
-                description:
-                  type: string
-                  description: A detailed description of the event
-                  example: "Discuss quarterly results"
-                start:
-                  type: object
-                  properties:
-                    dateTime:
-                      type: string
-                      format: date-time
-                      description: Start time of the event
-                      example: "2024-11-30T09:00:00Z"
-                    timeZone:
-                      type: string
-                      description: Time zone of the event start
-                      example: "UTC"
-                end:
-                  type: object
-                  properties:
-                    dateTime:
-                      type: string
-                      format: date-time
-                      description: End time of the event
-                      example: "2024-11-30T10:00:00Z"
-                    timeZone:
-                      type: string
-                      description: Time zone of the event end
-                      example: "UTC"
-                attendees:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      email:
-                        type: string
-                        description: The email address of an attendee
-                        example: "attendee@example.com"
-              required:
-                - summary
-                - start
-                - end
-      responses:
-        '201':
-          description: Event created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    description: The ID of the created event
-                  summary:
-                    type: string
-                    description: The event summary (title)
-                  start:
-                    type: object
-                    properties:
-                      dateTime:
-                        type: string
-                        format: date-time
-                        description: The start time of the event
-                  end:
-                    type: object
-                    properties:
-                      dateTime:
-                        type: string
-                        format: date-time
-                        description: The end time of the event
-        '400':
-          description: Bad request, invalid event data
-        '401':
-          description: Unauthorized access due to missing or invalid OAuth token
-        '500':
-          description: Internal server error
-```
+<<&lt;CODE_0&gt;>>
 
 If successful, you'll see the two endpoints appear at the bottom of the configuration screen.
 

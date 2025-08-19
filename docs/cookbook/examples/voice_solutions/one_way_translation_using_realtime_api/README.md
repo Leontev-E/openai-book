@@ -18,30 +18,22 @@ This project demonstrates how to use the [OpenAI Realtime API](https://platform.
 
 2. **Clone the Repository:**
 
-   ```bash
-   git clone <repository-url>
-   ```
+   <<&lt;CODE_0&gt;>>
 
 3. **Set your API key:**
 
    - Create a `.env` file at the root of the project and add the following line:
-     ```bash
-     REACT_APP_OPENAI_API_KEY=<your_api_key>
-     ```
+     <<&lt;CODE_1&gt;>>
 
 4. **Install dependencies:**
 
    Navigate to the project directory and run:
 
-   ```bash
-   npm install
-   ```
+   <<&lt;CODE_2&gt;>>
 
 5. **Run the Speaker & Listener Apps:**
 
-   ```bash
-   npm start
-   ```
+   <<&lt;CODE_3&gt;>>
 
    The speaker and listener apps will be available at:
    - [http://localhost:3000/speaker](http://localhost:3000/speaker)
@@ -51,9 +43,7 @@ This project demonstrates how to use the [OpenAI Realtime API](https://platform.
 
    In another terminal window, navigate to the project directory and run:
 
-   ```bash
-   node mirror-server/mirror-server.mjs
-   ```
+   <<&lt;CODE_4&gt;>>
 
 ### Adding a New Language
 
@@ -63,35 +53,21 @@ To add a new language to the codebase, follow these steps:
 
    - Open `mirror-server/mirror-server.cjs`.
    - Add a new socket event for the new language. For example, for Hindi:
-     ```javascript
-     socket.on('mirrorAudio:hi', (audioChunk) => {
-       console.log('logging Hindi mirrorAudio', audioChunk);
-       socket.broadcast.emit('audioFrame:hi', audioChunk);
-     });
-     ```
+     <<&lt;CODE_5&gt;>>
 
 2. **Instructions Configuration:**
 
    - Open `src/utils/translation_prompts.js`.
    - Add new instructions for the new language. For example:
-     ```javascript
-     export const hindi_instructions = "Your Hindi instructions here...";
-     ```
+     <<&lt;CODE_6&gt;>>
 
 3. **Realtime Client Initialization in SpeakerPage:**
 
    - Open `src/pages/SpeakerPage.tsx`.
    - Import the new language instructions:
-     ```typescript
-     import { hindi_instructions } from '../utils/translation_prompts.js';
-     ```
+     <<&lt;CODE_7&gt;>>
    - Add the new language to the `languageConfigs` array:
-     ```typescript
-     const languageConfigs = [
-       // ... existing languages ...
-       { code: 'hi', instructions: hindi_instructions },
-     ];
-     ```
+     <<&lt;CODE_8&gt;>>
 
 4. **Language Configuration in ListenerPage:**
 
@@ -99,17 +75,7 @@ To add a new language to the codebase, follow these steps:
    - Locate the `languages` object, which centralizes all language-related data.
    - Add a new entry for your language. The key should be the language code, and the value should be an object containing the language name.
 
-     ```typescript
-     const languages = {
-       fr: { name: 'French' },
-       es: { name: 'Spanish' },
-       tl: { name: 'Tagalog' },
-       en: { name: 'English' },
-       zh: { name: 'Mandarin' },
-       // Add your new language here
-       hi: { name: 'Hindi' }, // Example for adding Hindi
-     } as const;
-     ```
+     <<&lt;CODE_9&gt;>>
 
    - The `ListenerPage` component will automatically handle the new language in the dropdown menu and audio stream handling.
 

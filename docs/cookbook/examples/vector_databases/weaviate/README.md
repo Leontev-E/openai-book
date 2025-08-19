@@ -3,7 +3,7 @@ lang: ru
 translationOf: openai-cookbook
 ---
 
-# Weaviate <> OpenAI
+# Weaviate &lt;&gt; OpenAI
 
 [​Weaviate](https://weaviate.io) is an open-source vector search engine ([docs](https://weaviate.io/developers/weaviate) - [Github](https://github.com/weaviate/weaviate)) that can store and search through OpenAI embeddings _and_ data objects. The database allows you to do similarity search, hybrid search (the combining of multiple search techniques, such as keyword-based and vector search), and generative search (like Q&A). Weaviate also supports a wide variety of OpenAI-based modules (e.g., [`text2vec-openai`](https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-openai), [`qna-openai`](https://weaviate.io/developers/weaviate/modules/reader-generator-modules/qna-openai)), allowing you to vectorize and query data fast and efficiently.
 

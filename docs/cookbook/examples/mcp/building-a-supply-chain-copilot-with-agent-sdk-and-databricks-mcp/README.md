@@ -35,27 +35,19 @@ These notebooks stand up every asset the Agent will later reach via MCP, from ra
 - (Optional) Virtualenv/pyenv for Python isolation
 
 ### 2. Install Python Dependencies
-```bash
-pip install -r requirements.txt
-```
+<<&lt;CODE_0&gt;>>
 
 ### 3. Start the Backend (FastAPI)
 
 To kick off the backend, run:
 
-```bash
-python -m uvicorn api_server:app --reload --port 8000
-```
+<<&lt;CODE_1&gt;>>
 - The API will be available at http://localhost:8000
 - FastAPI docs: http://localhost:8000/docs
 
 ### 4. Start the Frontend (React UI)
 In a different terminal, run the following:
-```bash
-cd ui
-npm install
-npm run dev
-```
+<<&lt;CODE_2&gt;>>
 - The app will be available at http://localhost:5173
 
 ---

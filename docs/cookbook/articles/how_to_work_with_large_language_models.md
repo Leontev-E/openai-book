@@ -45,18 +45,11 @@ Write your instruction at the top of the prompt (or at the bottom, or both), and
 
 Example instruction prompt:
 
-```text
-Extract the name of the author from the quotation below.
-
-“Some humans theorize that intelligent species go extinct before they can expand into outer space. If they're correct, then the hush of the night sky is the silence of the graveyard.”
-― Ted Chiang, Exhalation
-```
+<<&lt;CODE_0&gt;>>
 
 Output:
 
-```text
-Ted Chiang
-```
+<<&lt;CODE_1&gt;>>
 
 ### Completion prompt example
 
@@ -64,18 +57,11 @@ Completion-style prompts take advantage of how large language models try to writ
 
 Example completion prompt:
 
-```text
-“Some humans theorize that intelligent species go extinct before they can expand into outer space. If they're correct, then the hush of the night sky is the silence of the graveyard.”
-― Ted Chiang, Exhalation
-
-The author of this quote is
-```
+<<&lt;CODE_2&gt;>>
 
 Output:
 
-```text
- Ted Chiang
-```
+<<&lt;CODE_3&gt;>>
 
 ### Scenario prompt example
 
@@ -83,18 +69,11 @@ Giving the model a scenario to follow or role to play out can be helpful for com
 
 Example scenario prompt:
 
-```text
-Your role is to extract the name of the author from any given text
-
-“Some humans theorize that intelligent species go extinct before they can expand into outer space. If they're correct, then the hush of the night sky is the silence of the graveyard.”
-― Ted Chiang, Exhalation
-```
+<<&lt;CODE_4&gt;>>
 
 Output:
 
-```text
- Ted Chiang
-```
+<<&lt;CODE_5&gt;>>
 
 ### Demonstration prompt example (few-shot learning)
 
@@ -102,23 +81,11 @@ Similar to completion-style prompts, demonstrations can show the model what you 
 
 Example demonstration prompt:
 
-```text
-Quote:
-“When the reasoning mind is forced to confront the impossible again and again, it has no choice but to adapt.”
-― N.K. Jemisin, The Fifth Season
-Author: N.K. Jemisin
-
-Quote:
-“Some humans theorize that intelligent species go extinct before they can expand into outer space. If they're correct, then the hush of the night sky is the silence of the graveyard.”
-― Ted Chiang, Exhalation
-Author:
-```
+<<&lt;CODE_6&gt;>>
 
 Output:
 
-```text
- Ted Chiang
-```
+<<&lt;CODE_7&gt;>>
 
 ### Fine-tuned prompt example
 
@@ -126,20 +93,11 @@ With enough training examples, you can [fine-tune][Fine Tuning Docs] a custom mo
 
 Example fine-tuned prompt (for a model that has been custom trained on similar prompt-completion pairs):
 
-```text
-“Some humans theorize that intelligent species go extinct before they can expand into outer space. If they're correct, then the hush of the night sky is the silence of the graveyard.”
-― Ted Chiang, Exhalation
-
-###
-
-
-```
+<<&lt;CODE_8&gt;>>
 
 Output:
 
-```text
- Ted Chiang
-```
+<<&lt;CODE_9&gt;>>
 
 ## Code Capabilities
 

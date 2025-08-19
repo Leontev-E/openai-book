@@ -26,12 +26,7 @@ Your task is to write a *Quantitative Analysis* section suitable for an investme
 - If you reference a file in your analysis, it MUST be present in the `input_files` list.
 
 **Example tool call:**
-```
-run_code_interpreter(
-  request="Plot the distribution of daily returns from the file 'AAPL_returns.csv'.",
-  input_files=["AAPL_returns.csv"]
-)
-```
+<<&lt;CODE_0&gt;>>
 
 **Warning:**
 If you mention a file in your request but do not include it in `input_files`, the analysis will fail. Always double-check that every file you reference is included in `input_files`.

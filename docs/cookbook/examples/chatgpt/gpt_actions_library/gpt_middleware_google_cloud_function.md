@@ -74,85 +74,26 @@ Follow the steps [here](https://cloud.google.com/sdk/docs/install) that are rele
 ##### Part 2: Setup local development environment
 In this example, we will be setting up a Node.js environment.
 
-```
-mkdir <directory_name>
-cd <directory_name>
-```
+<<&lt;CODE_0&gt;>>
 
 Initialize the Node.js project
 
-```
-npm init
-```
+<<&lt;CODE_1&gt;>>
 Accept the default values for `npm init`
 
 ##### Part 3: Create Function
 Create the `index.js` file
 
-```
-const functions = require('@google-cloud/functions-framework');
-const axios = require('axios');
-
-const TOKENINFO_URL = 'https://oauth2.googleapis.com/tokeninfo';
-
-// Register an HTTP function with the Functions Framework that will be executed
-// when you make an HTTP request to the deployed function's endpoint.
-functions.http('executeGCPFunction', async (req, res) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).send('Unauthorized: No token provided');
-  }
-
-  const token = authHeader.split(' ')[1];
-  if (!token) {
-    return res.status(401).send('Unauthorized: No token provided');
-  }
-
-  try {
-    const tokenInfo = await validateAccessToken(token);            
-    res.json("You have connected as an authenticated user to Google Functions");
-  } catch (error) {
-    res.status(401).send('Unauthorized: Invalid token');
-  }  
-});
-
-async function validateAccessToken(token) {
-  try {
-    const response = await axios.get(TOKENINFO_URL, {
-      params: {
-        access_token: token,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error('Invalid token');
-  }
-}
-```
+<<&lt;CODE_2&gt;>>
 ##### Part 4: Deploy Function
 
 This step below will install and add the necessary dependencies in your `package.json` file
 
-```
-npm install @google-cloud/functions-framework
-npm install axios
-```
+<<&lt;CODE_3&gt;>>
 
-```
-npx @google-cloud/functions-framework --target=executeGCPFunction
-```
+<<&lt;CODE_4&gt;>>
 
-```
-gcloud functions deploy gcp-function-for-chatgpt \
-  --gen2 \
-  --runtime=nodejs20 \
-  --region=us-central1 \
-  --source=. \
-  --entry-point=executeGCPFunction \
-  --trigger-http \
-  --allow-unauthenticated
-```
+<<&lt;CODE_5&gt;>>
 
 ## ChatGPT Steps
 
@@ -160,9 +101,7 @@ gcloud functions deploy gcp-function-for-chatgpt \
 
 Once you've created a Custom GPT, copy the text below in the Instructions panel. Have questions? Check out [Getting Started Example](https://platform.openai.com/docs/actions/getting-started) to see how this step works in more detail.
 
-```
-When the user asks you to test the integration, you will make a call to the custom action and display the results
-```
+<<&lt;CODE_6&gt;>>
 
 ### OpenAPI Schema
 
@@ -170,29 +109,7 @@ Once you've created a Custom GPT, copy the text below in the Actions panel. Have
 
 Below is an example of what connecting to this Middlware might look like. You'll need to insert your application's & function's information in this section.
 
-```javascript
-openapi: 3.1.0
-info:
-  title: {insert title}
-  description: {insert description}
-  version: 1.0.0
-servers:
-  - url: {url of your Google Cloud Function}
-    description: {insert description}
-paths:
-  /{your_function_name}:
-    get:
-      operationId: {create an operationID}
-      summary: {insert summary}
-      responses:
-        '200':
-          description: {insert description}
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: {example of response}
-```
+<<&lt;CODE_7&gt;>>
 
 ## Authentication Instructions
 
@@ -200,11 +117,11 @@ Below are instructions on setting up authentication with this 3rd party applicat
 
 
 ### In Google Cloud Console
-In Google Cloud Console, you need to create OAuth client ID credentials. To navigate to the right page search for "Credentials" in Google Cloud Console or enter `https://console.cloud.google.com/apis/credentials?project=<your_project_id>` in your browser. You can read more about it [here](https://developers.google.com/workspace/guides/create-credentials).
+In Google Cloud Console, you need to create OAuth client ID credentials. To navigate to the right page search for "Credentials" in Google Cloud Console or enter `https://console.cloud.google.com/apis/credentials?project=&lt;your_project_id&gt;` in your browser. You can read more about it [here](https://developers.google.com/workspace/guides/create-credentials).
 
 Click on "CREATE CREDENTIALS" and select "Oauth client ID". Select "Web Application" for "Application type" and enter the name of your application (see below).
 
-![](/cookbook-images/gcp-function-middleware-oauthclient.png)
+![](../../../images/gcp-function-middleware-oauthclient.png)
 
 In the "OAuth client created" modal dialog, please take note of the
 
@@ -226,7 +143,7 @@ In ChatGPT, click on "Authentication" and choose **"OAuth"**. Enter in the infor
 
 Edit the OAuth 2.0 Client ID you create in Google Cloud earlier and add the callback URL you received after creating your custom action.
 
-![](/cookbook-images/gcp-function-middleware-oauthcallback.png)
+![](../../../images/gcp-function-middleware-oauthcallback.png)
 
 ### Test the GPT
 

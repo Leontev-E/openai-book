@@ -40,7 +40,7 @@ Before you get started, make sure you go through the following steps in your Tra
 ### Application Workflow Steps
 
 Below is an example of a building and extending a basic set of API Management operations:\
-![Tray.ai APIM Create Operation Gif](/cookbook-images/gptactions_trayai_createoperation.gif)
+![Tray.ai APIM Create Operation Gif](../../../images/gptactions_trayai_createoperation.gif)
 
 ## ChatGPT Steps
 
@@ -63,7 +63,7 @@ Before you set up authentication in ChatGPT, please take the following steps in 
 - Create a new client with roles set to `full`
 - Save your API Token for future steps
 
-![Tray.ai APIM Create Operation Gif](/cookbook-images/gptactions_trayai_createclientcredential.gif)
+![Tray.ai APIM Create Operation Gif](../../../images/gptactions_trayai_createclientcredential.gif)
 
 
 ### In ChatGPT

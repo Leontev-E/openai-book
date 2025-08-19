@@ -24,7 +24,7 @@ In this notebook you'll learn how to:
  - Encode a question with the `openai ada-02` model
  - Perform a semantic search
 
-<hr>
+<hr />
 
 
 ### [Retrieval augmented generation](https://github.com/openai/openai-cookbook/blob/main/examples/vector_databases/elasticsearch/elasticsearch-retrieval-augmented-generation.ipynb)

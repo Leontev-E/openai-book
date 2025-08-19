@@ -24,22 +24,7 @@ part for accurate performance is to return the raw CoT as part of the `output`.
 
 For this we added a new `content` array to the Responses API’s `reasoning` items. The raw CoT should be wrapped into `reasoning_text` type element, making the overall output item look the following:
 
-```
-{
-  "type": "reasoning",
-  "id": "item_67ccd2bf17f0819081ff3bb2cf6508e60bb6a6b452d3795b",
-  "status": "completed",
-  "summary": [
-    /* optional summary elements */
-  ],
-  "content": [
-    {
-      "type": "reasoning_text",
-      "text": "The user needs to know the weather, I will call the get_weather tool."
-    }
-  ]
-}
-```
+<<&lt;CODE_0&gt;>>
 
 These items should be received in subsequent turns and then inserted back into the harmony formatted prompt as outlined in the [raw CoT handling guide](https://cookbook.openai.com/articles/gpt-oss/handle-raw-cot).
 
@@ -61,21 +46,7 @@ This largely acts as a smoke test but should be a good indicator on whether the 
 
 To run the test suite run the following commands:
 
-```shell
-# clone the repository
-git clone https://github.com/openai/gpt-oss.git
-
-# go into the compatibility test directory
-cd gpt-oss/compatibility-test/
-
-# install the dependencies
-npm install
-
-# change the provider config in providers.ts to add your provider
-
-# run the tests
-npm start -- --provider <your-provider-name>
-```
+<<&lt;CODE_1&gt;>>
 
 Afterwards you should receive a result of both the API implementation and any details on the function call performance.
 
@@ -83,7 +54,7 @@ If your tests are successful, the output should show 0 invalid requests and over
 
 If you want a detailed view of the individual responses, you can the `jsonl` file that was created in your directory.
 
-You can also enable debug mode to view any of the actual request payloads using `DEBUG=openai-agents:openai npm start -- --provider <provider-name>` but it might get noisy. To run only one test use the `-n 1` flag for easier debugging. For testing streaming events you can use `--streaming`.
+You can also enable debug mode to view any of the actual request payloads using `DEBUG=openai-agents:openai npm start -- --provider &lt;provider-name&gt;` but it might get noisy. To run only one test use the `-n 1` flag for easier debugging. For testing streaming events you can use `--streaming`.
 
 ## Verifying correctness through evals
 
@@ -93,14 +64,10 @@ To be on the safe side you should consider running evals yourself. To run your o
 
 To test a Responses API compatible API run:
 
-```bash
-python -m gpt_oss.evals --base-url http://localhost:8000/v1 --eval aime25 --sampler responses --model openai/gpt-oss-120b --reasoning-effort high
-```
+<<&lt;CODE_2&gt;>>
 
 To test a Chat Completions API compatible API run:
 
-```bash
-python -m gpt_oss.evals --base-url http://localhost:8000/v1 --eval aime25 --sampler chat_completions --model openai/gpt-oss-120b --reasoning-effort high
-```
+<<&lt;CODE_3&gt;>>
 
 If you are getting similar benchmark results as those published by us and your function calling tests above succeeded you likely have a correct implementation of gpt-oss.

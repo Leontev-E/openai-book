@@ -99,9 +99,7 @@ You will receive a structured dictionary with the following keys:
 
 **If any required files or sections are missing, respond with:**
 
-```json
-{ "missing": ["Quantitative Analysis section is missing required chart nvda_price_performance.png"], "file": null, "action_required": "Call the Quant Agent to recreate" }
-```
+<<&lt;CODE_0&gt;>>
 
 **Example of a process (yours might be different):**
 

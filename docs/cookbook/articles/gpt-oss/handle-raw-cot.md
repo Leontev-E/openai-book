@@ -39,89 +39,15 @@ For the Responses API we augmented our Responses API spec to cover this case. Be
 
 **Item type changes**
 
-```typescript
-type ReasoningItem = {
-  id: string;
-  type: "reasoning";
-  summary: SummaryContent[];
-  // new
-  content: ReasoningTextContent[];
-};
-
-type ReasoningTextContent = {
-  type: "reasoning_text";
-  text: string;
-};
-
-type ReasoningTextDeltaEvent = {
-  type: "response.reasoning_text.delta";
-  sequence_number: number;
-  item_id: string;
-  output_index: number;
-  content_index: number;
-  delta: string;
-};
-
-type ReasoningTextDoneEvent = {
-  type: "response.reasoning_text.done";
-  sequence_number: number;
-  item_id: string;
-  output_index: number;
-  content_index: number;
-  text: string;
-};
-```
+<<&lt;CODE_0&gt;>>
 
 **Event changes**
 
-```typescript
-...
-{
-	type: "response.content_part.added"
-	...
-}
-{
-	type: "response.reasoning_text.delta",
-	sequence_number: 14,
-	item_id: "rs_67f47a642e788191aec9b5c1a35ab3c3016f2c95937d6e91",
-	output_index: 0,
-	content_index: 0,
-	delta: "The "
-}
-...
-{
-	type: "response.reasoning_text.done",
-	sequence_number: 18,
-	item_id: "rs_67f47a642e788191aec9b5c1a35ab3c3016f2c95937d6e91",
-	output_index: 0,
-	content_index: 0,
-	text: "The user asked me to think"
-}
-```
+<<&lt;CODE_1&gt;>>
 
 **Example responses output**
 
-```typescript
-"output": [
-  {
-    "type": "reasoning",
-    "id": "rs_67f47a642e788191aec9b5c1a35ab3c3016f2c95937d6e91",
-    "summary": [
-      {
-        "type": "summary_text",
-        "text": "**Calculating volume of gold for Pluto layer**\n\nStarting with the approximation..."
-      }
-    ],
-    "content": [
-      {
-        "type": "reasoning_text",
-        "text": "The user asked me to think..."
-      }
-    ]
-  }
-]
-
-```
+<<&lt;CODE_2&gt;>>
 
 ## Displaying raw CoT to end-users
 

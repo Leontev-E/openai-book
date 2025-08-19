@@ -54,66 +54,34 @@ Control your ESP32 AI device from your phone with your own webapp.
 
 Head over to the [ElatoAI GitHub repository](https://github.com/akdeb/ElatoAI) and clone the repository.
 
-```bash
-git clone https://github.com/akdeb/ElatoAI.git
-cd ElatoAI
-```
+<<&lt;CODE_0&gt;>>
 
 2. **Set your environment variables (OPENAI_API_KEY, SUPABASE_ANON_KEY)**
 
 In the `frontend-nextjs` directory, create a `.env.local` file and set your environment variables.
 
-```bash
-cd frontend-nextjs
-cp .env.example .env.local
-
-# In .env.local, set your environment variables 
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
-# OPENAI_API_KEY=<your-openai-api-key>
-```
+<<&lt;CODE_1&gt;>>
 
 In the `server-deno` directory, create a `.env` file and set your environment variables.
 
-```bash
-cd server-deno
-cp .env.example .env
-
-# In .env, set your environment variables 
-# SUPABASE_KEY=<your-supabase-anon-key>
-# OPENAI_API_KEY=<your-openai-api-key>
-```
+<<&lt;CODE_2&gt;>>
 
 2. **Start Supabase**
 
 Install [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) and set up your Local Supabase Backend. From the root directory, run:
-```bash
-brew install supabase/tap/supabase
-supabase start # Starts your local Supabase server with the default migrations and seed data.
-```
+<<&lt;CODE_3&gt;>>
 
 3. **Set up your NextJS Frontend**
 
 ([See the Frontend README](https://github.com/akdeb/ElatoAI/tree/main/frontend-nextjs/README.md)) 
 
 From the `frontend-nextjs` directory, run the following commands. (**Login creds:** Email: `admin@elatoai.com`, Password: `admin`)
-```bash
-cd frontend-nextjs
-npm install
-
-# Run the development server
-npm run dev
-```
+<<&lt;CODE_4&gt;>>
 
 4. **Start the Deno server**
 
 ([See the Deno server README](https://github.com/akdeb/ElatoAI/tree/main/server-deno/README.md))
-```bash
-# Navigate to the server directory
-cd server-deno
-
-# Run the server at port 8000
-deno run -A --env-file=.env main.ts
-```
+<<&lt;CODE_5&gt;>>
 
 5. **Setup the ESP32 Device firmware**
 
@@ -201,21 +169,7 @@ We have a [Usecases.md](https://github.com/akdeb/ElatoAI/tree/main/Usecases.md) 
 
 ## ⚙️ PlatformIO Config
 
-```ini
-[env:esp32-s3-devkitc-1]
-platform = espressif32 @ 6.10.0
-board = esp32-s3-devkitc-1
-framework = arduino
-monitor_speed = 115200
-
-lib_deps =
-    bblanchon/ArduinoJson@^7.1.0
-    links2004/WebSockets@^2.4.1
-    ESP32Async/ESPAsyncWebServer@^3.7.6
-    https://github.com/esp-arduino-libs/ESP32_Button.git#v0.0.1
-    https://github.com/pschatzmann/arduino-audio-tools.git#v1.0.1
-    https://github.com/pschatzmann/arduino-libopus.git#a1.1.0
-```
+<<&lt;CODE_6&gt;>>
 
 ## 📊 Important Stats
 

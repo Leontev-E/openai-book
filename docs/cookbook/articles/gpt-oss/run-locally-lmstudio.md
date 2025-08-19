@@ -31,22 +31,12 @@ LM Studio ships both a [llama.cpp](https://github.com/ggml-org/llama.cpp) infere
 
 2. **Download the gpt-oss model** → 
 
-```shell
-# For 20B
-lms get openai/gpt-oss-20b
-# or for 120B
-lms get openai/gpt-oss-120b
-``` 
+<<&lt;CODE_0&gt;>> 
 
 3. **Load the model in LM Studio** 
   → Open LM Studio and use the model loading interface to load the gpt-oss model you downloaded. Alternatively, you can use the command line:
 
-```shell
-# For 20B
-lms load openai/gpt-oss-20b
-# or for 120B
-lms load openai/gpt-oss-120b
-```
+<<&lt;CODE_1&gt;>>
 
 4. **Use the model** → Once loaded, you can interact with the model directly in LM Studio's chat interface or through the API.
 
@@ -54,9 +44,7 @@ lms load openai/gpt-oss-120b
 
 Use LM Studio's chat interface to start a conversation with gpt-oss, or use the `chat` command in the terminal:
 
-```shell
-lms chat openai/gpt-oss-20b
-```
+<<&lt;CODE_2&gt;>>
 
 Note about prompt formatting: LM Studio utilizes OpenAI's [Harmony](https://cookbook.openai.com/articles/openai-harmony) library to construct the input to gpt-oss models, both when running via llama.cpp and MLX.
 
@@ -64,24 +52,7 @@ Note about prompt formatting: LM Studio utilizes OpenAI's [Harmony](https://cook
 
 LM Studio exposes a **Chat Completions-compatible API** so you can use the OpenAI SDK without changing much. Here’s a Python example:
 
-```py
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:1234/v1",
-    api_key="not-needed"  # LM Studio does not require an API key
-)
-
-result = client.chat.completions.create(
-    model="openai/gpt-oss-20b",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Explain what MXFP4 quantization is."}
-    ]
-)
-
-print(result.choices[0].message.content)
-```
+<<&lt;CODE_3&gt;>>
 
 If you’ve used the OpenAI SDK before, this will feel instantly familiar and your existing code should work by changing the base URL.
 
@@ -91,9 +62,7 @@ LM Studio is an [MCP client](https://lmstudio.ai/docs/app/plugins/mcp), which me
 
 LM Studio's mcp.json file is located in:
 
-```shell
-~/.lmstudio/mcp.json
-```
+<<&lt;CODE_4&gt;>>
 
 ## Local tool use with gpt-oss in Python or TypeScript
 
@@ -103,102 +72,12 @@ The way to achieve this is via the `.act()` call, which allows you to provide to
 
 The example below shows how to provide a single tool to the model that is able to create files on your local filesystem. You can use this example as a starting point, and extend it with more tools. See docs about tool definitions here for [Python](https://lmstudio.ai/docs/python/agent/tools) and [TypeScript](https://lmstudio.ai/docs/typescript/agent/tools).
 
-```shell
-uv pip install lmstudio
-```
+<<&lt;CODE_5&gt;>>
 
-```python
-import readline # Enables input line editing
-from pathlib import Path
-
-import lmstudio as lms
-
-# Define a function that can be called by the model and provide them as tools to the model.
-# Tools are just regular Python functions. They can be anything at all.
-def create_file(name: str, content: str):
-    """Create a file with the given name and content."""
-    dest_path = Path(name)
-    if dest_path.exists():
-        return "Error: File already exists."
-    try:
-        dest_path.write_text(content, encoding="utf-8")
-    except Exception as exc:
-        return "Error: {exc!r}"
-    return "File created."
-
-def print_fragment(fragment, round_index=0):
-    # .act() supplies the round index as the second parameter
-    # Setting a default value means the callback is also
-    # compatible with .complete() and .respond().
-    print(fragment.content, end="", flush=True)
-
-model = lms.llm("openai/gpt-oss-20b")
-chat = lms.Chat("You are a helpful assistant running on the user's computer.")
-
-while True:
-    try:
-        user_input = input("User (leave blank to exit): ")
-    except EOFError:
-        print()
-        break
-    if not user_input:
-        break
-    chat.add_user_message(user_input)
-    print("Assistant: ", end="", flush=True)
-    model.act(
-        chat,
-        [create_file],
-        on_message=chat.append,
-        on_prediction_fragment=print_fragment,
-    )
-    print()
-
-```
+<<&lt;CODE_6&gt;>>
 
 For TypeScript developers who want to utilize gpt-oss locally, here's a similar example using `lmstudio-js`:
 
-```shell
-npm install @lmstudio/sdk
-```
+<<&lt;CODE_7&gt;>>
 
-```typescript
-import { Chat, LMStudioClient, tool } from "@lmstudio/sdk";
-import { existsSync } from "fs";
-import { writeFile } from "fs/promises";
-import { createInterface } from "readline/promises";
-import { z } from "zod";
-
-const rl = createInterface({ input: process.stdin, output: process.stdout });
-const client = new LMStudioClient();
-const model = await client.llm.model("openai/gpt-oss-20b");
-const chat = Chat.empty();
-
-const createFileTool = tool({
-  name: "createFile",
-  description: "Create a file with the given name and content.",
-  parameters: { name: z.string(), content: z.string() },
-  implementation: async ({ name, content }) => {
-    if (existsSync(name)) {
-      return "Error: File already exists.";
-    }
-    await writeFile(name, content, "utf-8");
-    return "File created.";
-  },
-});
-
-while (true) {
-  const input = await rl.question("User: ");
-  // Append the user input to the chat
-  chat.append("user", input);
-
-  process.stdout.write("Assistant: ");
-  await model.act(chat, [createFileTool], {
-    // When the model finish the entire message, push it to the chat
-    onMessage: (message) => chat.append(message),
-    onPredictionFragment: ({ content }) => {
-      process.stdout.write(content);
-    },
-  });
-  process.stdout.write("\n");
-}
-```
+<<&lt;CODE_8&gt;>>

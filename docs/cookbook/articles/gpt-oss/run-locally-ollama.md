@@ -32,21 +32,13 @@ Ollama supports both model sizes of gpt-oss:
 1. **Install Ollama** → [Get it here](https://ollama.com/download)
 2. **Pull the model you want:**
 
-```shell
-# For 20B
-ollama pull gpt-oss:20b
-
-# For 120B
-ollama pull gpt-oss:120b
-```
+<<&lt;CODE_0&gt;>>
 
 ## Chat with gpt-oss
 
 Ready to talk to the model? You can fire up a chat in the app or the terminal:
 
-```shell
-ollama run gpt-oss:20b
-```
+<<&lt;CODE_1&gt;>>
 
 Ollama applies a **chat template** out of the box that mimics the [OpenAI harmony format](https://cookbook.openai.com/articles/openai-harmony). Type your message and start the conversation.
 
@@ -54,24 +46,7 @@ Ollama applies a **chat template** out of the box that mimics the [OpenAI harmon
 
 Ollama exposes a **Chat Completions-compatible API**, so you can use the OpenAI SDK without changing much. Here’s a Python example:
 
-```py
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:11434/v1",  # Local Ollama API
-    api_key="ollama"                       # Dummy key
-)
-
-response = client.chat.completions.create(
-    model="gpt-oss:20b",
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Explain what MXFP4 quantization is."}
-    ]
-)
-
-print(response.choices[0].message.content)
-```
+<<&lt;CODE_2&gt;>>
 
 If you’ve used the OpenAI SDK before, this will feel instantly familiar.
 
@@ -86,30 +61,7 @@ Ollama can:
 
 Example of invoking a function via Chat Completions:
 
-```py
-tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "get_weather",
-            "description": "Get current weather in a given city",
-            "parameters": {
-                "type": "object",
-                "properties": {"city": {"type": "string"}},
-                "required": ["city"]
-            },
-        },
-    }
-]
-
-response = client.chat.completions.create(
-    model="gpt-oss:20b",
-    messages=[{"role": "user", "content": "What's the weather in Berlin right now?"}],
-    tools=tools
-)
-
-print(response.choices[0].message)
-```
+<<&lt;CODE_3&gt;>>
 
 Since the models can perform tool calling as part of the chain-of-thought (CoT) it’s important for you to return the reasoning returned by the API back into a subsequent call to a tool call where you provide the answer until the model reaches a final answer.
 
@@ -121,12 +73,7 @@ If you do want to use the Responses API you can use [**Hugging Face’s `Respons
 
 For basic use cases you can also [**run our example Python server with Ollama as the backend.**](https://github.com/openai/gpt-oss?tab=readme-ov-file#responses-api) This server is a basic example server and does not have the
 
-```shell
-pip install gpt-oss
-python -m gpt_oss.responses_api.serve \
-    --inference_backend=ollama \
-    --checkpoint gpt-oss:20b
-```
+<<&lt;CODE_4&gt;>>
 
 ## Agents SDK integration
 
@@ -139,30 +86,4 @@ Both Agents SDK enable you to override the OpenAI base client to point to Ollama
 
 Here’s a Python Agents SDK example using LiteLLM:
 
-```py
-import asyncio
-from agents import Agent, Runner, function_tool, set_tracing_disabled
-from agents.extensions.models.litellm_model import LitellmModel
-
-set_tracing_disabled(True)
-
-@function_tool
-def get_weather(city: str):
-    print(f"[debug] getting weather for {city}")
-    return f"The weather in {city} is sunny."
-
-
-async def main(model: str, api_key: str):
-    agent = Agent(
-        name="Assistant",
-        instructions="You only respond in haikus.",
-        model=LitellmModel(model="ollama/gpt-oss:120b", api_key=api_key),
-        tools=[get_weather],
-    )
-
-    result = await Runner.run(agent, "What's the weather in Tokyo?")
-    print(result.final_output)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
+<<&lt;CODE_5&gt;>>

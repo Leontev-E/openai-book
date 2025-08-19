@@ -23,7 +23,7 @@ The second solution **Solution 2** pre-processes the file within the Azure Funct
 
 ### Solution 1: Returning the file to GPT using the [Returning Files](https://platform.openai.com/docs/actions/sending-files) pattern
 
-![](/cookbook-images/solution_1.gif)
+![](../../../images/solution_1.gif)
 
 This solution uses a Node.js Azure Function to, based on the logged in user:
 
@@ -36,13 +36,13 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 4. Return that to ChatGPT. The GPT then can use those files as if you had uploaded it to the conversation.
 
 
-![](/cookbook-images/solution_1_architecture.png)
+![](../../../images/solution_1_architecture.png)
 
 
 ### Solution 2: Converting the file to text in the Azure Function
 
 
-![](/cookbook-images/solution_2.gif)
+![](../../../images/solution_2.gif)
 
 
 This solution uses a Node.js Azure Function to, based on the logged in user:
@@ -58,7 +58,7 @@ This solution uses a Node.js Azure Function to, based on the logged in user:
 As you can see from the below architecture diagram, the first three steps are the same as Solution 1. The main difference is that this solution converts the file to text instead of a base64 string, and then summarizes that text using GPT 3.5 Turbo.
 
 
-![](/cookbook-images/solution_2_architecture.png)
+![](../../../images/solution_2_architecture.png)
 
 
 ### Why is this necessary instead of interacting with the Microsoft API directly?
@@ -114,7 +114,7 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 ##### Part 1: Create Function
 
 
-![](/cookbook-images/create_function_app.png)
+![](../../../images/create_function_app.png)
 
 
 1. Create an [Azure Function app](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview?pivots=programming-language-csharp). I used the following settings but you can use anything you are comfortable with. Note that not every language / operating system allows for editing the functions in the console directly - the combination I chose below does. For my walkthrough, I left everything as default and made the selections below
@@ -160,11 +160,11 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 
    3. Add it, then you’ll need an Admin on Azure Portal to **Grant Admin Consent.**
 
-5) **Within that enterprise application**, Click on **“Expose an API”** on the left hand menu under **Manage,** then copy the **scope** that was created using the **Copy to Clipboard** button. The scope should look like “api://\<insert-uuid>/user\_impersonation”. **Save this for later as** `SCOPE`**.**
+5) **Within that enterprise application**, Click on **“Expose an API”** on the left hand menu under **Manage,** then copy the **scope** that was created using the **Copy to Clipboard** button. The scope should look like “api://\&lt;insert-uuid&gt;/user\_impersonation”. **Save this for later as** `SCOPE`**.**
 
 6) Click on **“Authentication”** on the left hand menu under **Manage**
 
-   1. Under the **Web** section, you’ll notice one callback URI was added automatically. Add the Postman redirect URI (<https://oauth.pstmn.io/v1/callback>) for testing.
+   1. Under the **Web** section, you’ll notice one callback URI was added automatically. Add the Postman redirect URI ([https://oauth.pstmn.io/v1/callback](https://oauth.pstmn.io/v1/callback)) for testing.
 
 7) On the left-hand side, go to **Overview**. Copy the **application (client) ID** and and the **directory (tenant) ID** and **save for later as** `CLIENT_ID` **and** `TENANT_ID`**.**
 
@@ -184,7 +184,7 @@ See the documentation [here](https://learn.microsoft.com/en-us/azure/azure-funct
 10. Click on the function you just created (You may need to click refresh to see it). Click on **Get Function URL** and save it to test in Postman. You will also use this when creating the OpenAPI spec later when you put it into the GPT. 
 
 
-![](/cookbook-images/get_function_url.png)
+![](../../../images/get_function_url.png)
 
 11. Go back to the function app and click on **Configuration.** Show the value for the `MICROSOFT_PROVIDER_AUTHENTICATION_SECRET` variable, copy it (click advanced edit to copy it), and **save it for later.**  
 
@@ -249,18 +249,9 @@ Now that you have an authenticated Azure Function, we can update the function to
 17. Once this is complete, try calling the function (POST call) from Postman again, putting the below into body (using a query and search term you think will generate responses).
 
      *Solution 1*:
-     ```json
-    {
-        "searchTerm": "<choose a search term>"
-    }
-    ```
+     <<&lt;CODE_0&gt;>>
     *Solution 2*: 
-    ```json
-    {
-        "query": "<choose a question>",
-        "searchTerm": "<choose a search term>"
-    }
-    ```
+    <<&lt;CODE_1&gt;>>
 18. If you get a response, you are ready to set this up with a Custom GPT!
 
 
@@ -302,75 +293,18 @@ Below we have a few helper functions that we’ll use in the function.
 
 Create a function to initialize the Graph client with an access token. This will be used to search through Office 365 and SharePoint.
 
-```javascript
-const { Client } = require('@microsoft/microsoft-graph-client');
-
-function initGraphClient(accessToken) {
-    return Client.init({
-        authProvider: (done) => {
-            done(null, accessToken);
-        }
-    });
-}
-```
+<<&lt;CODE_2&gt;>>
 
 ##### Obtaining an On-Behalf-Of (OBO) Token
 
 This function uses an existing bearer token to request an OBO token from Microsoft's identity platform. This enables passing through the credentials to ensure the search only returns files the logged-in user can access.
 
-```javascript
-const axios = require('axios');
-const qs = require('querystring');
-
-async function getOboToken(userAccessToken) {
-    const { TENANT_ID, CLIENT_ID, MICROSOFT_PROVIDER_AUTHENTICATION_SECRET } = process.env;
-    const params = {
-        client_id: CLIENT_ID,
-        client_secret: MICROSOFT\_PROVIDER\_AUTHENTICATION\_SECRET,
-        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-        assertion: userAccessToken,
-        requested_token_use: 'on_behalf_of',
-        scope: 'https://graph.microsoft.com/.default'
-    };
-
-    const url = `https\://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`;
-    try {
-        const response = await axios.post(url, qs.stringify(params), {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
-        return response.data.access\_token;
-    } catch (error) {
-        console.error('Error obtaining OBO token:', error.response?.data || error.message);
-        throw error;
-    }
-}
-```
+<<&lt;CODE_3&gt;>>
 
 #### Retrieving Content from O365 / SharePoint Items
 
 This function fetches the content of drive items, converts it to a base64 string, and restructures to match the `openaiFileResponse` format.
-```javascript
-const getDriveItemContent = async (client, driveId, itemId, name) => {
-   try
-       const filePath = `/drives/${driveId}/items/${itemId}`;
-       const downloadPath = filePath + `/content`
-       // this is where we get the contents and convert to base64
-       const fileStream = await client.api(downloadPath).getStream();
-       let chunks = [];
-           for await (let chunk of fileStream) {
-               chunks.push(chunk);
-           }
-       const base64String = Buffer.concat(chunks).toString('base64');
-       // this is where we get the other metadata to include in response
-       const file = await client.api(filePath).get();
-       const mime_type = file.file.mimeType;
-       const name = file.name;
-       return {"name":name, "mime_type":mime_type, "content":base64String}
-   } catch (error) {
-       console.error('Error fetching drive content:', error);
-       throw new Error(`Failed to fetch content for ${name}: ${error.message}`);
-   }
-```
+<<&lt;CODE_4&gt;>>
 
 #### Creating the Azure Function to Handle Requests
 
@@ -391,88 +325,7 @@ Now that we have all these helper functions, the Azure Function will orchestrate
 - It converts the document to base64 string and restructures it to match the `openaiFileResponse` structure.
 
 **Response**: The function sends them back in the HTTP response.
-```javascript
-module.exports = async function (context, req) {
-   // const query = req.query.query || (req.body && req.body.query);
-   const searchTerm = req.query.searchTerm || (req.body && req.body.searchTerm);
-   if (!req.headers.authorization) {
-       context.res = {
-           status: 400,
-           body: 'Authorization header is missing'
-       };
-       return;
-   }
-   /// The below takes the token passed to the function, to use to get an OBO token.
-   const bearerToken = req.headers.authorization.split(' ')[1];
-   let accessToken;
-   try {
-       accessToken = await getOboToken(bearerToken);
-   } catch (error) {
-       context.res = {
-           status: 500,
-           body: `Failed to obtain OBO token: ${error.message}`
-       };
-       return;
-   }
-   // Initialize the Graph Client using the initGraphClient function defined above
-   let client = initGraphClient(accessToken);
-   // this is the search body to be used in the Microsft Graph Search API: https://learn.microsoft.com/en-us/graph/search-concept-files
-   const requestBody = {
-       requests: [
-           {
-               entityTypes: ['driveItem'],
-               query: {
-                   queryString: searchTerm
-               },
-               from: 0,
-               // the below is set to summarize the top 10 search results from the Graph API, but can configure based on your documents.
-               size: 10
-           }
-       ]
-   };
-
-
-   try {
-       // This is where we are doing the search
-       const list = await client.api('/search/query').post(requestBody);
-       const processList = async () => {
-           // This will go through and for each search response, grab the contents of the file and summarize with gpt-3.5-turbo
-           const results = [];
-           await Promise.all(list.value[0].hitsContainers.map(async (container) => {
-               for (const hit of container.hits) {
-                   if (hit.resource["@odata.type"] === "#microsoft.graph.driveItem") {
-                       const { name, id } = hit.resource;
-                       // The below is where the file lives
-                       const driveId = hit.resource.parentReference.driveId;
-                       // we use the helper function we defined above to get the contents, convert to base64, and restructure it
-                       const contents = await getDriveItemContent(client, driveId, id, name);
-                       results.push(contents)
-               }
-           }));
-           return results;
-       };
-       let results;
-       if (list.value[0].hitsContainers[0].total == 0) {
-           // Return no results found to the API if the Microsoft Graph API returns no results
-           results = 'No results found';
-       } else {
-           // If the Microsoft Graph API does return results, then run processList to iterate through.
-           results = await processList();
-           // this is where we structure the response so ChatGPT knows they are files
-           results = {'openaiFileResponse': results}
-       }
-       context.res = {
-           status: 200,
-           body: results
-       };
-   } catch (error) {
-       context.res = {
-           status: 500,
-           body: `Error performing search or processing results: ${error.message}`,
-       };
-   }
-};
-```
+<<&lt;CODE_5&gt;>>
 ### Customizations
 
 Below are some potential areas to customize. 
@@ -494,96 +347,12 @@ Note that all the same limitations of Actions apply here, with regards to return
 ### Sample GPT Instructions
 
 
-```text
-You are a Q&A helper that helps answer users questions. You have access to a documents repository through your API action. When a user asks a question, you pass in the "searchTerm" a single keyword or term you think you should use for the search.
-
-****
-
-Scenario 1: There are answers
-
-If your action returns results, then you take the results from the action and try to answer the users question. 
-
-****
-
-Scenario 2: No results found
-
-If the response you get from the action is "No results found", stop there and let the user know there were no results and that you are going to try a different search term, and explain why. You must always let the user know before conducting another search.
-
-Example:
-
-****
-
-I found no results for "DEI". I am now going to try [insert term] because [insert explanation]
-
-****
-
-Then, try a different searchTerm that is similar to the one you tried before, with a single word. 
-
-Try this three times. After the third time, then let the user know you did not find any relevant documents to answer the question, and to check SharePoint. 
-Be sure to be explicit about what you are searching for at each step.
-
-****
-
-In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. 
-```
+<<&lt;CODE_6&gt;>>
 ### Sample OpenAPI Spec
 This expects a response that matches the file retrieval structure in our doc [here](https://platform.openai.com/docs/actions/sending-files) and passes in a `searchTerm` parameter to inform the search.
 >Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
 
-```yaml
-openapi: 3.0.0
-info:
-  title: SharePoint Search API
-  description: API for searching SharePoint documents.
-  version: 1.0.0
-servers:
-  - url: https://{your_function_app_name}.azurewebsites.net/api
-    description: SharePoint Search API server
-paths:
-  /{your_function_name}?code={enter your specific endpoint id here}:
-    post:
-      operationId: searchSharePoint
-      summary: Searches SharePoint for documents matching a query and term.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                searchTerm:
-                  type: string
-                  description: A specific term to search for within the documents.
-      responses:
-        '200':
-          description: A CSV file of query results encoded in base64.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  openaiFileResponseData:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          description: The name of the file.
-                        mime_type:
-                          type: string
-                          description: The MIME type of the file.
-                        content:
-                          type: string
-                          format: byte
-                          description: The base64 encoded contents of the file.
-        '400':
-          description: Bad request when the SQL query parameter is missing.
-        '413':
-          description: Payload too large if the response exceeds the size limit.
-        '500':
-          description: Server error when there are issues executing the query or encoding the results.
-```
+<<&lt;CODE_7&gt;>>
 
 ## Solution 2 Detailed Walkthrough: Converting the file to text in the Azure Function
 
@@ -600,81 +369,13 @@ This solution follows the same authentication steps as solution 1 above - see [I
 #### Retrieving Content from O365 / SharePoint Items
 
 This function fetches the content of drive items, handling different file types and converting files to PDF when necessary for text extraction. This uses the [download endpoint](https://learn.microsoft.com/en-us/graph/api/driveitem-get-content?view=graph-rest-1.0\&tabs=http) for PDFs and the [convert endpoint](https://learn.microsoft.com/en-us/graph/api/driveitem-get-content-format?view=graph-rest-1.0\&tabs=http) for other supported file types.
-```javascript
-const getDriveItemContent = async (client, driveId, itemId, name) => {
-    try {
-        const fileType = path.extname(name).toLowerCase();
-        // the below files types are the ones that are able to be converted to PDF to extract the text. See https://learn.microsoft.com/en-us/graph/api/driveitem-get-content-format?view=graph-rest-1.0&tabs=http
-        const allowedFileTypes = ['.pdf', '.doc', '.docx', '.odp', '.ods', '.odt', '.pot', '.potm', '.potx', '.pps', '.ppsx', '.ppsxm', '.ppt', '.pptm', '.pptx', '.rtf'];
-        // filePath changes based on file type, adding ?format=pdf to convert non-pdf types to pdf for text extraction, so all files in allowedFileTypes above are converted to pdf
-        const filePath = `/drives/${driveId}/items/${itemId}/content` + ((fileType === '.pdf' || fileType === '.txt' || fileType === '.csv') ? '' : '?format=pdf');
-        if (allowedFileTypes.includes(fileType)) {
-            response = await client.api(filePath).getStream();
-            // The below takes the chunks in response and combines
-            let chunks = [];
-            for await (let chunk of response) {
-                chunks.push(chunk);
-            }
-            let buffer = Buffer.concat(chunks);
-            // the below extracts the text from the PDF.
-            const pdfContents = await pdfParse(buffer);
-            return pdfContents.text;
-        } else if (fileType === '.txt') {
-            // If the type is txt, it does not need to create a stream and instead just grabs the content
-            response = await client.api(filePath).get();
-            return response;
-        }  else if (fileType === '.csv') {
-            response = await client.api(filePath).getStream();
-            let chunks = [];
-            for await (let chunk of response) {
-                chunks.push(chunk);
-            }
-            let buffer = Buffer.concat(chunks);
-            let dataString = buffer.toString('utf-8');
-            return dataString
-            
-    } else {
-        return 'Unsupported File Type';
-    }
-     
-    } catch (error) {
-        console.error('Error fetching drive content:', error);
-        throw new Error(`Failed to fetch content for ${name}: ${error.message}`);
-    }
-};
-```
+<<&lt;CODE_8&gt;>>
 
 #### Integrating GPT 3.5-Turbo for Text Analysis
 
 This function utilizes the OpenAI SDK to analyze text extracted from documents and find relevant information based on a user query. This helps to ensure only relevant text to the user’s question is returned to the GPT. 
 
-```javascript
-const getRelevantParts = async (text, query) => {
-    try {
-        // We use your OpenAI key to initialize the OpenAI client
-        const openAIKey = process.env["OPENAI_API_KEY"];
-        const openai = new OpenAI({
-            apiKey: openAIKey,
-        });
-        const response = await openai.chat.completions.create({
-            // Using gpt-3.5-turbo due to speed to prevent timeouts. You can tweak this prompt as needed
-            model: "gpt-3.5-turbo-0125",
-            messages: [
-                {"role": "system", "content": "You are a helpful assistant that finds relevant content in text based on a query. You only return the relevant sentences, and you return a maximum of 10 sentences"},
-                {"role": "user", "content": `Based on this question: **"${query}"**, get the relevant parts from the following text:*****\n\n${text}*****. If you cannot answer the question based on the text, respond with 'No information provided'`}
-            ],
-            // using temperature of 0 since we want to just extract the relevant content
-            temperature: 0,
-            // using max_tokens of 1000, but you can customize this based on the number of documents you are searching. 
-            max_tokens: 1000
-        });
-        return response.choices[0].message.content;
-    } catch (error) {
-        console.error('Error with OpenAI:', error);
-        return 'Error processing text with OpenAI' + error;
-    }
-};
-```
+<<&lt;CODE_9&gt;>>
 
 #### Creating the Azure Function to Handle Requests
 
@@ -698,128 +399,7 @@ Now that we have all these helper functions, the Azure Function will orchestrate
 
 **Response**: The function sorts the results by relevance and sends them back in the HTTP response.
 
-```javascript
-module.exports = async function (context, req) {
-    const query = req.query.query || (req.body && req.body.query);
-    const searchTerm = req.query.searchTerm || (req.body && req.body.searchTerm);
-    if (!req.headers.authorization) {
-        context.res = {
-            status: 400,
-            body: 'Authorization header is missing'
-        };
-        return;
-    }
-    /// The below takes the token passed to the function, to use to get an OBO token.
-    const bearerToken = req.headers.authorization.split(' ')[1];
-    let accessToken;
-    try {
-        accessToken = await getOboToken(bearerToken);
-    } catch (error) {
-        context.res = {
-            status: 500,
-            body: `Failed to obtain OBO token: ${error.message}`
-        };
-        return;
-    }
-    // Initialize the Graph Client using the initGraphClient function defined above
-    let client = initGraphClient(accessToken);
-    // this is the search body to be used in the Microsft Graph Search API: https://learn.microsoft.com/en-us/graph/search-concept-files
-    const requestBody = {
-        requests: [
-            {
-                entityTypes: ['driveItem'],
-                query: {
-                    queryString: searchTerm
-                },
-                from: 0,
-                // the below is set to summarize the top 10 search results from the Graph API, but can configure based on your documents. 
-                size: 10
-            }
-        ]
-    };
-
-    try { 
-        // Function to tokenize content (e.g., based on words). 
-        const tokenizeContent = (content) => {
-            return content.split(/\s+/);
-        };
-
-        // Function to break tokens into 10k token windows for gpt-3.5-turbo
-        const breakIntoTokenWindows = (tokens) => {
-            const tokenWindows = []
-            const maxWindowTokens = 10000; // 10k tokens
-            let startIndex = 0;
-
-            while (startIndex < tokens.length) {
-                const window = tokens.slice(startIndex, startIndex + maxWindowTokens);
-                tokenWindows.push(window);
-                startIndex += maxWindowTokens;
-            }
-
-            return tokenWindows;
-        };
-        // This is where we are doing the search
-        const list = await client.api('/search/query').post(requestBody);
-
-        const processList = async () => {
-            // This will go through and for each search response, grab the contents of the file and summarize with gpt-3.5-turbo
-            const results = [];
-
-            await Promise.all(list.value[0].hitsContainers.map(async (container) => {
-                for (const hit of container.hits) {
-                    if (hit.resource["@odata.type"] === "#microsoft.graph.driveItem") {
-                        const { name, id } = hit.resource;
-                        // We use the below to grab the URL of the file to include in the response
-                        const webUrl = hit.resource.webUrl.replace(/\s/g, "%20");
-                        // The Microsoft Graph API ranks the reponses, so we use this to order it
-                        const rank = hit.rank;
-                        // The below is where the file lives
-                        const driveId = hit.resource.parentReference.driveId;
-                        const contents = await getDriveItemContent(client, driveId, id, name);
-                        if (contents !== 'Unsupported File Type') {
-                            // Tokenize content using function defined previously
-                            const tokens = tokenizeContent(contents);
-
-                            // Break tokens into 10k token windows
-                            const tokenWindows = breakIntoTokenWindows(tokens);
-
-                            // Process each token window and combine results
-                            const relevantPartsPromises = tokenWindows.map(window => getRelevantParts(window.join(' '), query));
-                            const relevantParts = await Promise.all(relevantPartsPromises);
-                            const combinedResults = relevantParts.join('\n'); // Combine results
-
-                            results.push({ name, webUrl, rank, contents: combinedResults });
-                        } 
-                        else {
-                            results.push({ name, webUrl, rank, contents: 'Unsupported File Type' });
-                        }
-                    }
-                }
-            }));
-
-            return results;
-        };
-        let results;
-        if (list.value[0].hitsContainers[0].total == 0) {
-            // Return no results found to the API if the Microsoft Graph API returns no results
-            results = 'No results found';
-        } else {
-            // If the Microsoft Graph API does return results, then run processList to iterate through.
-            results = await processList();
-            results.sort((a, b) => a.rank - b.rank);
-        }
-        context.res = {
-            status: 200,
-            body: results
-        };
-    } catch (error) {
-        context.res = {
-            status: 500,
-            body: `Error performing search or processing results: ${error.message}`,
-        };
-    }
-};
-```
+<<&lt;CODE_10&gt;>>
 
 ### Customizations
 
@@ -846,89 +426,13 @@ Note that all the same limitations of Actions apply here, with regards to return
 ### Sample GPT Instructions
 
 
-```
-You are a Q&A helper that helps answer users questions. You have access to a documents repository through your API action. When a user asks a question, you pass in that question exactly as stated to the "query" parameter, and for the "searchTerm" you use a single keyword or term you think you should use for the search.
-
-****
-
-Scenario 1: There are answers
-
-If your action returns results, then you take the results from the action and summarize concisely with the webUrl returned from the action. You answer the users question to the best of your knowledge from the action
-
-****
-
-Scenario 2: No results found
-
-If the response you get from the action is "No results found", stop there and let the user know there were no results and that you are going to try a different search term, and explain why. You must always let the user know before conducting another search.
-
-Example:
-
-****
-
-I found no results for "DEI". I am now going to try [insert term] because [insert explanation]
-
-****
-
-Then, try a different searchTerm that is similar to the one you tried before, with a single word. 
-
-Try this three times. After the third time, then let the user know you did not find any relevant documents to answer the question, and to check SharePoint. Be sure to be explicit about what you are searching for at each step.
-
-****
-
-In either scenario, try to answer the user's question. If you cannot answer the user's question based on the knowledge you find, let the user know and ask them to go check the HR Docs in SharePoint. If the file is a CSV, XLSX, or XLS, you can tell the user to download the file using the link and re-upload to use Advanced Data Analysis.
-```
+<<&lt;CODE_11&gt;>>
 
 ### Sample OpenAPI Spec
 The below spec passes in the `query` parameter to inform the pre-processing and a `searchTerm` to find the right files in Microsoft Graph.
 >Make sure to switch the function app name, function name and code based on link copied in screenshot [here](#part-3-set-up-test-function)
 
-```yaml
-openapi: 3.0.0
-info:
-  title: SharePoint Search API
-  description: API for searching SharePoint documents.
-  version: 1.0.0
-servers:
-  - url: https://{your_function_app_name}.azurewebsites.net/api
-    description: SharePoint Search API server
-paths:
-  /{your_function_name}?code={enter your specific endpoint id here}:
-    post:
-      operationId: searchSharePoint
-      summary: Searches SharePoint for documents matching a query and term.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                query:
-                  type: string
-                  description: The full query to search for in SharePoint documents.
-                searchTerm:
-                  type: string
-                  description: A specific term to search for within the documents.
-      responses:
-        '200':
-          description: Search results
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    documentName:
-                      type: string
-                      description: The name of the document.
-                    snippet:
-                      type: string
-                      description: A snippet from the document containing the search term.
-                    url:
-                      type: string
-                      description: The URL to access the document.
-```
+<<&lt;CODE_12&gt;>>
 
 
 ## FAQ

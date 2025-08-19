@@ -14,7 +14,7 @@ Kusto also supports in-built function [series_cosine_similarity_fl](https://lear
 
 [Get started](https://aka.ms/kustofree) with Kusto for free. 
 
-![Kusto_Vector](/cookbook-images/kusto_vector_db.png)
+![Kusto_Vector](./images/kusto_vector_db.png)
 
 
 
@@ -22,9 +22,9 @@ Kusto also supports in-built function [series_cosine_similarity_fl](https://lear
 
 ### Demo Scenario
 
-![Wiki_embeddings](/cookbook-images/wiki_embeddings.png)
+![Wiki_embeddings](./images/wiki_embeddings.png)
 
-![semantic_search_flow](/cookbook-images/semantic_search_user_flow.png)
+![semantic_search_flow](./images/semantic_search_user_flow.png)
 
 If you’d like to try this demo, please follow the instructions in the [Notebook](Getting_started_with_kusto_and_openai_embeddings.ipynb).
 

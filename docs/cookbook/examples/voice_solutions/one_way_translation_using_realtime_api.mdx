@@ -29,16 +29,7 @@ The Realtime API is powered by [GPT-4o Realtime](https://platform.openai.com/doc
 
 We can dynamically input speech in any language.
 
-```js
-// Define language codes and import their corresponding instructions from our prompt config file
-const languageConfigs = [
-  { code: 'fr', instructions: french_instructions },
-  { code: 'es', instructions: spanish_instructions },
-  { code: 'tl', instructions: tagalog_instructions },
-  { code: 'en', instructions: english_instructions },
-  { code: 'zh', instructions: mandarin_instructions },
-];
-```
+<<&lt;CODE_0&gt;>>
 
 ## Step 2: Setting up the Speaker App 
 
@@ -47,23 +38,7 @@ const languageConfigs = [
 
 We need to handle the setup and management of client instances that connect to the Realtime API, allowing the application to process and stream audio in different languages. `clientRefs` holds a map of `RealtimeClient` instances, each associated with a language code (e.g., 'fr' for French, 'es' for Spanish) representing each unique client connection to the Realtime API. 
 
-```js
-const clientRefs = useRef(
-    languageConfigs.reduce((acc, { code }) => {
-      acc[code] = new RealtimeClient({
-        apiKey: OPENAI_API_KEY,
-        dangerouslyAllowAPIKeyInBrowser: true,
-      });
-      return acc;
-    }, {} as Record<string, RealtimeClient>)
-  ).current;
-
-  // Update languageConfigs to include client references
-  const updatedLanguageConfigs = languageConfigs.map(config => ({
-    ...config,
-    clientRef: { current: clientRefs[config.code] }
-  }));
-  ```
+<<&lt;CODE_1&gt;>>
 
 Note: The `dangerouslyAllowAPIKeyInBrowser` option is set to true because we are using our OpenAI API key in the browser for demo purposes but in production you should use an [ephemeral API key](https://platform.openai.com/docs/api-reference/realtime-sessions) generated via the OpenAI REST API. 
 
@@ -71,34 +46,11 @@ We need to actually initiate the connection to the Realtime API and send audio d
  
 The `connectConversation` function orchestrates the connection, ensuring that all necessary components are initialized and ready for use. 
 
-```js
-const connectConversation = useCallback(async () => {
-    try {
-        setIsLoading(true);
-        const wavRecorder = wavRecorderRef.current;
-        await wavRecorder.begin();
-        await connectAndSetupClients();
-        setIsConnected(true);
-    } catch (error) {
-        console.error('Error connecting to conversation:', error);
-    } finally {
-        setIsLoading(false);
-    }
-}, []);
-```
+<<&lt;CODE_2&gt;>>
 
  `connectAndSetupClients` ensures we are using the right model and voice. For this demo, we are using gpt-4o-realtime-preview-2024-12-17 and coral. 
 
-```js
-   // Function to connect and set up all clients
-  const connectAndSetupClients = async () => {
-    for (const { clientRef } of updatedLanguageConfigs) {
-      const client = clientRef.current;
-      await client.realtime.connect({ model: DEFAULT_REALTIME_MODEL });
-      await client.updateSession({ voice: DEFAULT_REALTIME_VOICE });
-    }
-  };
-```
+<<&lt;CODE_3&gt;>>
 
 ## Step 3: Audio Streaming 
 
@@ -107,19 +59,7 @@ Sending audio with WebSockets requires work to manage the inbound and outbound P
 
 This demo supports both [manual and voice activity detection (VAD)](https://platform.openai.com/docs/guides/realtime-model-capabilities#voice-activity-detection-vad) modes for recording that can be toggled by the speaker. For cleaner audio capture we recommend using manual mode here. 
 
-```js
-const startRecording = async () => {
-    setIsRecording(true);
-    const wavRecorder = wavRecorderRef.current;
-
-    await wavRecorder.record((data) => {
-      // Send mic PCM to all clients
-      updatedLanguageConfigs.forEach(({ clientRef }) => {
-        clientRef.current.appendInputAudio(data.mono);
-      });
-    });
-  };
-  ```
+<<&lt;CODE_4&gt;>>
 
 
 ## Step 4: Showing Transcripts
@@ -137,27 +77,7 @@ The app connects to a simple `Socket.IO` server that acts as a relay for audio d
 
 The key function here is `connectServer` that connects to the server and sets up audio streaming. 
 
-```js
-  // Function to connect to the server and set up audio streaming
-  const connectServer = useCallback(async () => {
-    if (socketRef.current) return;
-    try {
-      const socket = io('http://localhost:3001');
-      socketRef.current = socket;
-      await wavStreamPlayerRef.current.connect();
-      socket.on('connect', () => {
-        console.log('Listener connected:', socket.id);
-        setIsConnected(true);
-      });
-      socket.on('disconnect', () => {
-        console.log('Listener disconnected');
-        setIsConnected(false);
-      });
-    } catch (error) {
-      console.error('Error connecting to server:', error);
-    }
-  }, []);
-```
+<<&lt;CODE_5&gt;>>
 
 ### POC to Production
 
