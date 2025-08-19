@@ -50,10 +50,13 @@ jobs:
       - name: Translate RU (bootstrap, no API calls)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SKIP_TRANSLATE: "1"
+          SKIP_TRANSLATE: "1" # пока без перевода, чтобы быстро собрать сайт
           MAX_TRANSLATE: "0"
           CONCURRENCY: "4"
           MAX_FILE_KB: "0"
+          EXCLUDE_GLOBS: |
+            upstream/articles/gpt-oss/**
+            upstream/articles/what_is_new_with_dalle_3.mdx
         run: npm run translate
 
       # На всякий случай отбрасываем любые изменения lock-файла (если npm его трогал)

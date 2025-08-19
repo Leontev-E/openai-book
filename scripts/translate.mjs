@@ -27,7 +27,7 @@ const EXCLUDE = (process.env.EXCLUDE_GLOBS || '')
 
 const client = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 
-const SRC_DIRS = ['upstream/articles', 'upstream/examples'];
+const SRC_DIRS = ['upstream/articles'];
 const OUT_DIR = 'docs/cookbook';
 const STATIC_IMG_DST = 'static/cookbook-images';
 const CACHE_DIR = path.join('scripts', 'cache');
