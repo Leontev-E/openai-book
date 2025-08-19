@@ -91,7 +91,7 @@ async function processFile(srcPath) {
 (async () => {
     const spinner = ora('Scanning sources…').start();
     const patterns = SRC_DIRS.map(d => `${d}/**/*.{md,mdx}`);
-    const files = await globby(patterns, { gitignore: true });
+    const files = await globby(patterns, { gitignore: false });
     spinner.succeed(`Found ${files.length} files`);
 
     let ok = 0;
