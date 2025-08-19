@@ -1,3 +1,4 @@
+// scripts/translate.mjs
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -45,43 +46,102 @@ function sha256(s) {
     return crypto.createHash('sha256').update(s).digest('hex');
 }
 
+/* ---------- Защита кода ---------- */
+
+// Вырезает fenced-блоки ```lang ... ``` и заменяет на <<<CODE_i>>>
+function protectFencedCode(text) {
+    const blocks = [];
+    const fenced = /```([a-zA-Z0-9_.+\-]*)[ \t]*\n([\s\S]*?)\n```/g; // нежадный
+    const masked = text.replace(fenced, (_m, lang = '', body) => {
+        const i = blocks.length;
+        blocks.push({ lang: (lang || '').trim(), body });
+        return `<<<CODE_${i}>>>`;
+    });
+    return { masked, blocks };
+}
+function restoreFencedCode(text, blocks) {
+    return text.replace(/<<<CODE_(\d+)>>>/g, (_m, n) => {
+        const i = Number(n);
+        const b = blocks[i];
+        if (!b) return _m;
+        const lang = b.lang ? b.lang : '';
+        const code = (b.body ?? '').replace(/\s+$/, '');
+        return `\`\`\`${lang}\n${code}\n\`\`\``;
+    });
+}
+
+// Вырезает инлайн-код `...` и заменяет на <<<INL_i>>>
+function protectInlineCode(text) {
+    const blocks = [];
+    const masked = text.replace(/`([^`\n]+?)`/g, (_m, body) => {
+        const i = blocks.length;
+        blocks.push(body);
+        return `<<<INL_${i}>>>`;
+    });
+    return { masked, blocks };
+}
+function restoreInlineCode(text, blocks) {
+    return text.replace(/<<<INL_(\d+)>>>/g, (_m, n) => {
+        const i = Number(n);
+        const body = blocks[i];
+        if (body == null) return _m;
+        return '`' + body + '`';
+    });
+}
+
+/* ---------- Переписывание картинок ---------- */
 /**
  * Переписываем ссылки на изображения:
- *  - относительные ./ и ../ → копируем в /static/cookbook-images/
- *  - пути вида static/images/... и docs/images/... → ищем в upstream/<images|static/images>/
+ *  - относительные ./ и ../ → копируем в /static/cookbook-images/ с префиксом-хэшем
+ *  - пути вида static/images/... и docs/images/... → копируем в /static/cookbook-images/<тот_же_подпуть>
+ *  - HTML <img src="..."> тоже поддерживается
  */
 function rewriteImageLinks(md, relFrom) {
     function copyAndMap(srcPathRaw) {
         if (!srcPathRaw) return null;
 
-        // убираем окружающие <...> и кавычки, пробелы
+        // убрать <...> и кавычки, ведущие/хвостовые пробелы
         let u = srcPathRaw.trim().replace(/^<|>$/g, '').replace(/^["']|["']$/g, '');
 
-        // убираем ведущие ./ или /
+        // если абсолютная http(s) — не трогаем
+        if (/^https?:\/\//i.test(u)) return u;
+
+        // убрать ведущие ./ или /
         const cleaned = u.replace(/^(?:\.\/|\/)/, '');
 
-        // хвост после images/
-        const afterImages = cleaned.replace(/^(?:static|docs)\/images\//, '');
+        // если путь начинается с static/images или docs/images — сохраним подпапку
+        const m = cleaned.match(/^(?:static|docs)\/images\/(.+)/i);
+        if (m) {
+            const afterImages = m[1]; // напр. dalle_3/dalle_3_improved_prompts.png
+            const candidates = [
+                path.resolve('upstream/images', afterImages),
+                path.resolve('upstream/static/images', afterImages),
+            ];
+            const abs = candidates.find(p => fs.existsSync(p));
+            if (!abs) return null;
 
-        // кандидаты, откуда взять файл
-        const candidates = [
-            path.resolve(relFrom, u),                         // относительный рядом
-            path.resolve('upstream/images', afterImages),     // upstream/images/...
-            path.resolve('upstream/static/images', afterImages), // upstream/static/images/...
-        ];
-        const abs = candidates.find(p => fs.existsSync(p));
-        if (!abs) return null;
+            const dstRel = afterImages.replace(/\\/g, '/'); // нормализованный подпуть
+            const dstAbs = path.join(STATIC_IMG_DST, dstRel);
+            ensureDir(path.dirname(dstAbs));
+            try { fs.copyFileSync(abs, dstAbs); } catch { }
+            return `/cookbook-images/${dstRel}`;
+        }
 
-        ensureDir(STATIC_IMG_DST);
-        const fileName = path.basename(abs);
-        const dst = path.join(STATIC_IMG_DST, fileName);
-        try { fs.copyFileSync(abs, dst); } catch { }
-        return `/cookbook-images/${fileName}`;
+        // иначе считаем относительным путём рядом с исходником
+        const absRel = path.resolve(relFrom, u);
+        if (!fs.existsSync(absRel)) return null;
+
+        const base = path.basename(absRel);
+        const suffix = sha256(absRel).slice(0, 8);
+        const dstName = `${suffix}_${base}`;
+        const dstAbs = path.join(STATIC_IMG_DST, dstName);
+        try { fs.copyFileSync(absRel, dstAbs); } catch { }
+        return `/cookbook-images/${dstName}`;
     }
 
     let out = md;
 
-    // 1) Markdown: относительные ./../ с опциональным title
+    // Markdown: ![alt](./rel.png "title")
     out = out.replace(
         /!\[([^\]]*)\]\(((?<url>\.{1,2}\/[^)\s>]+))(?<title>\s+"[^"]*"|\s+'[^']*')?\)/g,
         (m, alt, _url, _title, groups) => {
@@ -90,16 +150,16 @@ function rewriteImageLinks(md, relFrom) {
         }
     );
 
-    // 2) Markdown: /static|static|docs/images/... (+ опц. title, допускаем <...> внутри)
+    // Markdown: ![alt](static/images/... | docs/images/...)
     out = out.replace(
-        /!\[([^\]]*)\]\(((?<url>(?:\/|\.{0,2}\/)?(?:static|docs)\/images\/[^)\s>]+|<[^)]+>))(?<title>\s+"[^"]*"|\s+'[^']*')?\)/gi,
+        /!\[([^\]]*)\]\(((?<url>(?:\/|\.{0,2}\/)?(?:(?:static|docs)\/images\/[^)\s>]+|<[^)]+>)))(?<title>\s+"[^"]*"|\s+'[^']*')?\)/gi,
         (m, alt, _url, _title, groups) => {
             const mapped = copyAndMap(groups?.url || _url);
             return mapped ? `![${alt}](${mapped}${groups?.title || ''})` : m;
         }
     );
 
-    // 3) HTML <img src="./...">
+    // HTML <img src="./...">
     out = out.replace(
         /<img\s+([^>]*?)src=["']((?:\.{1,2}\/)[^"']+)["']([^>]*)>/gi,
         (m, pre, rel, post) => {
@@ -108,7 +168,7 @@ function rewriteImageLinks(md, relFrom) {
         }
     );
 
-    // 4) HTML <img src="/static|static|docs/images/...">
+    // HTML <img src="/static|static|docs/images/...">
     out = out.replace(
         /<img\s+([^>]*?)src=["']((?:\/|\.{0,2}\/)?(?:static|docs)\/images\/[^"']+)["']([^>]*)>/gi,
         (m, pre, rel, post) => {
@@ -120,90 +180,78 @@ function rewriteImageLinks(md, relFrom) {
     return out;
 }
 
+/* ---------- Переписывание ссылок на ноутбуки ---------- */
 /**
- * Санитайзер под MDX v2:
- *  - самозакрывающиеся теги <br>/<hr>
- *  - автоссылки <https://...> → [https://...](https://...)
- *  - экранирование подозрительных <placeholders> (<name>, <token> и т.п.)
- *  - экранирование <> и <число...>
- *  - не трогаем кодовые блоки
+ * ../examples/XYZ.ipynb → https://github.com/openai/openai-cookbook/blob/main/examples/XYZ.ipynb
+ */
+function rewriteNotebookLinks(md) {
+    const GH = 'https://github.com/openai/openai-cookbook/blob/main/examples/';
+    // [text](../examples/....ipynb)
+    let out = md.replace(
+        /\]\(\.{2}\/examples\/([^)\s#]+?\.ipynb)(#[^)]+)?\)/gi,
+        (m, rel, hash = '') => `](${GH}${rel}${hash || ''})`
+    );
+    // [text](../../examples/....ipynb)
+    out = out.replace(
+        /\]\(\.{2,}\/examples\/([^)\s#]+?\.ipynb)(#[^)]+)?\)/gi,
+        (m, rel, hash = '') => `](${GH}${rel}${hash || ''})`
+    );
+    return out;
+}
+
+/* ---------- Санитайзер под MDX v2 ---------- */
+/**
+ * - самозакрывающиеся <br/> <hr/>
+ * - <https://...> → [https://...](https://...)
+ * - экранирование чуждых JSX-тегов/плейсхолдеров
+ * - аккуратно, без изменений внутри кода (мы его уже спрятали раньше)
  */
 function sanitizeMDX(text) {
-    // защитим кодовые блоки
-    const codeBlocks = [];
-    let t = text.replace(/```[\s\S]*?```/g, block => {
-        const key = `<<<CODE_${codeBlocks.length}>>>`;
-        codeBlocks.push(block);
-        return key;
-    });
+    // защитим fenced-код и инлайн-код (доп. страховка)
+    const f = protectFencedCode(text);
+    const i = protectInlineCode(f.masked);
+    let t = i.masked;
 
     // 1) <br>, <hr>
     t = t.replace(/<br\s*>/gi, '<br />');
     t = t.replace(/<hr\s*>/gi, '<hr />');
 
-    // 2) <&nbsp;> и подобные сущности в угловых
-    t = t.replace(/<&([a-z]+;)>/gi, (m, ent) => `&lt;&${ent}&gt;`);
+    // 2) автоссылки <https://...>
+    t = t.replace(/<((https?:\/\/)[^>\s]+)>/gi, (_m, url) => `[${url}](${url})`);
 
-    // 3) автоссылки <https://...>
-    t = t.replace(/<((https?:\/\/)[^>\s]+)>/gi, (m, url) => `[${url}](${url})`);
-
-    // 4) фрагменты вида <.../...> (внутри слэш) → не JSX
-    t = t.replace(/<([^ >]+\/[^>]+)>/g, (m, inner) => `&lt;${inner}&gt;`);
-
-    // 5) пустые <>
+    // 3) пустые <>, и подозрительные с '/'
     t = t.replace(/<>/g, '&lt;&gt;');
+    t = t.replace(/<([^ >]+\/[^>]+)>/g, (_m, inner) => `&lt;${inner}&gt;`);
 
-    // 6) <число...>
+    // 4) <число...>
     t = t.replace(/<\d[^>]*>/g, m => m.replace('<', '&lt;').replace('>', '&gt;'));
 
-    // 7) экранируем нестандартные теги-плейсхолдеры
-    const allowed = new Set([
-        'a', 'br', 'hr', 'img', 'p', 'div', 'span', 'strong', 'em', 'code', 'pre',
-        'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'sup', 'sub',
-        'blockquote', 'details', 'summary', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
-    ]);
+    // 5) общий фильтр: экранируем всё, что не является допустимым HTML-тегом
+    const allowed = '(a|br|hr|img|p|div|span|strong|em|code|pre|ul|ol|li|table|thead|tbody|tr|td|th|sup|sub|blockquote|details|summary|h[1-6])';
+    t = t.replace(new RegExp(`<(?!(?:/${allowed}|${allowed})\\b)`, 'gi'), '&lt;');
 
-    // открывающие
-    t = t.replace(/<([a-z][a-z0-9_-]*)(\s[^>]*)?>/gi, (m, name) => {
-        return allowed.has(name.toLowerCase()) ? m : m.replace('<', '&lt;').replace('>', '&gt;');
-    });
-    // закрывающие
-    t = t.replace(/<\/([a-z][a-z0-9_-]*)>/gi, (m, name) => {
-        return allowed.has(name.toLowerCase()) ? m : m.replace('<', '&lt;').replace('>', '&gt;');
-    });
-
-    // 9) финальный ловец: любой `<`, который НЕ начинает допустимый HTML-тег — экранируем
-    // оставляем только: a|br|hr|img|p|div|span|strong|em|code|pre|ul|ol|li|table|thead|tbody|tr|td|th|sup|sub|blockquote|details|summary|h1..h6
-    t = t.replace(/<(?!\/?(?:a|br|hr|img|p|div|span|strong|em|code|pre|ul|ol|li|table|thead|tbody|tr|td|th|sup|sub|blockquote|details|summary|h[1-6])\b)/gi, '&lt;');
-
-    // 10) одиночное закрытие без имени: </> → &lt;/>
-    t = t.replace(/<\/(?=>)/g, '&lt;/');
-
-    // вернём код
-    codeBlocks.forEach((blk, i) => { t = t.replaceAll(`<<<CODE_${i}>>>`, blk); });
+    // вернуть инлайн-код и fenced-код
+    t = restoreInlineCode(t, i.blocks);
+    t = restoreFencedCode(t, f.blocks);
     return t;
 }
 
-/**
- * Переводим, сохраняя кодовые блоки (или пропускаем перевод)
- */
+/* ---------- Перевод ---------- */
 async function translateMarkdownPreservingCode(md) {
     if (!client || SKIP_TRANSLATE) return md;
 
-    const codeBlocks = [];
-    const protectedMd = md.replace(/```[\s\S]*?```/g, block => {
-        const key = `<<<CODE_${codeBlocks.length}>>>`;
-        codeBlocks.push(block);
-        return key;
-    });
+    // 1) спрячем код (fenced + inline)
+    const f = protectFencedCode(md);
+    const i = protectInlineCode(f.masked);
 
+    // 2) система перевода
     const system = `Ты — профессиональный технический переводчик (EN→RU).
 - Сохраняй структуру Markdown/MDX и форматирование.
-- НЕ переводить кодовые блоки, команды, пути, имена пакетов.
-- Сохраняй ссылки и якори.`;
+- НЕ переводить кодовые блоки, команды, пути, имена пакетов и инлайн-код в \`backticks\`.
+- Сохраняй ссылки и якори, не ломай относительные пути.`;
 
-    const user = `Переведи на русский следующий Markdown/MDX, строго сохраняя разметку и не трогая кодовые блоки:
-${protectedMd}`;
+    const user = `Переведи на русский следующий Markdown/MDX (кодовые блоки и инлайн-код помечены плейсхолдерами и переводить их НЕ нужно):
+${i.masked}`;
 
     const resp = await client.responses.create({
         model: 'gpt-4.1-mini',
@@ -213,14 +261,16 @@ ${protectedMd}`;
         ],
     });
 
-    let out = resp.output_text || protectedMd;
-    codeBlocks.forEach((code, i) => { out = out.replaceAll(`<<<CODE_${i}>>>`, code); });
+    let out = resp.output_text || i.masked;
+
+    // 3) вернём инлайн-код, затем fenced-код
+    out = restoreInlineCode(out, i.blocks);
+    out = restoreFencedCode(out, f.blocks);
+
     return out;
 }
 
-/**
- * Обработка одного файла: кэш → (перевод|копия) → картинки → санитайз → фронтматтер
- */
+/* ---------- Обработка одного файла ---------- */
 async function processOneFile(srcPath) {
     const stat = fs.statSync(srcPath);
     const raw = fs.readFileSync(srcPath, 'utf8');
@@ -233,13 +283,15 @@ async function processOneFile(srcPath) {
         return { rel: srcPath, text: fs.readFileSync(cacheFile, 'utf8') };
     }
 
-    // лимит размера (если задан) — большие сначала публикуем как есть, без перевода
+    // лимит размера (если задан) — большие публикуем без перевода (но с переписью картинок/ссылок/санитайзом)
     let body = content;
     if (MAX_FILE_KB > 0 && stat.size > MAX_FILE_KB * 1024) {
         body = rewriteImageLinks(body, relFrom);
+        body = rewriteNotebookLinks(body);
     } else {
         const translated = await translateMarkdownPreservingCode(body);
         body = rewriteImageLinks(translated, relFrom);
+        body = rewriteNotebookLinks(body);
     }
 
     // санитайз под MDX v2
@@ -260,7 +312,7 @@ async function processOneFile(srcPath) {
     const spinner = ora('Scanning sources…').start();
 
     const patterns = SRC_DIRS.map(d => `${d}/**/*.{md,mdx}`);
-    // Важно: отключаем учёт .gitignore, чтобы видеть upstream/, и поддерживаем исключения
+    // отключаем gitignore (чтобы видеть upstream/), учитываем EXCLUDE
     const allFiles = await globby(patterns, { gitignore: false, ignore: EXCLUDE });
 
     spinner.succeed(`Found ${allFiles.length} files`);
