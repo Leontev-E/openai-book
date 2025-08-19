@@ -7,6 +7,9 @@ const config: Config = {
   favicon: 'img/favicon.ico',
   i18n: { defaultLocale: 'ru', locales: ['ru'] },
 
+  onBrokenLinks: 'warn',
+  onBrokenMarkdownLinks: 'warn',
+
   presets: [
     [
       'classic',
