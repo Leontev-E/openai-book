@@ -69,26 +69,16 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
 
-          # Стадим только то, что генерим
+          # не храним examples
+          rm -rf docs/cookbook/examples || true
+
           git add docs static
-
-          # Если нет изменений — выходим
-          if git diff --cached --quiet; then
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(ci): sync & translate (articles only)"
+            git push origin HEAD:${{ github.ref_name }} --force-with-lease || echo "Skip push"
+          else
             echo "No changes to commit."
-            exit 0
           fi
-
-          # Коммитим
-          git commit -m "chore(ci): sync & translate"
-
-          # Обновляем ссылку на удалённую ветку (без мерджей/ребейза)
-          git fetch origin ${{ github.ref_name }}
-
-          # Пытаемся пушнуть. Если за время рана удалённая ветка ушла вперёд,
-          # не падаем, а просто пропускаем пуш (следующий ран догонит).
-          git push origin HEAD:${{ github.ref_name }} --force-with-lease || {
-            echo "Remote advanced during run. Skipping push this time."
-          }
 
       - name: Build (verification)
         env:
