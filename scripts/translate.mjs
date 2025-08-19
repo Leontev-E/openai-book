@@ -136,6 +136,13 @@ function sanitizeMDX(text) {
         return allowed.has(name.toLowerCase()) ? m : m.replace('<', '&lt;').replace('>', '&gt;');
     });
 
+    // 9) финальный ловец: любой `<`, который НЕ начинает допустимый HTML-тег — экранируем
+    // оставляем только: a|br|hr|img|p|div|span|strong|em|code|pre|ul|ol|li|table|thead|tbody|tr|td|th|sup|sub|blockquote|details|summary|h1..h6
+    t = t.replace(/<(?!\/?(?:a|br|hr|img|p|div|span|strong|em|code|pre|ul|ol|li|table|thead|tbody|tr|td|th|sup|sub|blockquote|details|summary|h[1-6])\b)/gi, '&lt;');
+
+    // 10) одиночное закрытие без имени: </> → &lt;/>
+    t = t.replace(/<\/(?=>)/g, '&lt;/');
+
     // вернём код
     codeBlocks.forEach((blk, i) => { t = t.replaceAll(`<<<CODE_${i}>>>`, blk); });
     return t;
