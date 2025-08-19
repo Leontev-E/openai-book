@@ -1,9 +1,9 @@
-name: Sync & Rebuild
+name: "Sync and Rebuild"
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 2 * * *'     # каждый день 02:00 UTC
-  workflow_dispatch: {}
+    - cron: "0 2 * * *"
 
 jobs:
   sync:
@@ -12,59 +12,57 @@ jobs:
       contents: write
 
     steps:
-      # 1) Чекаут твоего репозитория (полная история, чтобы можно было rebase/push)
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 2) Чекаут оригинального Cookbook в подпапку upstream
-      - name: Checkout openai-cookbook -> upstream
+      - name: Checkout upstream (openai-cookbook)
         uses: actions/checkout@v4
         with:
           repository: openai/openai-cookbook
           path: upstream
           ref: main
 
-      # 3) Для наглядности — покажем, что upstream есть и там есть md/mdx
-      - name: List workspace
+      - name: Print tree
         run: |
           ls -la
           ls -la upstream || true
           ls -la upstream/articles || true
           ls -la upstream/examples || true
 
-      # 4) Node + зависимости
-      - name: Use Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
-      - name: Install deps
+      - name: Install dependencies
         run: npm i
 
-      # 5) Перевод
-      - name: Translate RU
-	env:
+      - name: Translate RU (bootstrap, no API calls)
+        env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SKIP_TRANSLATE: '1'      # ВРЕМЕННО: делаем быстрый бэкап без перевода
-          MAX_TRANSLATE: '0'       # 0 = без лимита; вместе с SKIP даст быструю генерацию
-          CONCURRENCY: '4'
-          MAX_FILE_KB: '0'
-      run: npm run translate
+          SKIP_TRANSLATE: "1"     # пока без перевода, чтобы быстро собрать сайт
+          MAX_TRANSLATE: "0"
+          CONCURRENCY: "4"
+          MAX_FILE_KB: "0"
+        run: npm run translate
 
-      # 6) Коммитим ТОЛЬКО docs/ и static/ (без lockfile)
-      - name: Commit generated docs (if any)
+      - name: Commit generated docs
         run: |
+          set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          git pull --rebase origin main
+          git pull --rebase origin ${{ github.ref_name }}
           git add docs static
-          git diff --cached --quiet || git commit -m "chore: nightly sync & translate" || true
-          git push origin HEAD:main
-          
-      # 7) Проверочная сборка (не публикует, просто убедиться, что билд проходит)
-      - name: Build (for verification)
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(ci): sync & translate"
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Build (verification)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run build
