@@ -73,3 +73,135 @@ a:not(.button):hover {
     flex: 1;
   }
 }
+
+/* ====== HERO ====== */
+.homeHero {
+  padding: clamp(48px, 8vw, 96px) 0;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(16, 163, 127, 0.15), transparent 60%),
+    radial-gradient(1000px 500px at 80% -20%, rgba(34, 199, 169, 0.15), transparent 55%);
+}
+
+.homeHero__title {
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.1;
+  margin: 0 0 8px;
+}
+
+.homeHero__badge {
+  display: inline-block;
+  font-size: 0.6em;
+  font-weight: 600;
+  margin-left: 10px;
+  padding: 0.2em 0.5em;
+  border-radius: 999px;
+  background: var(--ifm-color-primary);
+  color: white;
+}
+
+.homeHero__subtitle {
+  font-size: clamp(16px, 2.2vw, 20px);
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 22px;
+}
+
+.homeHero__search {
+  max-width: 720px;
+  margin: 0 auto 16px;
+}
+
+.homeHero__cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* ====== CARDS ====== */
+.section {
+  padding: 28px 0;
+}
+
+.section--padded {
+  padding: 40px 0 54px;
+}
+
+.section--soft {
+  background: var(--ifm-color-emphasis-0);
+}
+
+.section__title {
+  font-size: clamp(22px, 2.8vw, 28px);
+  margin-bottom: 18px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 16px;
+}
+
+.cards>a.cardLink {
+  grid-column: span 12;
+}
+
+@media (min-width: 576px) {
+  .cards>a.cardLink {
+    grid-column: span 6;
+  }
+}
+
+@media (min-width: 996px) {
+  .cards>a.cardLink {
+    grid-column: span 4;
+  }
+}
+
+.card--hover {
+  height: 100%;
+  transition: transform .18s ease, box-shadow .18s ease;
+  border: 1px solid rgba(127, 127, 127, 0.15);
+}
+
+.card--hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card__emoji {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.card__title {
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+
+.card__desc {
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.card__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px 12px;
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+/* ====== PANELS ====== */
+.panel {
+  border: 1px solid rgba(127, 127, 127, 0.15);
+  border-radius: 12px;
+  padding: 18px;
+  height: 100%;
+  background: var(--ifm-background-surface-color);
+}
+
+/* Мелкие доработки */
+.container .button.button--lg {
+  padding: 10px 18px;
+}
