@@ -51,35 +51,64 @@ function sha256(s) {
  *  - пути вида static/images/... и docs/images/... → ищем в upstream/<images|static/images>/
  */
 function rewriteImageLinks(md, relFrom) {
+    function copyAndMap(srcPath) {
+        // убираем ./ или / в начале
+        const cleaned = srcPath.replace(/^(?:\.\/|\/)/, '');
+        // если это static/images/... или docs/images/..., отделим хвост после images/
+        const afterImages = cleaned.replace(/^(?:static|docs)\/images\//, '');
+        // кандидаты, откуда копировать
+        const candidates = [
+            path.resolve(relFrom, srcPath),                        // относительный путь рядом с файлом
+            path.resolve('upstream/images', afterImages),          // upstream/images/...
+            path.resolve('upstream/static/images', afterImages),   // upstream/static/images/...
+        ];
+        const abs = candidates.find(p => fs.existsSync(p));
+        if (!abs) return null;
+
+        ensureDir(STATIC_IMG_DST);
+        const fileName = path.basename(abs);
+        const dst = path.join(STATIC_IMG_DST, fileName);
+        try { fs.copyFileSync(abs, dst); } catch { }
+        return `/cookbook-images/${fileName}`;
+    }
+
     let out = md;
 
-    // относительные ./ ../
-    out = out.replace(/!\{0,1}\[([^\]]*)\]\((\.{1,2}\/[^\)\s]+)\)/g, (m, alt, rel) => {
-        const abs = path.resolve(relFrom, rel);
-        if (fs.existsSync(abs)) {
-            const fileName = path.basename(abs);
-            const dst = path.join(STATIC_IMG_DST, fileName);
-            ensureDir(STATIC_IMG_DST);
-            try { fs.copyFileSync(abs, dst); } catch { }
-            return `![${alt}](/cookbook-images/${fileName})`;
+    // 1) Markdown: относительные ./ и ../
+    out = out.replace(
+        /!\[([^\]]*)\]\(((?:\.{1,2}\/)[^\)\s]+)\)/g,
+        (m, alt, rel) => {
+            const mapped = copyAndMap(rel);
+            return mapped ? `![${alt}](${mapped})` : m;
         }
-        return m;
-    });
+    );
 
-    // static/images/... или docs/images/...
-    out = out.replace(/!\{0,1}\[([^\]]*)\]\((?:static|docs)\/images\/([^\)\s]+)\)/g, (m, alt, rel) => {
-        const cand1 = path.resolve('upstream/images', rel);
-        const cand2 = path.resolve('upstream/static/images', rel);
-        const abs = fs.existsSync(cand1) ? cand1 : (fs.existsSync(cand2) ? cand2 : null);
-        if (abs) {
-            const fileName = path.basename(abs);
-            const dst = path.join(STATIC_IMG_DST, fileName);
-            ensureDir(STATIC_IMG_DST);
-            try { fs.copyFileSync(abs, dst); } catch { }
-            return `![${alt}](/cookbook-images/${fileName})`;
+    // 2) Markdown: static/images/... или docs/images/...
+    out = out.replace(
+        /!\[([^\]]*)\]\(((?:\.{0,2}\/)?(?:static|docs)\/images\/[^\)\s]+)\)/gi,
+        (m, alt, rel) => {
+            const mapped = copyAndMap(rel);
+            return mapped ? `![${alt}](${mapped})` : m;
         }
-        return m;
-    });
+    );
+
+    // 3) HTML <img ... src="...">: относительные ./ и ../
+    out = out.replace(
+        /<img\s+([^>]*?)src=["']((?:\.{1,2}\/)[^"']+)["']([^>]*)>/gi,
+        (m, pre, rel, post) => {
+            const mapped = copyAndMap(rel);
+            return mapped ? `<img ${pre}src="${mapped}"${post}>` : m;
+        }
+    );
+
+    // 4) HTML <img ... src="static/images/..."> и docs/images/...
+    out = out.replace(
+        /<img\s+([^>]*?)src=["']((?:\.{0,2}\/)?(?:static|docs)\/images\/[^"']+)["']([^>]*)>/gi,
+        (m, pre, rel, post) => {
+            const mapped = copyAndMap(rel);
+            return mapped ? `<img ${pre}src="${mapped}"${post}>` : m;
+        }
+    );
 
     return out;
 }
