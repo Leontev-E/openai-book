@@ -10,6 +10,8 @@ import { gray, green, yellow } from 'kleur/colors';
 import OpenAI from 'openai';
 import pLimit from 'p-limit';
 
+/* ====== ПАРАМЕТРЫ И ОКРУЖЕНИЕ ====== */
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -17,7 +19,11 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const SKIP_TRANSLATE = process.env.SKIP_TRANSLATE === '1';
 const MAX_TRANSLATE = parseInt(process.env.MAX_TRANSLATE || '0', 10); // 0 = без лимита
 const CONCURRENCY = parseInt(process.env.CONCURRENCY || '3', 10);
-const MAX_FILE_KB = parseInt(process.env.MAX_FILE_KB || '0', 10); // 0 = не ограничивать
+const MAX_FILE_KB = parseInt(process.env.MAX_FILE_KB || '0', 10);     // 0 = не ограничивать
+const EXCLUDE = (process.env.EXCLUDE_GLOBS || '')
+    .split(/\r?\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
 
 const client = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 
@@ -26,109 +32,215 @@ const OUT_DIR = 'docs/cookbook';
 const STATIC_IMG_DST = 'static/cookbook-images';
 const CACHE_DIR = path.join('scripts', 'cache');
 
-function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
+/* ====== УТИЛИТЫ ====== */
+
+function ensureDir(p) {
+    if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
+}
 ensureDir(OUT_DIR);
 ensureDir(STATIC_IMG_DST);
 ensureDir(CACHE_DIR);
 
-function sha256(s) { return crypto.createHash('sha256').update(s).digest('hex'); }
-
-function rewriteImageLinks(md, relFrom) {
-  return md.replace(/!\[([^\]]*)\]\((\.{1,2}\/[^\)\s]+)\)/g, (m, alt, rel) => {
-    const abs = path.resolve(relFrom, rel);
-    if (fs.existsSync(abs)) {
-      const fileName = path.basename(abs);
-      const dst = path.join(STATIC_IMG_DST, fileName);
-      try { fs.copyFileSync(abs, dst); } catch {}
-      return `![${alt}](/cookbook-images/${fileName})`;
-    }
-    return m;
-  });
+function sha256(s) {
+    return crypto.createHash('sha256').update(s).digest('hex');
 }
 
+/**
+ * Переписываем ссылки на изображения:
+ *  - относительные ./ и ../ → копируем в /static/cookbook-images/
+ *  - пути вида static/images/... и docs/images/... → ищем в upstream/<images|static/images>/
+ */
+function rewriteImageLinks(md, relFrom) {
+    let out = md;
+
+    // относительные ./ ../
+    out = out.replace(/!\{0,1}\[([^\]]*)\]\((\.{1,2}\/[^\)\s]+)\)/g, (m, alt, rel) => {
+        const abs = path.resolve(relFrom, rel);
+        if (fs.existsSync(abs)) {
+            const fileName = path.basename(abs);
+            const dst = path.join(STATIC_IMG_DST, fileName);
+            ensureDir(STATIC_IMG_DST);
+            try { fs.copyFileSync(abs, dst); } catch { }
+            return `![${alt}](/cookbook-images/${fileName})`;
+        }
+        return m;
+    });
+
+    // static/images/... или docs/images/...
+    out = out.replace(/!\{0,1}\[([^\]]*)\]\((?:static|docs)\/images\/([^\)\s]+)\)/g, (m, alt, rel) => {
+        const cand1 = path.resolve('upstream/images', rel);
+        const cand2 = path.resolve('upstream/static/images', rel);
+        const abs = fs.existsSync(cand1) ? cand1 : (fs.existsSync(cand2) ? cand2 : null);
+        if (abs) {
+            const fileName = path.basename(abs);
+            const dst = path.join(STATIC_IMG_DST, fileName);
+            ensureDir(STATIC_IMG_DST);
+            try { fs.copyFileSync(abs, dst); } catch { }
+            return `![${alt}](/cookbook-images/${fileName})`;
+        }
+        return m;
+    });
+
+    return out;
+}
+
+/**
+ * Санитайзер под MDX v2:
+ *  - самозакрывающиеся теги <br>/<hr>
+ *  - автоссылки <https://...> → [https://...](https://...)
+ *  - экранирование подозрительных <placeholders> (<name>, <token> и т.п.)
+ *  - экранирование <> и <число...>
+ *  - не трогаем кодовые блоки
+ */
+function sanitizeMDX(text) {
+    // защитим кодовые блоки
+    const codeBlocks = [];
+    let t = text.replace(/```[\s\S]*?```/g, block => {
+        const key = `<<<CODE_${codeBlocks.length}>>>`;
+        codeBlocks.push(block);
+        return key;
+    });
+
+    // 1) <br>, <hr>
+    t = t.replace(/<br\s*>/gi, '<br />');
+    t = t.replace(/<hr\s*>/gi, '<hr />');
+
+    // 2) <&nbsp;> и подобные сущности в угловых
+    t = t.replace(/<&([a-z]+;)>/gi, (m, ent) => `&lt;&${ent}&gt;`);
+
+    // 3) автоссылки <https://...>
+    t = t.replace(/<((https?:\/\/)[^>\s]+)>/gi, (m, url) => `[${url}](${url})`);
+
+    // 4) фрагменты вида <.../...> (внутри слэш) → не JSX
+    t = t.replace(/<([^ >]+\/[^>]+)>/g, (m, inner) => `&lt;${inner}&gt;`);
+
+    // 5) пустые <>
+    t = t.replace(/<>/g, '&lt;&gt;');
+
+    // 6) <число...>
+    t = t.replace(/<\d[^>]*>/g, m => m.replace('<', '&lt;').replace('>', '&gt;'));
+
+    // 7) экранируем нестандартные теги-плейсхолдеры
+    const allowed = new Set([
+        'a', 'br', 'hr', 'img', 'p', 'div', 'span', 'strong', 'em', 'code', 'pre',
+        'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'td', 'th', 'sup', 'sub',
+        'blockquote', 'details', 'summary', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+    ]);
+
+    // открывающие
+    t = t.replace(/<([a-z][a-z0-9_-]*)(\s[^>]*)?>/gi, (m, name) => {
+        return allowed.has(name.toLowerCase()) ? m : m.replace('<', '&lt;').replace('>', '&gt;');
+    });
+    // закрывающие
+    t = t.replace(/<\/([a-z][a-z0-9_-]*)>/gi, (m, name) => {
+        return allowed.has(name.toLowerCase()) ? m : m.replace('<', '&lt;').replace('>', '&gt;');
+    });
+
+    // вернём код
+    codeBlocks.forEach((blk, i) => { t = t.replaceAll(`<<<CODE_${i}>>>`, blk); });
+    return t;
+}
+
+/**
+ * Переводим, сохраняя кодовые блоки (или пропускаем перевод)
+ */
 async function translateMarkdownPreservingCode(md) {
-  if (!client || SKIP_TRANSLATE) return md;
-  const codeBlocks = [];
-  const protectedMd = md.replace(/```[\s\S]*?```/g, block => {
-    const key = `<<<CODE_${codeBlocks.length}>>>`;
-    codeBlocks.push(block);
-    return key;
-  });
+    if (!client || SKIP_TRANSLATE) return md;
 
-  const system = `Ты — профессиональный технический переводчик (EN→RU).
+    const codeBlocks = [];
+    const protectedMd = md.replace(/```[\s\S]*?```/g, block => {
+        const key = `<<<CODE_${codeBlocks.length}>>>`;
+        codeBlocks.push(block);
+        return key;
+    });
+
+    const system = `Ты — профессиональный технический переводчик (EN→RU).
 - Сохраняй структуру Markdown/MDX и форматирование.
-- Не переводить кодовые блоки, команды и пути.`;
+- НЕ переводить кодовые блоки, команды, пути, имена пакетов.
+- Сохраняй ссылки и якори.`;
 
-  const user = `Переведи на русский следующий Markdown/MDX, строго сохраняя разметку и не трогая кодовые блоки:
+    const user = `Переведи на русский следующий Markdown/MDX, строго сохраняя разметку и не трогая кодовые блоки:
 ${protectedMd}`;
 
-  const resp = await client.responses.create({
-    model: 'gpt-4.1-mini',
-    input: [
-      { role: 'system', content: system },
-      { role: 'user', content: user },
-    ],
-  });
+    const resp = await client.responses.create({
+        model: 'gpt-4.1-mini',
+        input: [
+            { role: 'system', content: system },
+            { role: 'user', content: user },
+        ],
+    });
 
-  let out = resp.output_text || protectedMd;
-  codeBlocks.forEach((code, i) => { out = out.replaceAll(`<<<CODE_${i}>>>`, code); });
-  return out;
+    let out = resp.output_text || protectedMd;
+    codeBlocks.forEach((code, i) => { out = out.replaceAll(`<<<CODE_${i}>>>`, code); });
+    return out;
 }
 
+/**
+ * Обработка одного файла: кэш → (перевод|копия) → картинки → санитайз → фронтматтер
+ */
 async function processOneFile(srcPath) {
-  const stat = fs.statSync(srcPath);
-  const raw = fs.readFileSync(srcPath, 'utf8');
-  const relFrom = path.dirname(srcPath);
-  const { data: fm = {}, content = '' } = matter(raw);
+    const stat = fs.statSync(srcPath);
+    const raw = fs.readFileSync(srcPath, 'utf8');
+    const relFrom = path.dirname(srcPath);
+    const { data: fm = {}, content = '' } = matter(raw);
 
-  const key = sha256(raw);
-  const cacheFile = path.join(CACHE_DIR, `${key}.mdx`);
-  if (fs.existsSync(cacheFile)) return { rel: srcPath, text: fs.readFileSync(cacheFile, 'utf8') };
+    const key = sha256(raw);
+    const cacheFile = path.join(CACHE_DIR, `${key}.mdx`);
+    if (fs.existsSync(cacheFile)) {
+        return { rel: srcPath, text: fs.readFileSync(cacheFile, 'utf8') };
+    }
 
-  let body = content;
+    // лимит размера (если задан) — большие сначала публикуем как есть, без перевода
+    let body = content;
+    if (MAX_FILE_KB > 0 && stat.size > MAX_FILE_KB * 1024) {
+        body = rewriteImageLinks(body, relFrom);
+    } else {
+        const translated = await translateMarkdownPreservingCode(body);
+        body = rewriteImageLinks(translated, relFrom);
+    }
 
-  // Пропустить очень большие файлы на первом круге
-  if (MAX_FILE_KB > 0 && stat.size > MAX_FILE_KB * 1024) {
-    // без перевода, только перепишем картинки
-    body = rewriteImageLinks(body, relFrom);
-  } else {
-    const translated = await translateMarkdownPreservingCode(body);
-    body = rewriteImageLinks(translated, relFrom);
-  }
+    // санитайз под MDX v2
+    const sanitized = sanitizeMDX(body);
 
-  const newFm = { ...fm, lang: 'ru', translationOf: 'openai-cookbook' };
-  const fmStr = '---\n' + yaml.dump(newFm) + '---\n\n';
-  const result = fmStr + body;
+    // фронтматтер
+    const newFm = { ...fm, lang: 'ru', translationOf: 'openai-cookbook' };
+    const fmStr = '---\n' + yaml.dump(newFm) + '---\n\n';
+    const result = fmStr + sanitized;
 
-  fs.writeFileSync(cacheFile, result, 'utf8');
-  return { rel: srcPath, text: result };
+    fs.writeFileSync(cacheFile, result, 'utf8');
+    return { rel: srcPath, text: result };
 }
+
+/* ====== MAIN ====== */
 
 (async () => {
-  const spinner = ora('Scanning sources…').start();
-  const patterns = SRC_DIRS.map(d => `${d}/**/*.{md,mdx}`);
-  // ВАЖНО: игнор .gitignore отключен, чтобы брать upstream/
-  const allFiles = await globby(patterns, { gitignore: false });
-  spinner.succeed(`Found ${allFiles.length} files`);
+    const spinner = ora('Scanning sources…').start();
 
-  // Ограничим количество переводимых файлов за запуск
-  const files = (MAX_TRANSLATE > 0) ? allFiles.slice(0, MAX_TRANSLATE) : allFiles;
+    const patterns = SRC_DIRS.map(d => `${d}/**/*.{md,mdx}`);
+    // Важно: отключаем учёт .gitignore, чтобы видеть upstream/, и поддерживаем исключения
+    const allFiles = await globby(patterns, { gitignore: false, ignore: EXCLUDE });
 
-  const limit = pLimit(CONCURRENCY);
-  let ok = 0;
+    spinner.succeed(`Found ${allFiles.length} files`);
 
-  await Promise.all(files.map(f => limit(async () => {
-    const rel = f.replace(/^upstream\//, '');
-    const outPath = path.join(OUT_DIR, rel);
-    ensureDir(path.dirname(outPath));
-    const { text } = await processOneFile(f);
-    fs.writeFileSync(outPath, text, 'utf8');
-    process.stdout.write(gray(`✔ ${rel}\n`));
-    ok++;
-  })));
+    const files = (MAX_TRANSLATE > 0) ? allFiles.slice(0, MAX_TRANSLATE) : allFiles;
 
-  console.log(green(`\nDone. Generated ${ok} files in ${OUT_DIR}\n`));
+    const limit = pLimit(CONCURRENCY);
+    let ok = 0;
+
+    await Promise.all(
+        files.map(f => limit(async () => {
+            const rel = f.replace(/^upstream\//, '');
+            const outPath = path.join(OUT_DIR, rel);
+            ensureDir(path.dirname(outPath));
+            const { text } = await processOneFile(f);
+            fs.writeFileSync(outPath, text, 'utf8');
+            process.stdout.write(gray(`✔ ${rel}\n`));
+            ok++;
+        }))
+    );
+
+    console.log(green(`\nDone. Generated ${ok} files in ${OUT_DIR}\n`));
 })().catch(e => {
-  console.error(yellow('Translation failed:'), e);
-  process.exit(1);
+    console.error(yellow('Translation failed:'), e);
+    process.exit(1);
 });
