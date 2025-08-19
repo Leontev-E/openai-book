@@ -52,9 +52,9 @@ jobs:
       - name: Translate RU (bootstrap, no API calls)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SKIP_TRANSLATE: "1"
-          MAX_TRANSLATE: "0"
-          CONCURRENCY: "4"
+          SKIP_TRANSLATE: "0"
+          MAX_TRANSLATE: "10"
+          CONCURRENCY: "3"
           MAX_FILE_KB: "0"
         run: npm run translate
 
@@ -86,4 +86,3 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run build
-
