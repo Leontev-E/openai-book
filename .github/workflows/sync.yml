@@ -1,0 +1,49 @@
+name: Sync & Rebuild
+
+on:
+  schedule:
+    - cron: '0 2 * * *'     # каждый день 02:00 UTC
+  workflow_dispatch: {}      # запуск вручную
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # нужно, чтобы коммитить сгенерированные файлы
+
+    steps:
+      # 1) Ваш репозиторий
+      - uses: actions/checkout@v4
+
+      # 2) Оригинальный Cookbook в подпапку upstream (на Linux всё ок даже с «плохими» путями)
+      - uses: actions/checkout@v4
+        with:
+          repository: openai/openai-cookbook
+          path: upstream
+          ref: main
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm ci || npm i
+
+      - name: Translate RU
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: npm run translate
+
+      - name: Commit generated docs (if any)
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "chore: nightly sync & translate"
+          git push
+
+      - name: Build (for verification)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: npm run build
