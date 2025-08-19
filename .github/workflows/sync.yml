@@ -17,6 +17,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Всегда синхронизируемся с удалённой веткой до генерации
+      - name: Sync base branch
+        run: |
+          git fetch origin ${{ github.ref_name }}
+          git checkout ${{ github.ref_name }}
+          git reset --hard origin/${{ github.ref_name }}
+
       - name: Checkout upstream (openai-cookbook)
         uses: actions/checkout@v4
         with:
@@ -27,7 +34,6 @@ jobs:
       - name: Print tree
         run: |
           ls -la
-          ls -la upstream || true
           ls -la upstream/articles || true
           ls -la upstream/examples || true
 
@@ -36,40 +42,36 @@ jobs:
         with:
           node-version: "20"
 
+      # Старайся использовать ci; если вдруг не получится — fallback на i
       - name: Install dependencies
-        run: npm i
+        run: npm ci || npm i
 
+      # Первый прогон: без перевода, чтобы собрать сайт быстро
       - name: Translate RU (bootstrap, no API calls)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SKIP_TRANSLATE: "1"     # пока без перевода, чтобы быстро собрать сайт
+          SKIP_TRANSLATE: "1"
           MAX_TRANSLATE: "0"
           CONCURRENCY: "4"
           MAX_FILE_KB: "0"
         run: npm run translate
+
+      # На всякий случай отбрасываем любые изменения lock-файла (если npm его трогал)
+      - name: Discard lockfile changes (if any)
+        run: git restore --worktree --staged package-lock.json || true
 
       - name: Commit generated docs
         run: |
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-
-          # 1) Стадим ТОЛЬКО то, что генерим
           git add docs static
-
-          # 2) Коммитим, если есть изменения
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
+          if ! git diff --cached --quiet; then
             git commit -m "chore(ci): sync & translate"
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "No changes to commit."
           fi
-
-          # 3) Поднимаем локальную ветку на удалённую (без грязного рабочего дерева)
-          git fetch origin ${{ github.ref_name }}
-          git rebase origin/${{ github.ref_name }} || true
-
-          # 4) Пушим
-          git push origin HEAD:${{ github.ref_name }}
 
       - name: Build (verification)
         env:
