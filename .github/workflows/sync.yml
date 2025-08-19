@@ -49,20 +49,21 @@ jobs:
       - name: Clear translator cache
         run: rm -rf scripts/cache || true
 
-      # Первый прогон: без перевода, чтобы собрать сайт быстро
       - name: Translate RU (bootstrap, no API calls)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          SKIP_TRANSLATE: "1" # пока без перевода, чтобы быстро собрать сайт
+          SKIP_TRANSLATE: "1"
           MAX_TRANSLATE: "0"
           CONCURRENCY: "4"
           MAX_FILE_KB: "0"
-          EXCLUDE_GLOBS: |
-            upstream/articles/gpt-oss/**
-            upstream/articles/what_is_new_with_dalle_3.mdx
         run: npm run translate
 
-      # На всякий случай отбрасываем любые изменения lock-файла (если npm его трогал)
+      - name: Sync upstream images into repo
+        run: |
+          mkdir -p static/images
+          (cp -R upstream/images/* static/images/ 2>/dev/null || true)
+          (cp -R upstream/static/images/* static/images/ 2>/dev/null || true)
+
       - name: Discard lockfile changes (if any)
         run: git restore --worktree --staged package-lock.json || true
 
@@ -71,13 +72,11 @@ jobs:
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-
-          # не храним examples
+          # мы уже исключили examples в docusaurus.config.ts, но на всякий случай:
           rm -rf docs/cookbook/examples || true
-
           git add docs static
           if ! git diff --cached --quiet; then
-            git commit -m "chore(ci): sync & translate (articles only)"
+            git commit -m "chore(ci): sync & translate (articles only) + images"
             git push origin HEAD:${{ github.ref_name }} --force-with-lease || echo "Skip push"
           else
             echo "No changes to commit."
@@ -87,3 +86,4 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run build
+
