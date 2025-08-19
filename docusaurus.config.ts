@@ -15,8 +15,12 @@ const config: Config = {
           path: 'docs',
           routeBasePath: 'docs',
           sidebarPath: require.resolve('./sidebars.ts'),
-          // <<< ВАЖНО: не собирать примеры пока
-          exclude: ['cookbook/examples/**'],
+          // уже исключали examples — добавляем 2 проблемные статьи:
+          exclude: [
+            'cookbook/examples/**',
+            'cookbook/articles/techniques_to_improve_reliability.md',
+            'cookbook/articles/what_is_new_with_dalle_3.mdx',
+          ],
         },
         blog: false,
         theme: { customCss: require.resolve('./src/css/custom.css') },
