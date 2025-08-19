@@ -61,8 +61,8 @@ jobs:
       - name: Sync upstream images into repo
         run: |
           mkdir -p static/images
-          (cp -R upstream/images/* static/images/ 2>/dev/null || true)
-          (cp -R upstream/static/images/* static/images/ 2>/dev/null || true)
+          rsync -a upstream/images/ static/images/ || true
+          rsync -a upstream/static/images/ static/images/ || true
 
       - name: Discard lockfile changes (if any)
         run: git restore --worktree --staged package-lock.json || true
