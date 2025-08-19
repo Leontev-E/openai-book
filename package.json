@@ -1,18 +1,12 @@
 {
-  "name": "penai-book",
+  "name": "openai-book",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
-    "clear": "docusaurus clear",
-    "serve": "docusaurus serve",
-    "write-translations": "docusaurus write-translations",
-    "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc"
+    "dev": "docusaurus start",
+    "translate": "node scripts/translate.mjs",
+    "build": "npm run translate && docusaurus build",
+    "serve": "docusaurus serve"
   },
   "dependencies": {
     "@docusaurus/core": "3.8.1",
