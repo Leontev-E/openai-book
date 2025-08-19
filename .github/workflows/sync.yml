@@ -45,9 +45,13 @@ jobs:
 
       # 5) Перевод
       - name: Translate RU
-        env:
+	env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run translate
+          SKIP_TRANSLATE: '1'      # ВРЕМЕННО: делаем быстрый бэкап без перевода
+          MAX_TRANSLATE: '0'       # 0 = без лимита; вместе с SKIP даст быструю генерацию
+          CONCURRENCY: '4'
+          MAX_FILE_KB: '0'
+      run: npm run translate
 
       # 6) Коммитим ТОЛЬКО docs/ и static/ (без lockfile)
       - name: Commit generated docs (if any)
