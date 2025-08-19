@@ -3,46 +3,63 @@ name: Sync & Rebuild
 on:
   schedule:
     - cron: '0 2 * * *'     # каждый день 02:00 UTC
-  workflow_dispatch: {}      # запуск вручную
+  workflow_dispatch: {}
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # нужно, чтобы коммитить сгенерированные файлы
+      contents: write
 
     steps:
-      # 1) Ваш репозиторий
-      - uses: actions/checkout@v4
+      # 1) Чекаут твоего репозитория (полная история, чтобы можно было rebase/push)
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      # 2) Оригинальный Cookbook в подпапку upstream (на Linux всё ок даже с «плохими» путями)
-      - uses: actions/checkout@v4
+      # 2) Чекаут оригинального Cookbook в подпапку upstream
+      - name: Checkout openai-cookbook -> upstream
+        uses: actions/checkout@v4
         with:
           repository: openai/openai-cookbook
           path: upstream
           ref: main
 
+      # 3) Для наглядности — покажем, что upstream есть и там есть md/mdx
+      - name: List workspace
+        run: |
+          ls -la
+          ls -la upstream || true
+          ls -la upstream/articles || true
+          ls -la upstream/examples || true
+
+      # 4) Node + зависимости
       - name: Use Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install deps
-        run: npm ci || npm i
+        run: npm i
 
+      # 5) Перевод
       - name: Translate RU
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: npm run translate
 
+      # 6) Коммитим ТОЛЬКО docs/ и static/ (без lockfile)
       - name: Commit generated docs (if any)
         run: |
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet || git commit -m "chore: nightly sync & translate"
-          git push
-
+          git pull --rebase origin main
+          git add docs static
+          git diff --cached --quiet || git commit -m "chore: nightly sync & translate" || true
+          git push origin HEAD:main
+          
+      # 7) Проверочная сборка (не публикует, просто убедиться, что билд проходит)
       - name: Build (for verification)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
