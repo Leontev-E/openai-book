@@ -32,13 +32,13 @@ Ollama supports both model sizes of gpt-oss:
 1. **Install Ollama** → [Get it here](https://ollama.com/download)
 2. **Pull the model you want:**
 
-<<&lt;CODE_0&gt;>>
+&lt;&lt;&lt;CODE_0&gt;>>
 
 ## Chat with gpt-oss
 
 Ready to talk to the model? You can fire up a chat in the app or the terminal:
 
-<<&lt;CODE_1&gt;>>
+&lt;&lt;&lt;CODE_1&gt;>>
 
 Ollama applies a **chat template** out of the box that mimics the [OpenAI harmony format](https://cookbook.openai.com/articles/openai-harmony). Type your message and start the conversation.
 
@@ -46,7 +46,7 @@ Ollama applies a **chat template** out of the box that mimics the [OpenAI harmon
 
 Ollama exposes a **Chat Completions-compatible API**, so you can use the OpenAI SDK without changing much. Here’s a Python example:
 
-<<&lt;CODE_2&gt;>>
+&lt;&lt;&lt;CODE_2&gt;>>
 
 If you’ve used the OpenAI SDK before, this will feel instantly familiar.
 
@@ -61,7 +61,7 @@ Ollama can:
 
 Example of invoking a function via Chat Completions:
 
-<<&lt;CODE_3&gt;>>
+&lt;&lt;&lt;CODE_3&gt;>>
 
 Since the models can perform tool calling as part of the chain-of-thought (CoT) it’s important for you to return the reasoning returned by the API back into a subsequent call to a tool call where you provide the answer until the model reaches a final answer.
 
@@ -73,7 +73,7 @@ If you do want to use the Responses API you can use [**Hugging Face’s `Respons
 
 For basic use cases you can also [**run our example Python server with Ollama as the backend.**](https://github.com/openai/gpt-oss?tab=readme-ov-file#responses-api) This server is a basic example server and does not have the
 
-<<&lt;CODE_4&gt;>>
+&lt;&lt;&lt;CODE_4&gt;>>
 
 ## Agents SDK integration
 
@@ -86,4 +86,4 @@ Both Agents SDK enable you to override the OpenAI base client to point to Ollama
 
 Here’s a Python Agents SDK example using LiteLLM:
 
-<<&lt;CODE_5&gt;>>
+&lt;&lt;&lt;CODE_5&gt;>>

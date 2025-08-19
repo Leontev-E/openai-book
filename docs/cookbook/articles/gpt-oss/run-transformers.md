@@ -33,7 +33,7 @@ If you use `bfloat16` instead of MXFP4, memory consumption will be larger (\~48 
 1. **Install dependencies**  
    It’s recommended to create a fresh Python environment. Install transformers, accelerate, as well as the Triton kernels for MXFP4 compatibility:
 
-<<&lt;CODE_0&gt;>>
+&lt;&lt;&lt;CODE_0&gt;>>
 
 2. **(Optional) Enable multi-GPU**  
    If you’re running large models, use Accelerate or torchrun to handle device mapping automatically.
@@ -42,15 +42,15 @@ If you use `bfloat16` instead of MXFP4, memory consumption will be larger (\~48 
 
 To launch a server, simply use the `transformers serve` CLI command:
 
-<<&lt;CODE_1&gt;>>
+&lt;&lt;&lt;CODE_1&gt;>>
 
 The simplest way to interact with the server is through the transformers chat CLI
 
-<<&lt;CODE_2&gt;>>
+&lt;&lt;&lt;CODE_2&gt;>>
 
 or by sending an HTTP request with cURL, e.g.
 
-<<&lt;CODE_3&gt;>>
+&lt;&lt;&lt;CODE_3&gt;>>
 
 Additional use cases, like integrating `transformers serve` with Cursor and other tools, are detailed in [the documentation](https://huggingface.co/docs/transformers/main/serving).
 
@@ -58,13 +58,13 @@ Additional use cases, like integrating `transformers serve` with Cursor and othe
 
 The easiest way to run the gpt-oss models is with the Transformers high-level `pipeline` API:
 
-<<&lt;CODE_4&gt;>>
+&lt;&lt;&lt;CODE_4&gt;>>
 
 ## Advanced inference with `.generate()`
 
 If you want more control, you can load the model and tokenizer manually and invoke the `.generate()` method:
 
-<<&lt;CODE_5&gt;>>
+&lt;&lt;&lt;CODE_5&gt;>>
 
 ## Chat template and tool calling
 
@@ -74,15 +74,15 @@ To construct prompts you can use the built-in chat template of Transformers. Alt
 
 To use the chat template:
 
-<<&lt;CODE_6&gt;>>
+&lt;&lt;&lt;CODE_6&gt;>>
 
 To integrate the [`openai-harmony`](https://github.com/openai/harmony) library to prepare prompts and parse responses, first install it like this:
 
-<<&lt;CODE_7&gt;>>
+&lt;&lt;&lt;CODE_7&gt;>>
 
 Here’s an example of how to use the library to build your prompts and encode them to tokens:
 
-<<&lt;CODE_8&gt;>>
+&lt;&lt;&lt;CODE_8&gt;>>
 
 Note that the `Developer` role in Harmony maps to the `system` prompt in the chat template.
 
@@ -95,8 +95,8 @@ The large gpt-oss-120b fits on a single H100 GPU when using MXFP4. If you want t
 - Leverage Expert Parallelism
 - Use specialised Flash attention kernels for faster inference
 
-<<&lt;CODE_9&gt;>>
+&lt;&lt;&lt;CODE_9&gt;>>
 
 You can then run this on a node with four GPUs via
 
-<<&lt;CODE_10&gt;>>
+&lt;&lt;&lt;CODE_10&gt;>>

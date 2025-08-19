@@ -45,11 +45,11 @@ Write your instruction at the top of the prompt (or at the bottom, or both), and
 
 Example instruction prompt:
 
-<<&lt;CODE_0&gt;>>
+&lt;&lt;&lt;CODE_0&gt;>>
 
 Output:
 
-<<&lt;CODE_1&gt;>>
+&lt;&lt;&lt;CODE_1&gt;>>
 
 ### Completion prompt example
 
@@ -57,11 +57,11 @@ Completion-style prompts take advantage of how large language models try to writ
 
 Example completion prompt:
 
-<<&lt;CODE_2&gt;>>
+&lt;&lt;&lt;CODE_2&gt;>>
 
 Output:
 
-<<&lt;CODE_3&gt;>>
+&lt;&lt;&lt;CODE_3&gt;>>
 
 ### Scenario prompt example
 
@@ -69,11 +69,11 @@ Giving the model a scenario to follow or role to play out can be helpful for com
 
 Example scenario prompt:
 
-<<&lt;CODE_4&gt;>>
+&lt;&lt;&lt;CODE_4&gt;>>
 
 Output:
 
-<<&lt;CODE_5&gt;>>
+&lt;&lt;&lt;CODE_5&gt;>>
 
 ### Demonstration prompt example (few-shot learning)
 
@@ -81,11 +81,11 @@ Similar to completion-style prompts, demonstrations can show the model what you 
 
 Example demonstration prompt:
 
-<<&lt;CODE_6&gt;>>
+&lt;&lt;&lt;CODE_6&gt;>>
 
 Output:
 
-<<&lt;CODE_7&gt;>>
+&lt;&lt;&lt;CODE_7&gt;>>
 
 ### Fine-tuned prompt example
 
@@ -93,11 +93,11 @@ With enough training examples, you can [fine-tune][Fine Tuning Docs] a custom mo
 
 Example fine-tuned prompt (for a model that has been custom trained on similar prompt-completion pairs):
 
-<<&lt;CODE_8&gt;>>
+&lt;&lt;&lt;CODE_8&gt;>>
 
 Output:
 
-<<&lt;CODE_9&gt;>>
+&lt;&lt;&lt;CODE_9&gt;>>
 
 ## Code Capabilities
 

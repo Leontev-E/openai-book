@@ -24,7 +24,7 @@ part for accurate performance is to return the raw CoT as part of the `output`.
 
 For this we added a new `content` array to the Responses API’s `reasoning` items. The raw CoT should be wrapped into `reasoning_text` type element, making the overall output item look the following:
 
-<<&lt;CODE_0&gt;>>
+&lt;&lt;&lt;CODE_0&gt;>>
 
 These items should be received in subsequent turns and then inserted back into the harmony formatted prompt as outlined in the [raw CoT handling guide](https://cookbook.openai.com/articles/gpt-oss/handle-raw-cot).
 
@@ -46,7 +46,7 @@ This largely acts as a smoke test but should be a good indicator on whether the 
 
 To run the test suite run the following commands:
 
-<<&lt;CODE_1&gt;>>
+&lt;&lt;&lt;CODE_1&gt;>>
 
 Afterwards you should receive a result of both the API implementation and any details on the function call performance.
 
@@ -64,10 +64,10 @@ To be on the safe side you should consider running evals yourself. To run your o
 
 To test a Responses API compatible API run:
 
-<<&lt;CODE_2&gt;>>
+&lt;&lt;&lt;CODE_2&gt;>>
 
 To test a Chat Completions API compatible API run:
 
-<<&lt;CODE_3&gt;>>
+&lt;&lt;&lt;CODE_3&gt;>>
 
 If you are getting similar benchmark results as those published by us and your function calling tests above succeeded you likely have a correct implementation of gpt-oss.

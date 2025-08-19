@@ -39,15 +39,15 @@ For the Responses API we augmented our Responses API spec to cover this case. Be
 
 **Item type changes**
 
-<<&lt;CODE_0&gt;>>
+&lt;&lt;&lt;CODE_0&gt;>>
 
 **Event changes**
 
-<<&lt;CODE_1&gt;>>
+&lt;&lt;&lt;CODE_1&gt;>>
 
 **Example responses output**
 
-<<&lt;CODE_2&gt;>>
+&lt;&lt;&lt;CODE_2&gt;>>
 
 ## Displaying raw CoT to end-users
 

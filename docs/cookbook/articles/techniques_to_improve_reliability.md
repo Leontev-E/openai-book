@@ -21,15 +21,15 @@ Similarly, if you give GPT-3 a task that's too complex to do in the time it take
 
 As an example, if you ask `gpt-3.5-turbo-instruct` the following math problem about juggling balls, it answers incorrectly:
 
-<<&lt;CODE_0&gt;>>
+&lt;&lt;&lt;CODE_0&gt;>>
 
-<<&lt;CODE_1&gt;>>
+&lt;&lt;&lt;CODE_1&gt;>>
 
 Does this mean that GPT-3 cannot do simple math problems? No; in fact, it turns out that by prompting the model with `Let's think step by step`, the model solves the problem reliably:
 
-<<&lt;CODE_2&gt;>>
+&lt;&lt;&lt;CODE_2&gt;>>
 
-<<&lt;CODE_3&gt;>>
+&lt;&lt;&lt;CODE_3&gt;>>
 
 Of course, it's hard to tell from only a single example whether this `Let's think step by step` trick actually works in general or just got lucky on this particular problem. But it really does work. On a benchmark of word math problems, the `Let's think step by step` trick raised GPT-3's solve rate massively, from a worthless 18% to a decent 79%!
 
@@ -57,9 +57,9 @@ One way to give a model more time and space to think is to break tasks into simp
 
 As an example, consider a task where we ask the model a multiple-choice question about some text - in this case, a game of Clue. When asked directly, `gpt-3.5-turbo-instruct` isn't able to put clues 3 & 5 together, and answers incorrectly:
 
-<<&lt;CODE_4&gt;>>
+&lt;&lt;&lt;CODE_4&gt;>>
 
-<<&lt;CODE_5&gt;>>
+&lt;&lt;&lt;CODE_5&gt;>>
 
 Although clues 3 and 5 establish that Colonel Mustard was the only person in the observatory and that the person in the observatory had the candlestick, the model fails to combine them into a correct answer of (a) Yes.
 
@@ -69,9 +69,9 @@ However, instead of asking for the answer directly, we can split the task into t
 - Second, combine the relevant clues to reason out the answer to the question
 - Third, write the final answer: either (a), (b), or (c)
 
-<<&lt;CODE_6&gt;>>
+&lt;&lt;&lt;CODE_6&gt;>>
 
-<<&lt;CODE_7&gt;>>
+&lt;&lt;&lt;CODE_7&gt;>>
 
 By giving the model more time and space to think, and guiding it along a reasoning plan, it's able to figure out the correct answer of (a) Yes.
 
@@ -79,15 +79,15 @@ Another benefit of splitting complex instructions into smaller subtasks is that 
 
 For example, if we ask `gpt-3.5-turbo-instruct` to summarize a text in its original language, the model can lapse back into English:
 
-<<&lt;CODE_8&gt;>>
+&lt;&lt;&lt;CODE_8&gt;>>
 
-<<&lt;CODE_9&gt;>>
+&lt;&lt;&lt;CODE_9&gt;>>
 
 However, if we first ask the model to identify the language of the text, and then summarize the text, it becomes more reliable:
 
-<<&lt;CODE_10&gt;>>
+&lt;&lt;&lt;CODE_10&gt;>>
 
-<<&lt;CODE_11&gt;>>
+&lt;&lt;&lt;CODE_11&gt;>>
 
 ## Prompt the model to explain before answering
 
@@ -120,9 +120,9 @@ To learn more, read the [full paper](https://arxiv.org/abs/2205.11916).
 
 If you apply this technique to your own tasks, don't be afraid to experiment with customizing the instruction. `Let's think step by step` is rather generic, so you may find better performance with instructions that hew to a stricter format customized to your use case. For example, you can try more structured variants like `First, think step by step about why X might be true. Second, think step by step about why Y might be true. Third, think step by step about whether X or Y makes more sense.`. And you can even give the model an example format to help keep it on track, e.g.:
 
-<<&lt;CODE_12&gt;>>
+&lt;&lt;&lt;CODE_12&gt;>>
 
-<<&lt;CODE_13&gt;>>
+&lt;&lt;&lt;CODE_13&gt;>>
 
 ### Few-shot examples
 
