@@ -5,10 +5,18 @@ const config: Config = {
   url: 'https://openai-book.ru',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
-  i18n: { defaultLocale: 'ru', locales: ['ru'] },
+
+  i18n: {
+    defaultLocale: 'ru',
+    locales: ['ru'],
+  },
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
+
+  stylesheets: [
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+  ],
 
   presets: [
     [
@@ -18,7 +26,6 @@ const config: Config = {
           path: 'docs',
           routeBasePath: 'docs',
           sidebarPath: require.resolve('./sidebars.ts'),
-          // уже исключали examples — добавляем 2 проблемные статьи:
           exclude: [
             'cookbook/examples/**',
             'cookbook/articles/techniques_to_improve_reliability.md',
@@ -31,7 +38,7 @@ const config: Config = {
     ],
   ],
 
-themeConfig: {
+  themeConfig: {
     navbar: {
       title: 'OpenAI Cookbook',
       items: [
