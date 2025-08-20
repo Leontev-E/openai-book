@@ -24,3 +24,5 @@ upstream/
 scripts/cache/
 
 .tmp-upstream/
+# Scraper artifacts (do not commit)
+scraped/
