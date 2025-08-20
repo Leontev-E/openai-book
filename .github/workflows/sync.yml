@@ -68,6 +68,10 @@ jobs:
           EXCLUDE_GLOBS: ""         # ничего не исключаем
         run: npm run translate
 
+      - name: Fix placeholders (restore from upstream + escape)
+        run: node scripts/fix-placeholders.mjs
+
+
       # Картинки из upstream складываем туда, куда указывает translate.mjs
       - name: Sync upstream images into repo
         run: |
