@@ -53,16 +53,17 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SKIP_TRANSLATE: "0"
-          MAX_TRANSLATE: "10"
+          MAX_TRANSLATE: "15" # <= БЫЛО "10", ставим 0 = без лимита
           CONCURRENCY: "3"
           MAX_FILE_KB: "0"
+          EXCLUDE_GLOBS: "" # <= пусть пусто, ничего не исключаем
         run: npm run translate
 
       - name: Sync upstream images into repo
         run: |
-          mkdir -p static/images
-          rsync -a upstream/images/ static/images/ || true
-          rsync -a upstream/static/images/ static/images/ || true
+          mkdir -p static/cookbook-images
+          rsync -a upstream/images/ static/cookbook-images/ || true
+          rsync -a upstream/static/images/ static/cookbook-images/ || true
 
       - name: Discard lockfile changes (if any)
         run: git restore --worktree --staged package-lock.json || true
