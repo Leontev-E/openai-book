@@ -70,6 +70,7 @@ const config: Config = {
     navbar: {
       title: 'OpenAI Cookbook',
       items: [
+        { href: '/articles/articles/', label: 'Cookbook (EN)', position: 'left' },
         { to: '/docs/cookbook/', label: 'Большая энцеклопедия', position: 'left' },
         { to: '/about-license', label: 'Об источнике', position: 'right' },
         // Поиск добавит плагин сам в правую часть
