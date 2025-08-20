@@ -35,7 +35,8 @@ jobs:
         run: |
           ls -la
           ls -la upstream/articles || true
-          ls -la upstream/examples || true
+          ls -la upstream/images || true
+          ls -la upstream/static/images || true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -49,21 +50,47 @@ jobs:
       - name: Clear translator cache
         run: rm -rf scripts/cache || true
 
-      - name: Translate RU (bootstrap, no API calls)
+      # Зеркалим оригиналы в статик (чтобы Docusaurus их не компилировал)
+      - name: Mirror upstream originals (EN) as static files
+        run: |
+          rm -rf static/source-articles || true
+          mkdir -p static/source-articles
+          rsync -a upstream/articles/ static/source-articles/ || true
+
+      # Переводим порцией по 15 файлов за прогон
+      - name: Translate RU (daily batch)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SKIP_TRANSLATE: "0"
-          MAX_TRANSLATE: "15" # <= БЫЛО "10", ставим 0 = без лимита
+          MAX_TRANSLATE: "15"       # порция за один запуск; поменяй на 0 чтобы снять лимит
           CONCURRENCY: "3"
           MAX_FILE_KB: "0"
-          EXCLUDE_GLOBS: "" # <= пусть пусто, ничего не исключаем
+          EXCLUDE_GLOBS: ""         # ничего не исключаем
         run: npm run translate
 
+      # Картинки из upstream складываем туда, куда указывает translate.mjs
       - name: Sync upstream images into repo
         run: |
           mkdir -p static/cookbook-images
           rsync -a upstream/images/ static/cookbook-images/ || true
           rsync -a upstream/static/images/ static/cookbook-images/ || true
+
+      # Гарантируем существование главной страницы раздела /docs/cookbook/
+      - name: Ensure docs/cookbook/index.md exists
+        run: |
+          mkdir -p docs/cookbook
+          if [ ! -f docs/cookbook/index.md ]; then
+            cat > docs/cookbook/index.md <<'EOF'
+---
+id: index
+title: OpenAI Cookbook на русском
+slug: /cookbook/
+---
+
+Добро пожаловать! Слева — переведённые статьи.  
+Оригиналы (EN): [/source-articles/](\/source-articles/)
+EOF
+          fi
 
       - name: Discard lockfile changes (if any)
         run: git restore --worktree --staged package-lock.json || true
@@ -73,11 +100,11 @@ jobs:
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          # мы уже исключили examples в docusaurus.config.ts, но на всякий случай:
+          # examples в любом случае не публикуем
           rm -rf docs/cookbook/examples || true
           git add docs static
           if ! git diff --cached --quiet; then
-            git commit -m "chore(ci): sync & translate (articles only) + images"
+            git commit -m "chore(ci): sync originals + translate batch + images"
             git push origin HEAD:${{ github.ref_name }} --force-with-lease || echo "Skip push"
           else
             echo "No changes to commit."
