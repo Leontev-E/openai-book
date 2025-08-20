@@ -1,0 +1,226 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="/cookbook-assets/all.css"><title>How to run gpt-oss with vLLM</title><article><div class="flex flex-col items-center pt-8 pb-32 px-4 sm:px-8"><div class="w-full"><div class="w-full"><div class="mx-auto max-w-3xl px-4 sm:px-8"><div class="mb-12 mt-4"><h3 class="text-sm text-gray-500 mb-2 sm:mb-8 text-center">Aug 5, 2025</h3><h1 class="text-xl sm:text-4xl font-bold mb-12 sm:mb-16 text-center">How to run gpt-oss with vLLM</h1><div class="flex justify-between items-end"><div class="flex space-x-2 items-center"><div class="flex"><button class="transform transition-all cursor-pointer ml-0" style="z-index:1" rel="noopener noreferrer" aria-label="View profile of dkundel-openai"><div class="relative rounded-full h-8 w-8 bg-white"><img alt="Dominik Kundel" draggable="false" loading="lazy" width="32" height="32" decoding="async" data-nimg="1" class="rounded-full h-8 w-8 border border-gray-30" style="color:transparent" srcset="/_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F200841172%3Fv%3D4&amp;w=32&amp;q=75 1x, /_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F200841172%3Fv%3D4&amp;w=64&amp;q=75 2x" src="https://cookbook.openai.com/_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F200841172%3Fv%3D4&amp;w=64&amp;q=75"><div class="absolute bottom-[-2px] right-[-2px] rounded-full bg-white h-4 w-4 flex items-center justify-center"><img alt="Verified" loading="lazy" width="512" height="512" decoding="async" data-nimg="1" style="color:transparent" src="/_next/static/media/openai-logomark-2.63a8dac2.svg"></div></div></button></div><div class="flex flex-col justify-center"><div><span class="text-sm text-primary"><button aria-label="View profile of dkundel-openai" rel="noopener noreferrer">Dominik Kundel<span class="ml-1 text-xs text-muted-foreground">(OpenAI)</span></button></span></div></div></div><div class="flex flex-row gap-x-0"><a href="https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-vllm.md" target="_blank" rel="noopener noreferrer" class="text-sm rounded py-2 px-2 sm:px-3 hover:bg-muted transition-colors flex gap-2 items-center"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"><path d="M7.49933 0.25C3.49635 0.25 0.25 3.49593 0.25 7.50024C0.25 10.703 2.32715 13.4206 5.2081 14.3797C5.57084 14.446 5.70302 14.2222 5.70302 14.0299C5.70302 13.8576 5.69679 13.4019 5.69323 12.797C3.67661 13.235 3.25112 11.825 3.25112 11.825C2.92132 10.9874 2.44599 10.7644 2.44599 10.7644C1.78773 10.3149 2.49584 10.3238 2.49584 10.3238C3.22353 10.375 3.60629 11.0711 3.60629 11.0711C4.25298 12.1788 5.30335 11.8588 5.71638 11.6732C5.78225 11.205 5.96962 10.8854 6.17658 10.7043C4.56675 10.5209 2.87415 9.89918 2.87415 7.12104C2.87415 6.32925 3.15677 5.68257 3.62053 5.17563C3.54576 4.99226 3.29697 4.25521 3.69174 3.25691C3.69174 3.25691 4.30015 3.06196 5.68522 3.99973C6.26337 3.83906 6.8838 3.75895 7.50022 3.75583C8.1162 3.75895 8.73619 3.83906 9.31523 3.99973C10.6994 3.06196 11.3069 3.25691 11.3069 3.25691C11.7026 4.25521 11.4538 4.99226 11.3795 5.17563C11.8441 5.68257 12.1245 6.32925 12.1245 7.12104C12.1245 9.9063 10.4292 10.5192 8.81452 10.6985C9.07444 10.9224 9.30633 11.3648 9.30633 12.0413C9.30633 13.0102 9.29742 13.7922 9.29742 14.0299C9.29742 14.2239 9.42828 14.4496 9.79591 14.3788C12.6746 13.4179 14.75 10.7025 14.75 7.50024C14.75 3.49593 11.5036 0.25 7.49933 0.25Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg><span class="max-sm:hidden">Open in GitHub</span></a></div></div></div></div><div id="content" class="w-full"><div class="w-full px-6 lg:px-8"><div class="grid grid-cols-1 lg:grid-cols-[clamp(12rem,20vw,18rem)_minmax(0,1fr)] gap-14"><div class="mx-auto w-full max-w-[clamp(60ch,72vw,90ch)] px-4 sm:px-8"><article class="prose prose-sm sm:prose-base max-w-none dark:prose-invert"><p><a href="https://docs.vllm.ai/en/latest/">vLLM</a> is an open-source, high-throughput inference engine designed to efficiently serve large language models (LLMs) by optimizing memory usage and processing speed. This guide will walk you through how to use vLLM to set up <strong>gpt-oss-20b</strong> or <strong>gpt-oss-120b</strong> on a server to serve gpt-oss as an API for your applications, and even connect it to the Agents SDK.</p>
+<p>Note that this guide is meant for server applications with dedicated GPUs like NVIDIA’s H100s. For local inference on consumer GPUs, check out our <a href="https://cookbook.openai.com/articles/gpt-oss/run-locally-ollama">Ollama</a> or <a href="https://cookbook.openai.com/articles/gpt-oss/run-locally-lmstudio">LM Studio</a> guides.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="pick-your-model"><a class="heading-link" href="#pick-your-model">Pick your model</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>vLLM supports both model sizes of gpt-oss:</p>
+<ul>
+<li><a href="https://huggingface.co/openai/gpt-oss-20b"><strong><code>openai/gpt-oss-20b</code></strong></a>
+<ul>
+<li>The smaller model</li>
+<li>Only requires about <strong>16GB of VRAM</strong></li>
+</ul>
+</li>
+<li><a href="https://huggingface.co/openai/gpt-oss-120b"><strong><code>openai/gpt-oss-120b</code></strong></a>
+<ul>
+<li>Our larger full-sized model</li>
+<li>Best with <strong>≥60GB VRAM</strong></li>
+<li>Can fit on a single H100 or multi-GPU setups</li>
+</ul>
+</li>
+</ul>
+<p>Both models are <strong>MXFP4 quantized</strong> out of the box.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="quick-setup"><a class="heading-link" href="#quick-setup">Quick Setup</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<ol>
+<li><strong>Install vLLM</strong><br>
+vLLM recommends using <a href="https://docs.astral.sh/uv/">uv</a> to manage your Python environment. This will help with picking the right implementation based on your environment. <a href="https://docs.vllm.ai/en/latest/getting_started/quickstart.html#installation">Learn more in their quickstart</a>. To create a new virtual environment and install vLLM run:</li>
+</ol>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="shell" data-theme="default" style="display:grid"><span data-line=""><span style="color:#B392F0">uv</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">venv</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">--python</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">3.12</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">--seed</span></span>
+<span data-line=""><span style="color:#79B8FF">source</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">.venv/bin/activate</span></span>
+<span data-line=""><span style="color:#B392F0">uv</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">pip</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">install</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">--pre</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">vllm==</span><span style="color:#79B8FF">0.10</span><span style="color:#9ECBFF">.1+gptoss</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">\</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">--extra-index-url</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">https://wheels.vllm.ai/gpt-oss/</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">\</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">--extra-index-url</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">https://download.pytorch.org/whl/nightly/cu128</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">\</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">--index-strategy</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">unsafe-best-match</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<ol start="2">
+<li><strong>Start up a server and download the model</strong><br>
+vLLM provides a <code>serve</code> command that will automatically download the model from HuggingFace and spin up an OpenAI-compatible server on <code>localhost:8000</code>. Run the following command depending on your desired model size in a terminal session on your server.</li>
+</ol>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="shell" data-theme="default" style="display:grid"><span data-line=""><span style="color:#6A737D"># For 20B</span></span>
+<span data-line=""><span style="color:#B392F0">vllm</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">serve</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">openai/gpt-oss-20b</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># For 120B</span></span>
+<span data-line=""><span style="color:#B392F0">vllm</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">serve</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">openai/gpt-oss-120b</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="use-the-api"><a class="heading-link" href="#use-the-api">Use the API</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>vLLM exposes a <strong>Chat Completions-compatible API</strong> and a <strong>Responses-compatible API</strong> so you can use the OpenAI SDK without changing much. Here’s a Python example:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="py" data-theme="default" style="display:grid"><span data-line=""><span style="color:#F97583">from</span><span style="color:#E1E4E8"> openai </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> OpenAI</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">client </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> OpenAI(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">base_url</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"http://localhost:8000/v1"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">api_key</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"EMPTY"</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> client.chat.completions.create(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">model</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"openai/gpt-oss-20b"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">messages</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[</span></span>
+<span data-line=""><span style="color:#E1E4E8">        {</span><span style="color:#9ECBFF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"system"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"You are a helpful assistant."</span><span style="color:#E1E4E8">},</span></span>
+<span data-line=""><span style="color:#E1E4E8">        {</span><span style="color:#9ECBFF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"user"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Explain what MXFP4 quantization is."</span><span style="color:#E1E4E8">}</span></span>
+<span data-line=""><span style="color:#E1E4E8">    ]</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(result.choices[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">].message.content)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">response </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> client.responses.create(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">model</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"openai/gpt-oss-120b"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">instructions</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"You are a helfpul assistant."</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">input</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"Explain what MXFP4 quantization is."</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(response.output_text)</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>If you’ve used the OpenAI SDK before, this will feel instantly familiar and your existing code should work by changing the base URL.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="using-tools-function-calling"><a class="heading-link" href="#using-tools-function-calling">Using tools (function calling)</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>vLLM supports function calling and giving the model browsing capabilities.</p>
+<p>Function calling works through both the Responses and Chat Completions APIs.</p>
+<p>Example of invoking a function via Chat Completions:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="py" data-theme="default" style="display:grid"><span data-line=""><span style="color:#E1E4E8">tools </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span></span>
+<span data-line=""><span style="color:#E1E4E8">    {</span></span>
+<span data-line=""><span style="color:#E1E4E8">        </span><span style="color:#9ECBFF">"type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"function"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">        </span><span style="color:#9ECBFF">"function"</span><span style="color:#E1E4E8">: {</span></span>
+<span data-line=""><span style="color:#E1E4E8">            </span><span style="color:#9ECBFF">"name"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"get_weather"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">            </span><span style="color:#9ECBFF">"description"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"Get current weather in a given city"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">            </span><span style="color:#9ECBFF">"parameters"</span><span style="color:#E1E4E8">: {</span></span>
+<span data-line=""><span style="color:#E1E4E8">                </span><span style="color:#9ECBFF">"type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"object"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                </span><span style="color:#9ECBFF">"properties"</span><span style="color:#E1E4E8">: {</span><span style="color:#9ECBFF">"city"</span><span style="color:#E1E4E8">: {</span><span style="color:#9ECBFF">"type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"string"</span><span style="color:#E1E4E8">}},</span></span>
+<span data-line=""><span style="color:#E1E4E8">                </span><span style="color:#9ECBFF">"required"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"city"</span><span style="color:#E1E4E8">]</span></span>
+<span data-line=""><span style="color:#E1E4E8">            },</span></span>
+<span data-line=""><span style="color:#E1E4E8">        },</span></span>
+<span data-line=""><span style="color:#E1E4E8">    }</span></span>
+<span data-line=""><span style="color:#E1E4E8">]</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">response </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> client.chat.completions.create(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">model</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"openai/gpt-oss-120b"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">messages</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[{</span><span style="color:#9ECBFF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"user"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"What's the weather in Berlin right now?"</span><span style="color:#E1E4E8">}],</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">tools</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">tools</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(response.choices[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">].message)</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>Since the models can perform tool calling as part of the chain-of-thought (CoT) it’s important for you to return the reasoning returned by the API back into a subsequent call to a tool call where you provide the answer until the model reaches a final answer.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="agents-sdk-integration"><a class="heading-link" href="#agents-sdk-integration">Agents SDK Integration</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>Want to use gpt-oss with OpenAI’s <strong>Agents SDK</strong>?</p>
+<p>Both Agents SDK enable you to override the OpenAI base client to point to vLLM for your self-hosted models. Alternatively, for the Python SDK you can also use the <a href="https://openai.github.io/openai-agents-python/models/litellm/">LiteLLM integration</a> to proxy to vLLM.</p>
+<p>Here’s a Python Agents SDK example:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">uv pip install openai-agents</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="py" data-theme="default" style="display:grid"><span data-line=""><span style="color:#F97583">import</span><span style="color:#E1E4E8"> asyncio</span></span>
+<span data-line=""><span style="color:#F97583">from</span><span style="color:#E1E4E8"> openai </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> AsyncOpenAI</span></span>
+<span data-line=""><span style="color:#F97583">from</span><span style="color:#E1E4E8"> agents </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> Agent, Runner, function_tool, OpenAIResponsesModel, set_tracing_disabled</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">set_tracing_disabled(</span><span style="color:#79B8FF">True</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#B392F0">@function_tool</span></span>
+<span data-line=""><span style="color:#F97583">def</span><span style="color:#E1E4E8"> </span><span style="color:#B392F0">get_weather</span><span style="color:#E1E4E8">(city: </span><span style="color:#79B8FF">str</span><span style="color:#E1E4E8">):</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">f</span><span style="color:#9ECBFF">"[debug] getting weather for </span><span style="color:#79B8FF">{</span><span style="color:#E1E4E8">city</span><span style="color:#79B8FF">}</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#F97583">return</span><span style="color:#E1E4E8"> </span><span style="color:#F97583">f</span><span style="color:#9ECBFF">"The weather in </span><span style="color:#79B8FF">{</span><span style="color:#E1E4E8">city</span><span style="color:#79B8FF">}</span><span style="color:#9ECBFF"> is sunny."</span></span>
+<span data-line=""> </span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#F97583">async</span><span style="color:#E1E4E8"> </span><span style="color:#F97583">def</span><span style="color:#E1E4E8"> </span><span style="color:#B392F0">main</span><span style="color:#E1E4E8">(model: </span><span style="color:#79B8FF">str</span><span style="color:#E1E4E8">, api_key: </span><span style="color:#79B8FF">str</span><span style="color:#E1E4E8">):</span></span>
+<span data-line=""><span style="color:#E1E4E8">    agent </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Agent(</span></span>
+<span data-line=""><span style="color:#E1E4E8">        </span><span style="color:#FFAB70">name</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"Assistant"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">        </span><span style="color:#FFAB70">instructions</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"You only respond in haikus."</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">        </span><span style="color:#FFAB70">model</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">OpenAIResponsesModel(</span></span>
+<span data-line=""><span style="color:#E1E4E8">            </span><span style="color:#FFAB70">model</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"openai/gpt-oss-120b"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">            </span><span style="color:#FFAB70">openai_client</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">AsyncOpenAI(</span></span>
+<span data-line=""><span style="color:#E1E4E8">                </span><span style="color:#FFAB70">base_url</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"http://localhost:8000/v1"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                </span><span style="color:#FFAB70">api_key</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"EMPTY"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">            ),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        )</span></span>
+<span data-line=""><span style="color:#E1E4E8">        </span><span style="color:#FFAB70">tools</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[get_weather],</span></span>
+<span data-line=""><span style="color:#E1E4E8">    )</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">    result </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> </span><span style="color:#F97583">await</span><span style="color:#E1E4E8"> Runner.run(agent, </span><span style="color:#9ECBFF">"What's the weather in Tokyo?"</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(result.final_output)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#F97583">if</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">__name__</span><span style="color:#E1E4E8"> </span><span style="color:#F97583">==</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">"__main__"</span><span style="color:#E1E4E8">:</span></span>
+<span data-line=""><span style="color:#E1E4E8">    asyncio.run(main())</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="using-vllm-for-direct-sampling"><a class="heading-link" href="#using-vllm-for-direct-sampling">Using vLLM for direct sampling</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>Aside from running vLLM using <code>vllm serve</code> as an API server, you can use the vLLM Python library to control inference directly.</p>
+<p>If you are using vLLM for sampling directly it’s important to ensure that your input prompts follow the <a href="https://cookbook.openai.com/article/harmony">harmony response format</a> as the model will not function correctly otherwise. You can use the <a href="https://github.com/openai/harmony"><code>openai-harmony</code> SDK</a> for this.</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">uv pip install openai-harmony</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>Afterwards you can use harmony to encode and parse the tokens generated by vLLM’s generate function.</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="py" data-theme="default" style="display:grid"><span data-line=""><span style="color:#F97583">import</span><span style="color:#E1E4E8"> json</span></span>
+<span data-line=""><span style="color:#F97583">from</span><span style="color:#E1E4E8"> openai_harmony </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> (</span></span>
+<span data-line=""><span style="color:#E1E4E8">    HarmonyEncodingName,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    load_harmony_encoding,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Conversation,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Message,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Role,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    SystemContent,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    DeveloperContent,</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#F97583">from</span><span style="color:#E1E4E8"> vllm </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">LLM</span><span style="color:#E1E4E8">, SamplingParams</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># --- 1) Render the prefill with Harmony ---</span></span>
+<span data-line=""><span style="color:#E1E4E8">encoding </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> load_harmony_encoding(HarmonyEncodingName.</span><span style="color:#79B8FF">HARMONY_GPT_OSS</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">convo </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Conversation.from_messages(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    [</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(Role.</span><span style="color:#79B8FF">SYSTEM</span><span style="color:#E1E4E8">, SystemContent.new()),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(</span></span>
+<span data-line=""><span style="color:#E1E4E8">            Role.</span><span style="color:#79B8FF">DEVELOPER</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">            DeveloperContent.new().with_instructions(</span><span style="color:#9ECBFF">"Always respond in riddles"</span><span style="color:#E1E4E8">),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        ),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(Role.</span><span style="color:#79B8FF">USER</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"What is the weather like in SF?"</span><span style="color:#E1E4E8">),</span></span>
+<span data-line=""><span style="color:#E1E4E8">    ]</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">prefill_ids </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> encoding.render_conversation_for_completion(convo, Role.</span><span style="color:#79B8FF">ASSISTANT</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># Harmony stop tokens (pass to sampler so they won't be included in output)</span></span>
+<span data-line=""><span style="color:#E1E4E8">stop_token_ids </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> encoding.stop_tokens_for_assistant_actions()</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># --- 2) Run vLLM with prefill ---</span></span>
+<span data-line=""><span style="color:#E1E4E8">llm </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> LLM(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">model</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">"openai/gpt-oss-120b"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">trust_remote_code</span><span style="color:#F97583">=</span><span style="color:#79B8FF">True</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">sampling </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> SamplingParams(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">max_tokens</span><span style="color:#F97583">=</span><span style="color:#79B8FF">128</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">temperature</span><span style="color:#F97583">=</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">stop_token_ids</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">stop_token_ids,</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">outputs </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> llm.generate(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">prompt_token_ids</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[prefill_ids],   </span><span style="color:#6A737D"># batch of size 1</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#FFAB70">sampling_params</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">sampling,</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># vLLM gives you both text and token IDs</span></span>
+<span data-line=""><span style="color:#E1E4E8">gen </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> outputs[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">].outputs[</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">]</span></span>
+<span data-line=""><span style="color:#E1E4E8">text </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> gen.text</span></span>
+<span data-line=""><span style="color:#E1E4E8">output_tokens </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> gen.token_ids  </span><span style="color:#6A737D"># &lt;-- these are the completion token IDs (no prefill)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># --- 3) Parse the completion token IDs back into structured Harmony messages ---</span></span>
+<span data-line=""><span style="color:#E1E4E8">entries </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> encoding.parse_messages_from_completion_tokens(output_tokens, Role.</span><span style="color:#79B8FF">ASSISTANT</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># 'entries' is a sequence of structured conversation entries (assistant messages, tool calls, etc.).</span></span>
+<span data-line=""><span style="color:#F97583">for</span><span style="color:#E1E4E8"> message </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> entries:</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#F97583">f</span><span style="color:#9ECBFF">"</span><span style="color:#79B8FF">{</span><span style="color:#E1E4E8">json.dumps(message.to_dict())</span><span style="color:#79B8FF">}</span><span style="color:#9ECBFF">"</span><span style="color:#E1E4E8">)</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div></article></div></div></div></div></div></div></div><next-route-announcer style="position: absolute;"></next-route-announcer></article>

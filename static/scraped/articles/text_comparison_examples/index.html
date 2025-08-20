@@ -1,0 +1,60 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="/cookbook-assets/all.css"><title>Use cases for embeddings</title><article><div class="flex flex-col items-center pt-8 pb-32 px-4 sm:px-8"><div class="w-full"><div class="w-full"><div class="mx-auto max-w-3xl px-4 sm:px-8"><div class="mb-12 mt-4"><h3 class="text-sm text-gray-500 mb-2 sm:mb-8 text-center">Jan 20, 2023</h3><h1 class="text-xl sm:text-4xl font-bold mb-12 sm:mb-16 text-center">Use cases for embeddings</h1><div class="flex justify-between items-end"><div class="flex space-x-2 items-center"><div class="flex"><button class="transform transition-all cursor-pointer ml-0" style="z-index:1" rel="noopener noreferrer" aria-label="View profile of ted-at-openai"><div class="relative rounded-full h-8 w-8 bg-white"><img alt="Ted Sanders" draggable="false" loading="lazy" width="32" height="32" decoding="async" data-nimg="1" class="rounded-full h-8 w-8 border border-gray-30" style="color:transparent" srcset="/_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F95656834%3Fv%3D4&amp;w=32&amp;q=75 1x, /_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F95656834%3Fv%3D4&amp;w=64&amp;q=75 2x" src="https://cookbook.openai.com/_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F95656834%3Fv%3D4&amp;w=64&amp;q=75"><div class="absolute bottom-[-2px] right-[-2px] rounded-full bg-white h-4 w-4 flex items-center justify-center"><img alt="Verified" loading="lazy" width="512" height="512" decoding="async" data-nimg="1" style="color:transparent" src="/_next/static/media/openai-logomark-2.63a8dac2.svg"></div></div></button></div><div class="flex flex-col justify-center"><div><span class="text-sm text-primary"><button aria-label="View profile of ted-at-openai" rel="noopener noreferrer">Ted Sanders<span class="ml-1 text-xs text-muted-foreground">(OpenAI)</span></button></span></div></div></div><div class="flex flex-row gap-x-0"><a href="https://github.com/openai/openai-cookbook/blob/main/articles/text_comparison_examples.md" target="_blank" rel="noopener noreferrer" class="text-sm rounded py-2 px-2 sm:px-3 hover:bg-muted transition-colors flex gap-2 items-center"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"><path d="M7.49933 0.25C3.49635 0.25 0.25 3.49593 0.25 7.50024C0.25 10.703 2.32715 13.4206 5.2081 14.3797C5.57084 14.446 5.70302 14.2222 5.70302 14.0299C5.70302 13.8576 5.69679 13.4019 5.69323 12.797C3.67661 13.235 3.25112 11.825 3.25112 11.825C2.92132 10.9874 2.44599 10.7644 2.44599 10.7644C1.78773 10.3149 2.49584 10.3238 2.49584 10.3238C3.22353 10.375 3.60629 11.0711 3.60629 11.0711C4.25298 12.1788 5.30335 11.8588 5.71638 11.6732C5.78225 11.205 5.96962 10.8854 6.17658 10.7043C4.56675 10.5209 2.87415 9.89918 2.87415 7.12104C2.87415 6.32925 3.15677 5.68257 3.62053 5.17563C3.54576 4.99226 3.29697 4.25521 3.69174 3.25691C3.69174 3.25691 4.30015 3.06196 5.68522 3.99973C6.26337 3.83906 6.8838 3.75895 7.50022 3.75583C8.1162 3.75895 8.73619 3.83906 9.31523 3.99973C10.6994 3.06196 11.3069 3.25691 11.3069 3.25691C11.7026 4.25521 11.4538 4.99226 11.3795 5.17563C11.8441 5.68257 12.1245 6.32925 12.1245 7.12104C12.1245 9.9063 10.4292 10.5192 8.81452 10.6985C9.07444 10.9224 9.30633 11.3648 9.30633 12.0413C9.30633 13.0102 9.29742 13.7922 9.29742 14.0299C9.29742 14.2239 9.42828 14.4496 9.79591 14.3788C12.6746 13.4179 14.75 10.7025 14.75 7.50024C14.75 3.49593 11.5036 0.25 7.49933 0.25Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg><span class="max-sm:hidden">Open in GitHub</span></a></div></div></div></div><div id="content" class="w-full"><div class="w-full px-6 lg:px-8"><div class="grid grid-cols-1 lg:grid-cols-[clamp(12rem,20vw,18rem)_minmax(0,1fr)] gap-14"><div class="mx-auto w-full max-w-[clamp(60ch,72vw,90ch)] px-4 sm:px-8"><article class="prose prose-sm sm:prose-base max-w-none dark:prose-invert"><p>The <a href="https://beta.openai.com/docs/guides/embeddings">OpenAI API embeddings endpoint</a> can be used to measure relatedness or similarity between pieces of text.</p>
+<p>By leveraging GPT-3's understanding of text, these embeddings <a href="https://arxiv.org/abs/2201.10005">achieved state-of-the-art results</a> on benchmarks in unsupervised learning and transfer learning settings.</p>
+<p>Embeddings can be used for semantic search, recommendations, cluster analysis, near-duplicate detection, and more.</p>
+<p>For more information, read OpenAI's blog post announcements:</p>
+<ul>
+<li><a href="https://openai.com/blog/introducing-text-and-code-embeddings/">Introducing Text and Code Embeddings (Jan 2022)</a></li>
+<li><a href="https://openai.com/blog/new-and-improved-embedding-model/">New and Improved Embedding Model (Dec 2022)</a></li>
+</ul>
+<p>For comparison with other embedding models, see <a href="https://huggingface.co/spaces/mteb/leaderboard">Massive Text Embedding Benchmark (MTEB) Leaderboard</a></p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="semantic-search"><a class="heading-link" href="#semantic-search">Semantic search</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>Embeddings can be used for search either by themselves or as a feature in a larger system.</p>
+<p>The simplest way to use embeddings for search is as follows:</p>
+<ul>
+<li>Before the search (precompute):
+<ul>
+<li>Split your text corpus into chunks smaller than the token limit (8,191 tokens for <code>text-embedding-3-small</code>)</li>
+<li>Embed each chunk of text</li>
+<li>Store those embeddings in your own database or in a vector search provider like <a href="https://www.pinecone.io">Pinecone</a>, <a href="https://weaviate.io">Weaviate</a> or <a href="https://qdrant.tech">Qdrant</a></li>
+</ul>
+</li>
+<li>At the time of the search (live compute):
+<ul>
+<li>Embed the search query</li>
+<li>Find the closest embeddings in your database</li>
+<li>Return the top results</li>
+</ul>
+</li>
+</ul>
+<p>An example of how to use embeddings for search is shown in <a href="../examples/Semantic_text_search_using_embeddings.ipynb">Semantic_text_search_using_embeddings.ipynb</a>.</p>
+<p>In more advanced search systems, the cosine similarity of embeddings can be used as one feature among many in ranking search results.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="question-answering"><a class="heading-link" href="#question-answering">Question answering</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>The best way to get reliably honest answers from GPT-3 is to give it source documents in which it can locate correct answers. Using the semantic search procedure above, you can cheaply search through a corpus of documents for relevant information and then give that information to GPT-3 via the prompt to answer a question. We demonstrate this in <a href="../examples/Question_answering_using_embeddings.ipynb">Question_answering_using_embeddings.ipynb</a>.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="recommendations"><a class="heading-link" href="#recommendations">Recommendations</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>Recommendations are quite similar to search, except that instead of a free-form text query, the inputs are items in a set.</p>
+<p>An example of how to use embeddings for recommendations is shown in <a href="../examples/Recommendation_using_embeddings.ipynb">Recommendation_using_embeddings.ipynb</a>.</p>
+<p>Similar to search, these cosine similarity scores can either be used on their own to rank items or as features in larger ranking algorithms.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="customizing-embeddings"><a class="heading-link" href="#customizing-embeddings">Customizing Embeddings</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>Although OpenAI's embedding model weights cannot be fine-tuned, you can nevertheless use training data to customize embeddings to your application.</p>
+<p>In <a href="../examples/Customizing_embeddings.ipynb">Customizing_embeddings.ipynb</a>, we provide an example method for customizing your embeddings using training data. The idea of the method is to train a custom matrix to multiply embedding vectors by in order to get new customized embeddings. With good training data, this custom matrix will help emphasize the features relevant to your training labels. You can equivalently consider the matrix multiplication as (a) a modification of the embeddings or (b) a modification of the distance function used to measure the distances between embeddings.</p></article></div></div></div></div></div></div></div><next-route-announcer style="position: absolute;"></next-route-announcer></article>

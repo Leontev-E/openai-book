@@ -1,0 +1,620 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="/cookbook-assets/all.css"><title>OpenAI Harmony Response Format</title><article><div class="flex flex-col items-center pt-8 pb-32 px-4 sm:px-8"><div class="w-full"><div class="w-full"><div class="mx-auto max-w-3xl px-4 sm:px-8"><div class="mb-12 mt-4"><h3 class="text-sm text-gray-500 mb-2 sm:mb-8 text-center">Aug 5, 2025</h3><h1 class="text-xl sm:text-4xl font-bold mb-12 sm:mb-16 text-center">OpenAI Harmony Response Format</h1><div class="flex justify-between items-end"><div class="flex space-x-2 items-center"><div class="flex"><button class="transform transition-all cursor-pointer ml-0" style="z-index:1" rel="noopener noreferrer" aria-label="View profile of dkundel-openai"><div class="relative rounded-full h-8 w-8 bg-white"><img alt="Dominik Kundel" draggable="false" loading="lazy" width="32" height="32" decoding="async" data-nimg="1" class="rounded-full h-8 w-8 border border-gray-30" style="color:transparent" srcset="/_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F200841172%3Fv%3D4&amp;w=32&amp;q=75 1x, /_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F200841172%3Fv%3D4&amp;w=64&amp;q=75 2x" src="https://cookbook.openai.com/_next/image?url=https%3A%2F%2Favatars.githubusercontent.com%2Fu%2F200841172%3Fv%3D4&amp;w=64&amp;q=75"><div class="absolute bottom-[-2px] right-[-2px] rounded-full bg-white h-4 w-4 flex items-center justify-center"><img alt="Verified" loading="lazy" width="512" height="512" decoding="async" data-nimg="1" style="color:transparent" src="/_next/static/media/openai-logomark-2.63a8dac2.svg"></div></div></button></div><div class="flex flex-col justify-center"><div><span class="text-sm text-primary"><button aria-label="View profile of dkundel-openai" rel="noopener noreferrer">Dominik Kundel<span class="ml-1 text-xs text-muted-foreground">(OpenAI)</span></button></span></div></div></div><div class="flex flex-row gap-x-0"><a href="https://github.com/openai/openai-cookbook/blob/main/articles/openai-harmony.md" target="_blank" rel="noopener noreferrer" class="text-sm rounded py-2 px-2 sm:px-3 hover:bg-muted transition-colors flex gap-2 items-center"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"><path d="M7.49933 0.25C3.49635 0.25 0.25 3.49593 0.25 7.50024C0.25 10.703 2.32715 13.4206 5.2081 14.3797C5.57084 14.446 5.70302 14.2222 5.70302 14.0299C5.70302 13.8576 5.69679 13.4019 5.69323 12.797C3.67661 13.235 3.25112 11.825 3.25112 11.825C2.92132 10.9874 2.44599 10.7644 2.44599 10.7644C1.78773 10.3149 2.49584 10.3238 2.49584 10.3238C3.22353 10.375 3.60629 11.0711 3.60629 11.0711C4.25298 12.1788 5.30335 11.8588 5.71638 11.6732C5.78225 11.205 5.96962 10.8854 6.17658 10.7043C4.56675 10.5209 2.87415 9.89918 2.87415 7.12104C2.87415 6.32925 3.15677 5.68257 3.62053 5.17563C3.54576 4.99226 3.29697 4.25521 3.69174 3.25691C3.69174 3.25691 4.30015 3.06196 5.68522 3.99973C6.26337 3.83906 6.8838 3.75895 7.50022 3.75583C8.1162 3.75895 8.73619 3.83906 9.31523 3.99973C10.6994 3.06196 11.3069 3.25691 11.3069 3.25691C11.7026 4.25521 11.4538 4.99226 11.3795 5.17563C11.8441 5.68257 12.1245 6.32925 12.1245 7.12104C12.1245 9.9063 10.4292 10.5192 8.81452 10.6985C9.07444 10.9224 9.30633 11.3648 9.30633 12.0413C9.30633 13.0102 9.29742 13.7922 9.29742 14.0299C9.29742 14.2239 9.42828 14.4496 9.79591 14.3788C12.6746 13.4179 14.75 10.7025 14.75 7.50024C14.75 3.49593 11.5036 0.25 7.49933 0.25Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg><span class="max-sm:hidden">Open in GitHub</span></a></div></div></div></div><div id="content" class="w-full"><div class="w-full px-6 lg:px-8"><div class="grid grid-cols-1 lg:grid-cols-[clamp(12rem,20vw,18rem)_minmax(0,1fr)] gap-14"><div class="mx-auto w-full max-w-[clamp(60ch,72vw,90ch)] px-4 sm:px-8"><article class="prose prose-sm sm:prose-base max-w-none dark:prose-invert"><p>The <a href="https://openai.com/open-models"><code>gpt-oss</code> models</a> were trained on the harmony response format for defining conversation structures, generating reasoning output and structuring function calls. If you are not using <code>gpt-oss</code> directly but through an API or a provider like Ollama, you will not have to be concerned about this as your inference solution will handle the formatting. If you are building your own inference solution, this guide will walk you through the prompt format. The format is designed to mimic the OpenAI Responses API, so if you have used that API before, this format should hopefully feel familiar to you. <code>gpt-oss</code> should not be used without using the harmony format, as it will not work correctly.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="concepts"><a class="heading-link" href="#concepts">Concepts</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="roles"><a class="heading-link" href="#roles">Roles</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>Every message that the model processes has a role associated with it. The model knows about five types of roles:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th style="text-align:left">Role</th><th style="text-align:left">Purpose</th></tr></thead><tbody><tr><td style="text-align:left"><code>system</code></td><td style="text-align:left">A system message is used to specify reasoning effort, meta information like knowledge cutoff and built-in tools</td></tr><tr><td style="text-align:left"><code>developer</code></td><td style="text-align:left">The developer message is used to provide information about the instructions for the model (what is normally considered the “system prompt”) and available function tools</td></tr><tr><td style="text-align:left"><code>user</code></td><td style="text-align:left">Typically representing the input to the model</td></tr><tr><td style="text-align:left"><code>assistant</code></td><td style="text-align:left">Output by the model which can either be a tool call or a message output. The output might also be associated with a particular “channel” identifying what the intent of the message is.</td></tr><tr><td style="text-align:left"><code>tool</code></td><td style="text-align:left">Messages representing the output of a tool call. The specific tool name will be used as the role inside a message.</td></tr></tbody></table>
+<p>These roles also represent the information hierarchy that the model applies in case there are any instruction conflicts: <code>system</code> &gt; <code>developer</code> &gt; <code>user</code> &gt; <code>assistant</code> &gt; <code>tool</code></p>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="channels"><a class="heading-link" href="#channels">Channels</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>Assistant messages can be output in three different “channels”. These are being used to separate between user-facing responses and internal facing messages.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th style="text-align:left">Channel</th><th style="text-align:left">Purpose</th></tr></thead><tbody><tr><td style="text-align:left"><code>final</code></td><td style="text-align:left">Messages tagged in the final channel are messages intended to be shown to the end-user and represent the responses from the model.</td></tr><tr><td style="text-align:left"><code>analysis</code></td><td style="text-align:left">These are messages that are being used by the model for its chain of thought (CoT). <strong>Important:</strong> Messages in the analysis channel do not adhere to the same safety standards as final messages do. Avoid showing these to end-users.</td></tr><tr><td style="text-align:left"><code>commentary</code></td><td style="text-align:left">Any function tool call will typically be triggered on the <code>commentary</code> channel while built-in tools will normally be triggered on the <code>analysis</code> channel. However, occasionally built-in tools will still be output to <code>commentary</code>. Occasionally this channel might also be used by the model to generate a <a href="#preambles">preamble</a> to calling multiple functions.</td></tr></tbody></table>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="harmony-renderer-library"><a class="heading-link" href="#harmony-renderer-library">Harmony renderer library</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>We recommend using our harmony renderer through <a href="https://pypi.org/project/openai-harmony/">PyPI</a> or <a href="https://crates.io/crates/openai-harmony">crates.io</a> when possible as it will automatically handle rendering your messages in the right format and turning them into tokens for processing by the model.</p>
+<p>Below is an example of using the renderer to construct a system prompt and a short conversation.</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="py" data-theme="default" style="display:grid"><span data-line=""><span style="color:#F97583">from</span><span style="color:#E1E4E8"> openai_harmony </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> (</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Author,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Conversation,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    DeveloperContent,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    HarmonyEncodingName,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Message,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Role,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    SystemContent,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    ToolDescription,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    load_harmony_encoding,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    ReasoningEffort</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">encoding </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> load_harmony_encoding(HarmonyEncodingName.</span><span style="color:#79B8FF">HARMONY_GPT_OSS</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">system_message </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (</span></span>
+<span data-line=""><span style="color:#E1E4E8">    SystemContent.new()</span></span>
+<span data-line=""><span style="color:#E1E4E8">        .with_reasoning_effort(ReasoningEffort.</span><span style="color:#79B8FF">HIGH</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">        .with_conversation_start_date(</span><span style="color:#9ECBFF">"2025-06-28"</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">developer_message </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> (</span></span>
+<span data-line=""><span style="color:#E1E4E8">    DeveloperContent.new()</span></span>
+<span data-line=""><span style="color:#E1E4E8">        .with_instructions(</span><span style="color:#9ECBFF">"Always respond in riddles"</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">        .with_function_tools(</span></span>
+<span data-line=""><span style="color:#E1E4E8">            [</span></span>
+<span data-line=""><span style="color:#E1E4E8">                ToolDescription.new(</span></span>
+<span data-line=""><span style="color:#E1E4E8">                    </span><span style="color:#9ECBFF">"get_current_weather"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                    </span><span style="color:#9ECBFF">"Gets the current weather in the provided location."</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                    </span><span style="color:#FFAB70">parameters</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span></span>
+<span data-line=""><span style="color:#E1E4E8">                        </span><span style="color:#9ECBFF">"type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"object"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                        </span><span style="color:#9ECBFF">"properties"</span><span style="color:#E1E4E8">: {</span></span>
+<span data-line=""><span style="color:#E1E4E8">                            </span><span style="color:#9ECBFF">"location"</span><span style="color:#E1E4E8">: {</span></span>
+<span data-line=""><span style="color:#E1E4E8">                                </span><span style="color:#9ECBFF">"type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"string"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                                </span><span style="color:#9ECBFF">"description"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"The city and state, e.g. San Francisco, CA"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                            },</span></span>
+<span data-line=""><span style="color:#E1E4E8">                            </span><span style="color:#9ECBFF">"format"</span><span style="color:#E1E4E8">: {</span></span>
+<span data-line=""><span style="color:#E1E4E8">                                </span><span style="color:#9ECBFF">"type"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"string"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                                </span><span style="color:#9ECBFF">"enum"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"celsius"</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"fahrenheit"</span><span style="color:#E1E4E8">],</span></span>
+<span data-line=""><span style="color:#E1E4E8">                                </span><span style="color:#9ECBFF">"default"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"celsius"</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">                            },</span></span>
+<span data-line=""><span style="color:#E1E4E8">                        },</span></span>
+<span data-line=""><span style="color:#E1E4E8">                        </span><span style="color:#9ECBFF">"required"</span><span style="color:#E1E4E8">: [</span><span style="color:#9ECBFF">"location"</span><span style="color:#E1E4E8">],</span></span>
+<span data-line=""><span style="color:#E1E4E8">                    },</span></span>
+<span data-line=""><span style="color:#E1E4E8">                ),</span></span>
+<span data-line=""><span style="color:#E1E4E8">            ]</span></span>
+<span data-line=""><span style="color:#E1E4E8">	)</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">convo </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Conversation.from_messages(</span></span>
+<span data-line=""><span style="color:#E1E4E8">    [</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(Role.</span><span style="color:#79B8FF">SYSTEM</span><span style="color:#E1E4E8">, system_message),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(Role.</span><span style="color:#79B8FF">DEVELOPER</span><span style="color:#E1E4E8">, developer_message),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(Role.</span><span style="color:#79B8FF">USER</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"What is the weather in Tokyo?"</span><span style="color:#E1E4E8">),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(</span></span>
+<span data-line=""><span style="color:#E1E4E8">            Role.</span><span style="color:#79B8FF">ASSISTANT</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">            </span><span style="color:#9ECBFF">'User asks: "What is the weather in Tokyo?" We need to use get_current_weather tool.'</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">        ).with_channel(</span><span style="color:#9ECBFF">"analysis"</span><span style="color:#E1E4E8">),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_role_and_content(Role.</span><span style="color:#79B8FF">ASSISTANT</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">'{"location": "Tokyo"}'</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">        .with_channel(</span><span style="color:#9ECBFF">"commentary"</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">        .with_recipient(</span><span style="color:#9ECBFF">"functions.get_current_weather"</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">        .with_content_type(</span><span style="color:#9ECBFF">"&lt;|constrain|&gt; json"</span><span style="color:#E1E4E8">),</span></span>
+<span data-line=""><span style="color:#E1E4E8">        Message.from_author_and_content(</span></span>
+<span data-line=""><span style="color:#E1E4E8">            Author.new(Role.</span><span style="color:#79B8FF">TOOL</span><span style="color:#E1E4E8">, </span><span style="color:#9ECBFF">"functions.get_current_weather"</span><span style="color:#E1E4E8">),</span></span>
+<span data-line=""><span style="color:#E1E4E8">            </span><span style="color:#9ECBFF">'{ "temperature": 20, "sunny": true }'</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">        ).with_channel(</span><span style="color:#9ECBFF">"commentary"</span><span style="color:#E1E4E8">),</span></span>
+<span data-line=""><span style="color:#E1E4E8">    ]</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">tokens </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> encoding.render_conversation_for_completion(convo, Role.</span><span style="color:#79B8FF">ASSISTANT</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#6A737D"># After receiving a token response</span></span>
+<span data-line=""><span style="color:#6A737D"># Do not pass in the stop token</span></span>
+<span data-line=""><span style="color:#E1E4E8">parsed_response </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> encoding.parse_messages_from_completion_tokens(new_tokens, Role.</span><span style="color:#79B8FF">ASSISTANT</span><span style="color:#E1E4E8">)</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>Additionally the openai_harmony library also includes a StreamableParser for parsing and decoding as the model is generating new tokens. This can be helpful for example to stream output and handle unicode characters during decoding.</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="py" data-theme="default" style="display:grid"><span data-line=""><span style="color:#F97583">from</span><span style="color:#E1E4E8"> openai_harmony </span><span style="color:#F97583">import</span><span style="color:#E1E4E8"> (</span></span>
+<span data-line=""><span style="color:#E1E4E8">    load_harmony_encoding,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    Role,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    StreamableParser,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    HarmonyEncodingName</span></span>
+<span data-line=""><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">encoding </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> load_harmony_encoding(HarmonyEncodingName.</span><span style="color:#79B8FF">HARMONY_GPT_OSS</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">stream </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> StreamableParser(encoding, </span><span style="color:#FFAB70">role</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">Role.</span><span style="color:#79B8FF">ASSISTANT</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#E1E4E8">tokens </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">200005</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">35644</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">200008</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">1844</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">31064</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">25</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">392</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">4827</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">382</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">220</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">17</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">659</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">220</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">17</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">16842</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">12295</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">81645</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">13</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">51441</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">6052</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">13</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">200007</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">200006</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">173781</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">200005</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">17196</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">200008</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">17</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">659</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">220</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">17</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">314</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">220</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">19</span><span style="color:#E1E4E8">,</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">13</span><span style="color:#E1E4E8">,</span><span style="color:#79B8FF">200002</span></span>
+<span data-line=""><span style="color:#E1E4E8">]</span></span>
+<span data-line=""> </span>
+<span data-line=""><span style="color:#F97583">for</span><span style="color:#E1E4E8"> token </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> tokens:</span></span>
+<span data-line=""><span style="color:#E1E4E8">    stream.process(token)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"--------------------------------"</span><span style="color:#E1E4E8">)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"current_role"</span><span style="color:#E1E4E8">, stream.current_role)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"current_channel"</span><span style="color:#E1E4E8">, stream.current_channel)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"last_content_delta"</span><span style="color:#E1E4E8">, stream.last_content_delta)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"current_content_type"</span><span style="color:#E1E4E8">, stream.current_content_type)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"current_recipient"</span><span style="color:#E1E4E8">, stream.current_recipient)</span></span>
+<span data-line=""><span style="color:#E1E4E8">    </span><span style="color:#79B8FF">print</span><span style="color:#E1E4E8">(</span><span style="color:#9ECBFF">"current_content"</span><span style="color:#E1E4E8">, stream.current_content)</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="prompt-format"><a class="heading-link" href="#prompt-format">Prompt format</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>If you choose to build your own renderer, you’ll need to adhere to the following format.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="special-tokens"><a class="heading-link" href="#special-tokens">Special Tokens</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>The model uses a set of special tokens to identify the structure of your input. If you are using <a href="https://github.com/openai/tiktoken">tiktoken</a> these tokens are encoded in the <code>o200k_harmony</code> encoding. All special tokens follow the format <code>&lt;|type|&gt;</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th style="text-align:left">Special token</th><th style="text-align:left">Purpose</th><th style="text-align:left">Token ID</th></tr></thead><tbody><tr><td style="text-align:left">&lt;|start|&gt;</td><td style="text-align:left">Indicates the beginning of a <a href="#message-format">message</a>. Followed by the “header” information of a message starting with the <a href="#roles">role</a></td><td style="text-align:left"><code>200006</code></td></tr><tr><td style="text-align:left">&lt;|end|&gt;</td><td style="text-align:left">Indicates the end of a <a href="#message-format">message</a></td><td style="text-align:left"><code>200007</code></td></tr><tr><td style="text-align:left">&lt;|message|&gt;</td><td style="text-align:left">Indicates the transition from the message “header” to the actual content</td><td style="text-align:left"><code>200008</code></td></tr><tr><td style="text-align:left">&lt;|channel|&gt;</td><td style="text-align:left">Indicates the transition to the <a href="#channels">channel</a> information of the header</td><td style="text-align:left"><code>200005</code></td></tr><tr><td style="text-align:left">&lt;|constrain|&gt;</td><td style="text-align:left">Indicates the transition to the data type definition in a <a href="#receiving-tool-calls">tool call</a></td><td style="text-align:left"><code>200003</code></td></tr><tr><td style="text-align:left">&lt;|return|&gt;</td><td style="text-align:left">Indicates the model is done with sampling the response message. A valid “stop token” indicating that you should stop inference.</td><td style="text-align:left"><code>200002</code></td></tr><tr><td style="text-align:left">&lt;|call|&gt;</td><td style="text-align:left">Indicates the model wants to call a tool. A valid “stop token” indicating that you should stop inference.</td><td style="text-align:left"><code>200012</code></td></tr></tbody></table>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="message-format"><a class="heading-link" href="#message-format">Message format</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>The harmony response format consists of “messages” with the model potentially generating multiple messages in one go. The general structure of a message is as follows:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;{header}&lt;|message|&gt;{content}&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>The <code>{header}</code> contains a series of meta information including the <a href="#roles">role</a>. <code>&lt;|end|&gt;</code> represents the end of a fully completed message but the model might also use other stop tokens such as <code>&lt;|call|&gt;</code> for tool calling and <code>&lt;|return|&gt;</code> to indicate the model is done with the completion.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="chat-conversation-format"><a class="heading-link" href="#chat-conversation-format">Chat conversation format</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>Following the message format above the most basic chat format consists of a <code>user</code> message and the beginning of an <code>assistant</code> message.</p>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="example-input"><a class="heading-link" href="#example-input">Example input</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;user&lt;|message|&gt;What is 2 + 2?&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;assistant</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>The output will begin by specifying the <code>channel</code>. For example <code>analysis</code> to output the chain of thought. The model might output multiple messages (primarily chain of thought messages) for which it uses the <code>&lt;|end|&gt;</code> token to separate them.</p>
+<p>Once its done generating it will stop with either a <code>&lt;|return|&gt;</code> token indicating it’s done generating the final answer, or <code>&lt;|call|&gt;</code> indicating that a tool call needs to be performed. In either way this indicates that you should stop inference.</p>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="example-output"><a class="heading-link" href="#example-output">Example output</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|channel|&gt;analysis&lt;|message|&gt;User asks: "What is 2 + 2?" Simple arithmetic. Provide answer.&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;assistant&lt;|channel|&gt;final&lt;|message|&gt;2 + 2 = 4.&lt;|return|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>The <code>final</code> channel will contain the answer to your user’s request. Check out the <a href="#reasoning">reasoning section</a> for more details on the chain-of-thought.</p>
+<p><strong>Implementation note:</strong> <code>&lt;|return|&gt;</code> is a decode-time stop token only. When you add the assistant’s generated reply to conversation history for the next turn, replace the trailing <code>&lt;|return|&gt;</code> with <code>&lt;|end|&gt;</code> so that stored messages are fully formed as <code>&lt;|start|&gt;{header}&lt;|message|&gt;{content}&lt;|end|&gt;</code>. Prior messages in prompts should therefore end with <code>&lt;|end|&gt;</code>. For supervised targets/training examples, ending with <code>&lt;|return|&gt;</code> is appropriate; for persisted history, normalize to <code>&lt;|end|&gt;</code>.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="system-message-format"><a class="heading-link" href="#system-message-format">System message format</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>The system message is used to provide general information to the system. This is different to what might be considered the “system prompt” in other prompt formats. For that, check out the <a href="#developer-message-format">developer message format</a>.</p>
+<p>We use the system message to define:</p>
+<ol>
+<li>The <strong>identity</strong> of the model — This should always stay as <code>You are ChatGPT, a large language model trained by OpenAI.</code> If you want to change the identity of the model, use the instructions in the <a href="#developer-message-format">developer message</a>.</li>
+<li>Meta <strong>dates</strong> — Specifically the <code>Knowledge cutoff:</code> and the <code>Current date:</code></li>
+<li>The <strong>reasoning effort</strong> — As specified on the levels <code>high</code>, <code>medium</code>, <code>low</code></li>
+<li>Available channels — For the best performance this should map to <code>analysis</code>, <code>commentary</code>, and <code>final</code>.</li>
+<li>Built-in tools — The model has been trained on both a <code>python</code> and <code>browser</code> tool. Check out the <a href="#built-in-tools">built-in tools section</a> for details.</li>
+</ol>
+<p><strong>If you are defining functions,</strong> it should also contain a note that all function tool calls must go to the <code>commentary</code> channel.</p>
+<p>For the best performance stick to this format as closely as possible.</p>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="example-system-message"><a class="heading-link" href="#example-system-message">Example system message</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>The most basic system message you should use is the following:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;system&lt;|message|&gt;You are ChatGPT, a large language model trained by OpenAI.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Knowledge cutoff: 2024-06</span></span>
+<span data-line=""><span style="color:#e1e4e8">Current date: 2025-06-28</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Reasoning: high</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Valid channels: analysis, commentary, final. Channel must be included for every message.&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>If functions calls are present in the developer message section, use:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;system&lt;|message|&gt;You are ChatGPT, a large language model trained by OpenAI.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Knowledge cutoff: 2024-06</span></span>
+<span data-line=""><span style="color:#e1e4e8">Current date: 2025-06-28</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Reasoning: high</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Valid channels: analysis, commentary, final. Channel must be included for every message.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Calls to these tools must go to the commentary channel: 'functions'.&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="developer-message-format"><a class="heading-link" href="#developer-message-format">Developer message format</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>The developer message represents what is commonly considered the “system prompt”. It contains the instructions that are provided to the model and optionally a list of <a href="#function-calling">function tools</a> available for use or the output format you want the model to adhere to for <a href="#structured-output">structured outputs</a>.</p>
+<p>If you are not using function tool calling your developer message would just look like this:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;developer&lt;|message|&gt;# Instructions</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">{instructions}&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>Where <code>{instructions}</code> is replaced with your “system prompt”.</p>
+<p>For defining function calling tools, <a href="#function-calling">check out the dedicated section</a>.<br>
+For defining an output format to be used in structured outputs, <a href="#structured-output">check out this section of the guide</a>.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="reasoning"><a class="heading-link" href="#reasoning">Reasoning</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>The gpt-oss models are reasoning models. By default, the model will do medium level reasoning. To control the reasoning you can specify in the <a href="#system-message-format">system message</a> the reasoning level as <code>low</code>, <code>medium</code>, or <code>high</code>. The recommended format is:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">Reasoning: high</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>The model will output its raw chain-of-thought (CoT) as assistant messages into the <code>analysis</code> channel while the final response will be output as <code>final</code>.</p>
+<p>For example for the question <code>What is 2 + 2?</code> the model output might look like this:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|channel|&gt;analysis&lt;|message|&gt;User asks: "What is 2 + 2?" Simple arithmetic. Provide answer.&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;assistant&lt;|channel|&gt;final&lt;|message|&gt;2 + 2 = 4.&lt;|return|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>In this case the CoT is</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">User asks: “What is 2 + 2?” Simple arithmetic. Provide answer.</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>And the actual answer is:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">2 + 2 = 4</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p><strong>Important:</strong><br>
+The model has not been trained to the same safety standards in the chain-of-thought as it has for final output. You should not show the chain-of-thought to your users, as they might contain harmful content. <a href="https://openai.com/index/gpt-oss-model-card/">Learn more in the model card</a>.</p>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="handling-reasoning-output-in-subsequent-sampling"><a class="heading-link" href="#handling-reasoning-output-in-subsequent-sampling">Handling reasoning output in subsequent sampling</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>In general, you should drop any previous CoT content on subsequent sampling if the responses by the assistant ended in a message to the <code>final</code> channel. Meaning if our first input was this:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;user&lt;|message|&gt;What is 2 + 2?&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;assistant</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>and resulted in the output:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|channel|&gt;analysis&lt;|message|&gt;User asks: "What is 2 + 2?" Simple arithmetic. Provide answer.&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;assistant&lt;|channel|&gt;final&lt;|message|&gt;2 + 2 = 4.&lt;|return|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>For the model to work properly, the input for the next sampling should be</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;user&lt;|message|&gt;What is 2 + 2?&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;assistant&lt;|channel|&gt;final&lt;|message|&gt;2 + 2 = 4.&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;user&lt;|message|&gt;What about 9 / 2?&lt;|end|&gt;</span></span>
+<span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;assistant</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>The exception for this is tool/function calling. The model is able to call tools as part of its chain-of-thought and because of that, we should pass the previous chain-of-thought back in as input for subsequent sampling. Check out the <a href="#function-calling">function calling section</a> for a complete example.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="function-calling"><a class="heading-link" href="#function-calling">Function calling</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="defining-available-tools"><a class="heading-link" href="#defining-available-tools">Defining available tools</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>All functions that are available to the model should be defined in the <a href="#developer-message-format">developer message</a> in a dedicated <code>Tools</code> section.</p>
+<p>To define the functions we use a TypeScript-like type syntax and wrap the functions into a dedicated <code>functions</code> namespace. It’s important to stick to this format closely to improve accuracy of function calling. You can check out the harmony renderer codebase for more information on how we are turning JSON schema definitions for the arguments into this format but some general formatting practices:</p>
+<ul>
+<li>Define every function as a <code>type {function_name} = () =&gt; any</code> if it does not receive any arguments</li>
+<li>For functions that receive an argument name the argument <code>_</code> and inline the type definition</li>
+<li>Add comments for descriptions in the line above the field definition</li>
+<li>Always use <code>any</code> as the return type</li>
+<li>Keep an empty line after each function definition</li>
+<li>Wrap your functions into a namespace, generally <code>functions</code> is the namespace you should use to not conflict with <a href="#built-in-tools">other tools</a> that the model might have been trained on.</li>
+</ul>
+<p>Here’s a complete input example including the definition of two functions:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;system&lt;|message|&gt;You are ChatGPT, a large language model trained by OpenAI.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Knowledge cutoff: 2024-06</span></span>
+<span data-line=""><span style="color:#e1e4e8">Current date: 2025-06-28</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Reasoning: high</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Valid channels: analysis, commentary, final. Channel must be included for every message.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Calls to these tools must go to the commentary channel: 'functions'.&lt;|end|&gt;&lt;|start|&gt;developer&lt;|message|&gt;# Instructions</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Use a friendly tone.</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Tools</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">## functions</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">namespace functions {</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Gets the location of the user.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type get_location = () =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Gets the current weather in the provided location.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type get_current_weather = (_: {</span></span>
+<span data-line=""><span style="color:#e1e4e8">// The city and state, e.g. San Francisco, CA</span></span>
+<span data-line=""><span style="color:#e1e4e8">location: string,</span></span>
+<span data-line=""><span style="color:#e1e4e8">format?: "celsius" | "fahrenheit", // default: celsius</span></span>
+<span data-line=""><span style="color:#e1e4e8">}) =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Gets the current weather in the provided list of locations.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type get_multiple_weathers = (_: {</span></span>
+<span data-line=""><span style="color:#e1e4e8">// List of city and state, e.g. ["San Francisco, CA", "New York, NY"]</span></span>
+<span data-line=""><span style="color:#e1e4e8">locations: string[],</span></span>
+<span data-line=""><span style="color:#e1e4e8">format?: "celsius" | "fahrenheit", // default: celsius</span></span>
+<span data-line=""><span style="color:#e1e4e8">}) =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">} // namespace functions&lt;|end|&gt;&lt;|start|&gt;user&lt;|message|&gt;What is the weather like in SF?&lt;|end|&gt;&lt;|start|&gt;assistant</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="receiving-tool-calls"><a class="heading-link" href="#receiving-tool-calls">Receiving tool calls</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>If the model decides to call a tool it will define a <code>recipient</code> in the header of the message using the format <code>to={name}</code>. For example, if it decides to trigger the <code>get_current_weather</code> function from above it would specify <code>to=functions.get_current_weather</code> in the header and <code>commentary</code> as the channel as specified in the <a href="#system-message-format">system message</a>. <strong>The recipient might be defined in the role or channel section of the header.</strong></p>
+<p>The model might also specify a <code>&lt;|constrain|&gt;</code> token to indicate the type of input for the tool call. In this case since it’s being passed in as JSON the <code>&lt;|constrain|&gt;</code> is set to <code>json</code>.</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|channel|&gt;analysis&lt;|message|&gt;Need to use function get_current_weather.&lt;|end|&gt;&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=functions.get_current_weather &lt;|constrain|&gt;json&lt;|message|&gt;{"location":"San Francisco"}&lt;|call|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="handling-tool-calls"><a class="heading-link" href="#handling-tool-calls">Handling tool calls</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>After the function call was handled we need to provide the output back to the model by specifying a new tool message with the output after the call message.</p>
+<p>A tool message has the following format:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;{toolname} to=assistant&lt;|channel|&gt;commentary&lt;|message|&gt;{output}&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>So in our example above</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;functions.get_current_weather to=assistant&lt;|channel|&gt;commentary&lt;|message|&gt;{"sunny": true, "temperature": 20}&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>Once you have gathered the output for the tool calls you can run inference with the complete content:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;system&lt;|message|&gt;You are ChatGPT, a large language model trained by OpenAI.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Knowledge cutoff: 2024-06</span></span>
+<span data-line=""><span style="color:#e1e4e8">Current date: 2025-06-28</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Reasoning: high</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Valid channels: analysis, commentary, final. Channel must be included for every message.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Calls to these tools must go to the commentary channel: 'functions'.&lt;|end|&gt;&lt;|start|&gt;developer&lt;|message|&gt;# Instructions</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Use a friendly tone.</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Tools</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">## functions</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">namespace functions {</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Gets the location of the user.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type get_location = () =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Gets the current weather in the provided location.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type get_current_weather = (_: {</span></span>
+<span data-line=""><span style="color:#e1e4e8">// The city and state, e.g. San Francisco, CA</span></span>
+<span data-line=""><span style="color:#e1e4e8">location: string,</span></span>
+<span data-line=""><span style="color:#e1e4e8">format?: "celsius" | "fahrenheit", // default: celsius</span></span>
+<span data-line=""><span style="color:#e1e4e8">}) =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Gets the current weather in the provided list of locations.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type get_multiple_weathers = (_: {</span></span>
+<span data-line=""><span style="color:#e1e4e8">// List of city and state, e.g. ["San Francisco, CA", "New York, NY"]</span></span>
+<span data-line=""><span style="color:#e1e4e8">locations: string[],</span></span>
+<span data-line=""><span style="color:#e1e4e8">format?: "celsius" | "fahrenheit", // default: celsius</span></span>
+<span data-line=""><span style="color:#e1e4e8">}) =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">} // namespace functions&lt;|end|&gt;&lt;|start|&gt;user&lt;|message|&gt;What is the weather like in SF?&lt;|end|&gt;&lt;|start|&gt;assistant&lt;|channel|&gt;analysis&lt;|message|&gt;Need to use function get_current_weather.&lt;|end|&gt;&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=functions.get_current_weather &lt;|constrain|&gt;json&lt;|message|&gt;{"location":"San Francisco"}&lt;|call|&gt;&lt;|start|&gt;functions.get_current_weather to=assistant&lt;|channel|&gt;commentary&lt;|message|&gt;{"sunny": true, "temperature": 20}&lt;|end|&gt;&lt;|start|&gt;assistant</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>As you can see above we are passing not just the function out back into the model for further sampling but also the previous chain-of-thought (“Need to use function get_current_weather.”) to provide the model with the necessary information to continue its chain-of-thought or provide the final answer.</p>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="preambles"><a class="heading-link" href="#preambles">Preambles</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>At times the model might choose to generate a “preamble” to inform the user about the tools it is about to call. For example, when it plans to call multiple tools. If this is the case it will generate an assistant message on the <code>commentary</code> channel that, unlike the chain-of-thought, is intended to be shown to the end-user.</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|channel|&gt;analysis&lt;|message|&gt;{long chain of thought}&lt;|end|&gt;&lt;|start|&gt;assistant&lt;|channel|&gt;commentary&lt;|message|&gt;**Action plan**:</span></span>
+<span data-line=""><span style="color:#e1e4e8">1. Generate an HTML file</span></span>
+<span data-line=""><span style="color:#e1e4e8">2. Generate a JavaScript for the Node.js server</span></span>
+<span data-line=""><span style="color:#e1e4e8">3. Start the server</span></span>
+<span data-line=""><span style="color:#e1e4e8">---</span></span>
+<span data-line=""><span style="color:#e1e4e8">Will start executing the plan step by step&lt;|end|&gt;&lt;|start|&gt;assistant&lt;|channel|&gt;commentary to=functions.generate_file&lt;|constrain|&gt;json&lt;|message|&gt;{"template": "basic_html", "path": "index.html"}&lt;|call|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>In this case the model generated an action plan to inform the user about the multiple steps it is about to execute.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="structured-output"><a class="heading-link" href="#structured-output">Structured output</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>To control the output behavior of the model, you can define a response format at the end of the <a href="#developer-message-format">developer message</a> with the following structure:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8"># Response Formats</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">## {format name}</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// {description or context}</span></span>
+<span data-line=""><span style="color:#e1e4e8">{schema}&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>The format name functions similar to the name you can specify for your schema in the <a href="https://platform.openai.com/docs/guides/structured-outputs?api-mode=responses#how-to-use">Responses API</a> and the schema is a JSON Schema.</p>
+<p>As an example, here’s a developer message that defines a schema for a shopping list:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;developer&lt;|message|&gt;# Instructions</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">You are a helpful shopping assistant</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Response Formats</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">## shopping_list</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">{"properties":{"items":{"type":"array","description":"entries on the shopping list","items":{"type":"string"}}},"type":"object"}&lt;|end|&gt;&lt;|start|&gt;user&lt;|message|&gt;I need to buy coffee, soda and eggs&lt;|end|&gt;&lt;|start|&gt;assistant</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>This prompt alone will, however, only influence the model’s behavior but doesn’t guarantee the full adherence to the schema. For this you still need to construct your own grammar and enforce the schema during sampling.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="built-in-tools"><a class="heading-link" href="#built-in-tools">Built-in tools</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>During the training of the <code>gpt-oss</code> models, they were trained with two common tools to browse for information and execute python code to improve its results.</p>
+<p>If you are trying to build this functionality, you should use the format below to improve reliability and accuracy.</p>
+<p>These tools should be defined in the <a href="#system-message-format">system message</a> not in the developer message by adding a <code># Tools</code> section.</p>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="browser-tool"><a class="heading-link" href="#browser-tool">Browser tool</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<p>To define the browser tool add it to the system prompt section:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;system&lt;|message|&gt;You are ChatGPT, a large language model trained by OpenAI.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Knowledge cutoff: 2024-06</span></span>
+<span data-line=""><span style="color:#e1e4e8">Current date: 2025-06-28</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Reasoning: high</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Tools</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">## browser</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Tool for browsing.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// The `cursor` appears in brackets before each browsing display: `[{cursor}]`.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// Cite information from the tool using the following format:</span></span>
+<span data-line=""><span style="color:#e1e4e8">// `【{cursor}†L{line_start}(-L{line_end})?】`, for example: `【6†L9-L11】` or `【8†L3】`.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// Do not quote more than 10 words directly from the tool output.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// sources=web (default: web)</span></span>
+<span data-line=""><span style="color:#e1e4e8">namespace browser {</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Searches for information related to `query` and displays `topn` results.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type search = (_: {</span></span>
+<span data-line=""><span style="color:#e1e4e8">query: string,</span></span>
+<span data-line=""><span style="color:#e1e4e8">topn?: number, // default: 10</span></span>
+<span data-line=""><span style="color:#e1e4e8">source?: string,</span></span>
+<span data-line=""><span style="color:#e1e4e8">}) =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Opens the link `id` from the page indicated by `cursor` starting at line number `loc`, showing `num_lines` lines.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// Valid link ids are displayed with the formatting: `【{id}†.*】`.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// If `cursor` is not provided, the most recent page is implied.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// If `id` is a string, it is treated as a fully qualified URL associated with `source`.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// If `loc` is not provided, the viewport will be positioned at the beginning of the document or centered on the most relevant passage, if available.</span></span>
+<span data-line=""><span style="color:#e1e4e8">// Use this function without `id` to scroll to a new location of an opened page.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type open = (_: {</span></span>
+<span data-line=""><span style="color:#e1e4e8">id?: number | string, // default: -1</span></span>
+<span data-line=""><span style="color:#e1e4e8">cursor?: number, // default: -1</span></span>
+<span data-line=""><span style="color:#e1e4e8">loc?: number, // default: -1</span></span>
+<span data-line=""><span style="color:#e1e4e8">num_lines?: number, // default: -1</span></span>
+<span data-line=""><span style="color:#e1e4e8">view_source?: boolean, // default: false</span></span>
+<span data-line=""><span style="color:#e1e4e8">source?: string,</span></span>
+<span data-line=""><span style="color:#e1e4e8">}) =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">// Finds exact matches of `pattern` in the current page, or the page given by `cursor`.</span></span>
+<span data-line=""><span style="color:#e1e4e8">type find = (_: {</span></span>
+<span data-line=""><span style="color:#e1e4e8">pattern: string,</span></span>
+<span data-line=""><span style="color:#e1e4e8">cursor?: number, // default: -1</span></span>
+<span data-line=""><span style="color:#e1e4e8">}) =&gt; any;</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">} // namespace browser</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Valid channels: analysis, commentary, final. Channel must be included for every message.&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>If the model decides to call actions in the browser it will use the same format as for <a href="#function-calling">function calls</a> with two notable exceptions:</p>
+<ol>
+<li>Requests will be made to the <code>analysis</code> channel</li>
+<li>The recipient will be <code>browser.search</code>, <code>browser.open</code>, <code>browser.find</code> respectively</li>
+</ol>
+<h4 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="python-tool"><a class="heading-link" href="#python-tool">Python tool</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h4>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="" data-theme="default" style="display:grid"><span data-line=""><span style="color:#e1e4e8">&lt;|start|&gt;system&lt;|message|&gt;You are ChatGPT, a large language model trained by OpenAI.</span></span>
+<span data-line=""><span style="color:#e1e4e8">Knowledge cutoff: 2024-06</span></span>
+<span data-line=""><span style="color:#e1e4e8">Current date: 2025-06-28</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Reasoning: high</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Tools</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">## python</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">Use this tool to execute Python code in your chain of thought. The code will not be shown to the user. This tool should be used for internal reasoning, but not for code that is intended to be visible to the user (e.g. when creating plots, tables, or files).</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8">When you send a message containing Python code to python, it will be executed in a stateful Jupyter notebook environment. python will respond with the output of the execution or time out after 120.0 seconds. The drive at '/mnt/data' can be used to save and persist user files. Internet access for this session is UNKNOWN. Depends on the cluster.</span></span>
+<span data-line=""><span style="color:#e1e4e8"></span></span>
+<span data-line=""><span style="color:#e1e4e8"># Valid channels: analysis, commentary, final. Channel must be included for every message.&lt;|end|&gt;</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>If the model decides to execute Python code it will use the same format as for <a href="#function-calling">function calls</a> with two notable exceptions:</p>
+<ol start="3">
+<li>Requests will be made to the <code>analysis</code> channel</li>
+<li>The recipient will always be <code>python</code></li>
+</ol></article></div></div></div></div></div></div></div><next-route-announcer style="position: absolute;"></next-route-announcer></article>

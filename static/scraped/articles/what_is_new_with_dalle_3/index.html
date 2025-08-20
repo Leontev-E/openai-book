@@ -1,0 +1,223 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="/cookbook-assets/all.css"><title>What's new with DALL·E 3?</title><article><div class="flex flex-col items-center pt-8 pb-32 px-4 sm:px-8"><div class="w-full"><div class="w-full"><div class="mx-auto max-w-3xl px-4 sm:px-8"><div class="mb-12 mt-4"><h3 class="text-sm text-gray-500 mb-2 sm:mb-8 text-center">Nov 6, 2023</h3><h1 class="text-xl sm:text-4xl font-bold mb-12 sm:mb-16 text-center">What's new with DALL·E 3?</h1><div class="flex justify-between items-end"><div class="flex space-x-2 items-center"><div class="flex"><button class="transform transition-all cursor-pointer ml-0" style="z-index:1" rel="noopener noreferrer" aria-label="View profile of 0hq"><div class="relative rounded-full h-8 w-8 bg-white"><div class="rounded-full h-8 w-8 bg-gray-300 flex items-center justify-center text-white text-sm  border-white border-2">WD</div><div class="absolute bottom-[-2px] right-[-2px] rounded-full bg-white h-4 w-4 flex items-center justify-center"><img alt="Verified" loading="lazy" width="512" height="512" decoding="async" data-nimg="1" style="color:transparent" src="/_next/static/media/openai-logomark-2.63a8dac2.svg"></div></div></button></div><div class="flex flex-col justify-center"><div><span class="text-sm text-primary"><button aria-label="View profile of 0hq" rel="noopener noreferrer">Will Depue<span class="ml-1 text-xs text-muted-foreground">(OpenAI)</span></button></span></div></div></div><div class="flex flex-row gap-x-0"><a href="https://github.com/openai/openai-cookbook/blob/main/articles/what_is_new_with_dalle_3.mdx" target="_blank" rel="noopener noreferrer" class="text-sm rounded py-2 px-2 sm:px-3 hover:bg-muted transition-colors flex gap-2 items-center"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"><path d="M7.49933 0.25C3.49635 0.25 0.25 3.49593 0.25 7.50024C0.25 10.703 2.32715 13.4206 5.2081 14.3797C5.57084 14.446 5.70302 14.2222 5.70302 14.0299C5.70302 13.8576 5.69679 13.4019 5.69323 12.797C3.67661 13.235 3.25112 11.825 3.25112 11.825C2.92132 10.9874 2.44599 10.7644 2.44599 10.7644C1.78773 10.3149 2.49584 10.3238 2.49584 10.3238C3.22353 10.375 3.60629 11.0711 3.60629 11.0711C4.25298 12.1788 5.30335 11.8588 5.71638 11.6732C5.78225 11.205 5.96962 10.8854 6.17658 10.7043C4.56675 10.5209 2.87415 9.89918 2.87415 7.12104C2.87415 6.32925 3.15677 5.68257 3.62053 5.17563C3.54576 4.99226 3.29697 4.25521 3.69174 3.25691C3.69174 3.25691 4.30015 3.06196 5.68522 3.99973C6.26337 3.83906 6.8838 3.75895 7.50022 3.75583C8.1162 3.75895 8.73619 3.83906 9.31523 3.99973C10.6994 3.06196 11.3069 3.25691 11.3069 3.25691C11.7026 4.25521 11.4538 4.99226 11.3795 5.17563C11.8441 5.68257 12.1245 6.32925 12.1245 7.12104C12.1245 9.9063 10.4292 10.5192 8.81452 10.6985C9.07444 10.9224 9.30633 11.3648 9.30633 12.0413C9.30633 13.0102 9.29742 13.7922 9.29742 14.0299C9.29742 14.2239 9.42828 14.4496 9.79591 14.3788C12.6746 13.4179 14.75 10.7025 14.75 7.50024C14.75 3.49593 11.5036 0.25 7.49933 0.25Z" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd"></path></svg><span class="max-sm:hidden">Open in GitHub</span></a></div></div></div></div><div id="content" class="w-full"><div class="w-full px-6 lg:px-8"><div class="grid grid-cols-1 lg:grid-cols-[clamp(12rem,20vw,18rem)_minmax(0,1fr)] gap-14"><div class="mx-auto w-full max-w-[clamp(60ch,72vw,90ch)] px-4 sm:px-8"><div class="prose prose-sm sm:prose-base max-w-none dark:prose-invert"><p>DALL·E-3 is the latest version of our DALL-E text-to-image generation models. As the current state of the art in text-to-image generation, DALL·E is capable of generating high-quality images across a wide variety of domains. If you're interested in more technical details of how DALL·E-3 was built, you can read more about in our <a href="https://cdn.openai.com/papers/dall-e-3.pdf">research paper</a>. I'll be going over some of the new features and capabilities of DALL·E-3 in this article, as well as some examples of what new products you can build with the API.</p>
+<p>As a reminder, the Image generation API hasn't changed and maintains the same endpoints and formatting as with DALL·E-2. If you're looking for a guide on how to use the Image API, see <a href="https://cookbook.openai.com/examples/dalle/image_generations_edits_and_variations_with_dall-e">the Cookbook article</a> on the subject.</p>
+<p>The only API endpoint available for use with DALL·E-3 right now is <strong>Generations</strong> (/v1/images/generations). We don’t support variations or inpainting yet, though the Edits and Variations endpoints are available for use with DALL·E-2.</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="generations"><a class="heading-link" href="#generations">Generations</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>The generation API endpoint creates an image based on a text prompt. There’s a couple new parameters that we've added to enhance what you can create with our models. Here’s a quick overview of the options:</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="new-parameters"><a class="heading-link" href="#new-parameters">New parameters:</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<ul>
+<li><strong>model</strong> (‘dall-e-2’ or ‘dall-e-3’): This is the model you’re generating with. Be careful to set it to ‘dall-e-3’ as it defaults to ‘dall-e-2’ if empty.</li>
+<li><strong>style</strong> (‘natural’ or ‘vivid’): The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. Defaults to ‘vivid’.</li>
+<li><strong>quality</strong> (‘standard’ or ‘hd’): The quality of the image that will be generated. ‘hd’ creates images with finer details and greater consistency across the image. Defaults to ‘standard’.</li>
+</ul>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="other-parameters"><a class="heading-link" href="#other-parameters">Other parameters:</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<ul>
+<li><strong>prompt</strong> (str): A text description of the desired image(s). The maximum length is 1000 characters. Required field.</li>
+<li><strong>n</strong> (int): The number of images to generate. Must be between 1 and 10. Defaults to 1. For dall-e-3, only n=1 is supported.</li>
+<li><strong>size</strong> (...): The size of the generated images. Must be one of 256x256, 512x512, or 1024x1024 for DALL·E-2 models. Must be one of 1024x1024, 1792x1024, or 1024x1792 for DALL·E-3 models.</li>
+<li><strong>response_format</strong> ('url' or 'b64_json'): The format in which the generated images are returned. Must be one of "url" or "b64_json". Defaults to "url".</li>
+<li><strong>user</strong> (str): A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse. Learn more.</li>
+</ul>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="new-features"><a class="heading-link" href="#new-features">New Features</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>Our launch of DALL·E-3 comes with lots of new features and capabilities to help you generate the images you want. Here’s a quick overview of what’s new:</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="prompt-rewriting"><a class="heading-link" href="#prompt-rewriting">Prompt Rewriting</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>A new feature in the latest DALL·E-3 API is prompt rewriting, where we use GPT-4 to optimize all of your prompts before they’re passed to DALL-E. In our research, we’ve seen that using very detailed prompts give significantly better results. You can read more about our captioning, prompting, and safety mitigations in the <a href="https://cdn.openai.com/papers/dall-e-3.pdf">DALL·E-3 research paper</a>.</p>
+<p><em>Keep in mind that this feature isn’t able to be disabled at the moment, though you can achieve a high level of fidelity by simply giving instructions to the relabeler in your prompt, as I'll show below with examples.</em></p>
+<p><img src="/images/dalle_3/dalle_3_improved_prompts.png" alt="Prompt Rewriting"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="standard-vs-hd-quality"><a class="heading-link" href="#standard-vs-hd-quality">Standard vs HD Quality</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>DALL·E-3 introduces a new 'quality' parameter that allows you to adjust the level of detail and organization in all of your generations. The 'standard' quality generations are the DALL·E-3 you're familiar with, with 'hd' generations bringing a new level of attention to detail and adherence to your prompt. Keep in mind that setting your generation quality to ‘hd’ does increase the cost per image, as well as often increasing the time it takes to generate by ~10 seconds or so.</p>
+<p>For example, here we have two different icons in 'hd' and 'standard' quality. Often the choice between either quality is up to taste, but 'hd' often wins when the task requires more ability to capture details and textures or better composition of a scene.</p>
+<p><img src="/images/dalle_3/icons.jpg" alt="Icons"></p>
+<p>Here's another example, this time with a prompt of 'An infinite, uniform grid of tessellated cubes.', which DALL·E conveniently rewrites as <em>"An infinite, uniform grid of tessellated cubes painted carefully in an isometric perspective. The cubes are meticulously arranged in such a way that they seem to stretch endlessly into the distance. Each cube is identical to the next, with light reflecting consistently across all surfaces, underscoring their uniformity. This is a digitally rendered image."</em>:</p>
+<p><img src="/images/dalle_3/cubes.jpg" alt="Cubes"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="new-sizes"><a class="heading-link" href="#new-sizes">New Sizes</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>DALL·E-3 accepts three different image sizes: 1024px by 1024px, 1792px by 1024px, and 1024px by 1792px. Beyond giving more flexibility in terms of aspect ratio, these sizes can have significant effects on the style and context of your generated image. For example, vertical images might work better when you’re looking for an image that looks like it was taken by a cellphone camera, or horizontal images may work better for landscape paintings or digital designs.</p>
+<p>To demonstrate this difference, here’s multiple variations on the same input prompt with a different aspect ratio. In this case, my prompt was: “Professional photoshoot of a Chemex brewer in the process of brewing coffee.” (For reference, this is a photo of <a href="https://m.media-amazon.com/images/I/61lrld81vxL.jpg">a real Chemex brewer</a>).</p>
+<p>Here is the generation in square form (in both HD and standard qualities):</p>
+<p><img src="/images/dalle_3/square_coffee.jpg" alt="square_coffee"></p>
+<p>You can see how these images are framed closely to the item and seem to be taken in a more closed space with various surrounding items nearby.</p>
+<p>Here are the results on the same prompts with a wider aspect ratio:</p>
+<p><img src="/images/dalle_3/wide_coffee.jpg" alt="wide_coffee"></p>
+<p>Compared to the previous generations, these come in the form of close-ups. The background is blurred, with greater focus on the item itself, more like professionally organized photoshoots rather than quick snaps.</p>
+<p>Lastly, we have the vertical aspect ratio:</p>
+<p><img src="/images/dalle_3/tall_coffee.jpg" alt="tall_coffee"></p>
+<p>These feel more akin to cellphone images, with a more candid appearance. There’s more action involved: the slowly dripping coffee or the active pour from the pot.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="new-styles"><a class="heading-link" href="#new-styles">New Styles</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>DALL·E-3 introduces two new styles: natural and vivid. The natural style is more similar to the DALL·E-2 style in its 'blander' realism, while the vivid style is a new style that leans towards generating hyper-real and cinematic images. For reference, all DALL·E generations in ChatGPT are generated in the 'vivid' style.</p>
+<p>The natural style is specifically useful in cases where DALL·E-3 over-exaggerates or confuses a subject that's supposed to be more simple, subdued, or realistic. I've often used it for logo generation, stock photos, or other cases where I'm trying to match a real-world object.</p>
+<p>Here's an example of the same prompt as above in the vivid style. The vivid is far more cinematic (and looks great), but might pop too much if you're not looking for that.</p>
+<p><img src="/images/dalle_3/vivid_coffee.jpg" alt="vivid_coffee"></p>
+<p>There's many cases in which I prefer the natural style, such as this example of a painting in the style of Thomas Cole's 'Desolation':</p>
+<p><img src="/images/dalle_3/thomas_cole.jpg" alt="thomas_cole"></p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="examples-and-prompts"><a class="heading-link" href="#examples-and-prompts">Examples and Prompts</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>To help you get started building with DALL·E-3, I've come up with a few examples of products you could build with the API, as well as collected some styles and capabilities that seem to be unique to DALL·E-3 at the moment. I've also listed some subjects that I'm struggling to prompt DALL·E-3 to generate in case you want to try your hand at it.</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="icon-generation"><a class="heading-link" href="#icon-generation">Icon Generation</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>Have you ever struggled to find the perfect icon for your website or app? It would be awesome to see a custom icon generator app that lets you pick the style, size, and subject of your icon, and then generates a custom SVG from the DALL·E generation. Here's some examples of helpful website icons I generated with DALL·E-3:</p>
+<p><img src="/images/dalle_3/icon_set.jpg" alt="icon_set"></p>
+<p>In this case, I used Potrace to convert the images to SVGs, which you can download <a href="https://potrace.sourceforge.net/">here</a>. This is what I used to convert the images:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="bash" data-theme="default" style="display:grid"><span data-line=""><span style="color:#B392F0">potrace</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">-s</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">cat.jpg</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">-o</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">cat.svg</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<p>You might need to boost the brightness and contrast of the image before converting it to an SVG. I used the following command to do so:</p>
+<div data-rehype-pretty-code-fragment=""><div class="relative"><pre><code data-language="bash" data-theme="default" style="display:grid"><span data-line=""><span style="color:#B392F0">convert</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">cat.jpg</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">-brightness-contrast</span><span style="color:#E1E4E8"> </span><span style="color:#79B8FF">50</span><span style="color:#9ECBFF">x50</span><span style="color:#E1E4E8"> </span><span style="color:#9ECBFF">cat.jpg</span></span></code></pre><button class="rounded p-1.5 hover:bg-muted/10 transition-all absolute top-2 right-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 stroke-1 stroke-gray-200"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div></div>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="logo-generation"><a class="heading-link" href="#logo-generation">Logo Generation</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>DALL·E-3 is great at jumpstarting the logo creation process for your company or product. By prompting DALL·E to create 'Vector logo design of a Greek statue, minimalistic, with a white background' I achieved the following:</p>
+<p><img src="/images/dalle_3/logo_greece.jpg" alt="logo_greece"></p>
+<p>Here's another logo I created, this time for an Arabian coffee shop:</p>
+<p><img src="/images/dalle_3/logo_arabia.jpg" alt="logo_arabia"></p>
+<p>In the case of iterating on an existing logo, I took OpenAI's logo, asked GPT-4V to describe it, and then asked DALL·E to generate variations on the logo:</p>
+<p><img src="/images/dalle_3/iteration.jpg" alt="iteration"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="custom-tattoos"><a class="heading-link" href="#custom-tattoos">Custom Tattoos</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>DALL·E-3 is great at generating line art, which might be useful for generating custom tattoos. Here's some line art I generated with DALL·E-3:</p>
+<p><img src="/images/dalle_3/tattoos.jpg" alt="tattoos"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="die-cut-stickers--t-shirts"><a class="heading-link" href="#die-cut-stickers--t-shirts">Die-Cut Stickers &amp; T-Shirts</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>What if you could generate custom die-cut stickers and t-shirts with DALL·E-3, integrating with a print-on-demand service like Printful or Stickermule? You could have a custom sticker or t-shirt in minutes, with no design experience required. Here's some examples of stickers I generated with DALL·E-3:</p>
+<p><img src="/images/dalle_3/stickers.jpg" alt="stickers"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="minecraft-skins"><a class="heading-link" href="#minecraft-skins">Minecraft Skins</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>With some difficulty, I managed to prompt DALL·E-3 to generate Minecraft skins. I'm sure with some clever prompting you could get DALL·E-3 to reliably generate incredible Minecraft skins. It might be hard to use the words 'Minecraft' since DALL·E might think you are trying to generate content from the game itself, instead, you can communicate the idea differently: "Flat player skin texture of a ninja skin, compatible with Minecraftskins.com or Planet Minecraft."</p>
+<p>Here's what I managed to create. They might need some work, but I think they're a good start:</p>
+<p><img src="/images/dalle_3/minecraft.jpg" alt="minecraft"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="and-much-more"><a class="heading-link" href="#and-much-more">And much more...</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>Here's some ideas I've had that I haven't had time to try yet:</p>
+<ul>
+<li>Custom emojis or Twitch emotes?</li>
+<li>Vector illustrations?</li>
+<li>Personalized Bitmoji-style avatars?</li>
+<li>Album art?</li>
+<li>Custom greeting cards?</li>
+<li>Poster/flyer 'pair-programming' with DALL·E?</li>
+</ul>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="showcase"><a class="heading-link" href="#showcase">Showcase</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>We're really just starting to figure out what DALL·E-3 is capable of. Here's some of the best styles, generations, and prompts I've seen so far. I've been unable to locate the original authors of some of these images, so if you know who created them, please let me know!</p>
+<p><img src="/images/dalle_3/collage.jpg" alt="collage"></p>
+<p>Sources:</p>
+<p><a href="https://www.reddit.com/r/dalle2/comments/170ce1r/dalle_3_is_pretty_good_at_drawing/">@scharan79 on Reddit</a><br>
+<a href="https://www.reddit.com/r/dalle2/comments/1712x7a/60s_pulp_magazine_illustration_is_the_best_style/">@TalentedJuli on Reddit</a><br>
+<a href="https://www.reddit.com/r/dalle2/comments/17dwp0s/soviet_blade_runner/">@Wild-Culture-5068 on Reddit</a><br>
+<a href="https://www.reddit.com/r/dalle2/comments/170lx1z/%F0%9D%94%AA%F0%9D%94%A2%F0%9D%94%B1%F0%9D%94%9E%F0%9D%94%AA%F0%9D%94%AC%F0%9D%94%AF%F0%9D%94%AD%F0%9D%94%A5%F0%9D%94%AC%F0%9D%94%B0%F0%9D%94%A6%F0%9D%94%B0/">@popsicle_pope on Reddit</a><br>
+<a href="https://twitter.com/gopatrik/status/1717579802205626619">@gopatrik on Twitter</a><br>
+<a href="https://twitter.com/ARTiV3RSE/status/1720202013638599040">@ARTiV3RSE on Twitter</a><br>
+<a href="https://twitter.com/willdepue/status/1705677997150445941">@willdepue on Twitter</a><br>
+<!-- -->Various OpenAI employees</p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="challenges"><a class="heading-link" href="#challenges">Challenges</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>DALL·E-3 is still very new and there's still a lot of things it struggles with (or maybe I just haven't figured out how to prompt it correctly yet). Here's some challenges which you might want to try your hand at:</p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="web-design"><a class="heading-link" href="#web-design">Web Design</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>DALL·E really struggles at generating real looking websites, apps, etc. and often generates what looks like a portfolio page of a web designer. Here's the best I've gotten so far:</p>
+<p><img src="/images/dalle_3/websites.jpg" alt="websites"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="seamless-textures"><a class="heading-link" href="#seamless-textures">Seamless Textures</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>It feels like DALL·E-3 is so close to being able to generate seamless textures. Often they come out great, just slightly cutoff or with a few artifacts. See examples below:</p>
+<p><img src="/images/dalle_3/seamless.jpg" alt="seamless"></p>
+<h3 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="fonts"><a class="heading-link" href="#fonts">Fonts</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h3>
+<p>Using DALL·E to generate custom fonts or iterate on letter designs could be really cool, but I haven't been able to get it to work yet. Here's the best I've gotten so far:</p>
+<p><img src="/images/dalle_3/fonts.jpg" alt="fonts"></p>
+<h2 class="
+        group 
+        relative 
+        cursor-pointer
+        scroll-mt-24 
+      " id="more-resources"><a class="heading-link" href="#more-resources">More Resources</a><button class=" absolute  top-1/2  -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out text-[var(--oai-green)] hover:text-[var(--oai-green-hover)] p-1 pl-3 pointer-events-none group-hover:pointer-events-auto " aria-label="Copy link to clipboard"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button><div id="_rht_toaster" style="position:fixed;z-index:9999;top:16px;left:16px;right:16px;bottom:16px;pointer-events:none"></div></h2>
+<p>Thanks for reading! If you're looking for more resources on DALL·E-3, here are some related links:</p>
+<ul>
+<li><a href="https://openai.com/dall-e-3">DALL·E-3 Blog Post</a></li>
+<li><a href="https://cdn.openai.com/papers/dall-e-3.pdf">DALL·E-3 Research Paper</a></li>
+<li><a href="https://platform.openai.com/docs/api-reference/images">Image API Documentation</a></li>
+<li><a href="https://cookbook.openai.com/examples/dalle/image_generations_edits_and_variations_with_dall-e">Image API Cookbook</a></li>
+</ul></div></div></div></div></div></div></div></div><next-route-announcer style="position: absolute;"></next-route-announcer></article>
