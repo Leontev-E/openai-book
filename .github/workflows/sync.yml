@@ -17,69 +17,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Всегда синхронизируемся с удалённой веткой до генерации
-      - name: Sync base branch
-        run: |
-          git fetch origin ${{ github.ref_name }}
-          git checkout ${{ github.ref_name }}
-          git reset --hard origin/${{ github.ref_name }}
-
-      - name: Checkout upstream (openai-cookbook)
-        uses: actions/checkout@v4
-        with:
-          repository: openai/openai-cookbook
-          path: upstream
-          ref: main
-
-      - name: Print tree
-        run: |
-          ls -la
-          ls -la upstream/articles || true
-          ls -la upstream/images || true
-          ls -la upstream/static/images || true
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      # Старайся использовать ci; если вдруг не получится — fallback на i
       - name: Install dependencies
         run: npm ci || npm i
 
       - name: Clear translator cache
         run: rm -rf scripts/cache || true
 
-      # Зеркалим оригиналы в статик (чтобы Docusaurus их не компилировал)
-      - name: Mirror upstream originals (EN) as static files
-        run: |
-          rm -rf static/source-articles || true
-          mkdir -p static/source-articles
-          rsync -a upstream/articles/ static/source-articles/ || true
-
-      # Переводим порцией по 15 файлов за прогон
-      - name: Translate RU (daily batch)
+      # Переводим порцией (поменяй MAX_TRANSLATE при желании)
+      - name: Translate RU (batch)
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SKIP_TRANSLATE: "0"
-          MAX_TRANSLATE: "15"       # порция за один запуск; поменяй на 0 чтобы снять лимит
+          MAX_TRANSLATE: "15"
           CONCURRENCY: "3"
           MAX_FILE_KB: "0"
-          EXCLUDE_GLOBS: ""         # ничего не исключаем
+          EXCLUDE_GLOBS: ""
         run: npm run translate
 
-      - name: Fix placeholders (restore from upstream + escape)
-        run: node scripts/fix-placeholders.mjs
-
-
-      # Картинки из upstream складываем туда, куда указывает translate.mjs
-      - name: Sync upstream images into repo
-        run: |
-          mkdir -p static/cookbook-images
-          rsync -a upstream/images/ static/cookbook-images/ || true
-          rsync -a upstream/static/images/ static/cookbook-images/ || true
-
-      # Гарантируем существование главной страницы раздела /docs/cookbook/
+      # Гарантируем индекс /docs/cookbook/
       - name: Ensure docs/cookbook/index.md exists
         run: |
           mkdir -p docs/cookbook
@@ -92,23 +52,18 @@ slug: /cookbook/
 ---
 
 Добро пожаловать! Слева — переведённые статьи.  
-Оригиналы (EN): [/source-articles/](\/source-articles/)
+Оригиналы (EN) хранятся в репозитории в папке `content/en/articles`.
 EOF
           fi
-
-      - name: Discard lockfile changes (if any)
-        run: git restore --worktree --staged package-lock.json || true
 
       - name: Commit generated docs
         run: |
           set -e
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
-          # examples в любом случае не публикуем
-          rm -rf docs/cookbook/examples || true
           git add docs static
           if ! git diff --cached --quiet; then
-            git commit -m "chore(ci): sync originals + translate batch + images"
+            git commit -m "chore(ci): translate batch + images"
             git push origin HEAD:${{ github.ref_name }} --force-with-lease || echo "Skip push"
           else
             echo "No changes to commit."

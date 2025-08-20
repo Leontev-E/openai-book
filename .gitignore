@@ -22,3 +22,5 @@ upstream/
 
 # translator cache
 scripts/cache/
+
+.tmp-upstream/
